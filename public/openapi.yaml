@@ -1,0 +1,1158 @@
+openapi: 3.0.3
+info:
+  title: 问卷星 API
+  description: |
+    问卷星 API 允许开发者以编程方式访问和管理问卷、问题和回复数据。
+    您可以创建自定义问卷界面，集成数据到您的系统中，或构建自动化工作流。
+  version: 1.0.0
+  contact:
+    name: 问卷星开发者支持
+    url: https://wenjuanxing.com/developer/support
+    email: api@wenjuanxing.com
+servers:
+  - url: https://api.wenjuanxing.com/v1
+    description: 生产环境
+  - url: https://api-sandbox.wenjuanxing.com/v1
+    description: 沙箱环境
+security:
+  - ApiKeyAuth: []
+paths:
+  /surveys:
+    get:
+      summary: 获取问卷列表
+      description: 获取当前用户的问卷列表
+      operationId: listSurveys
+      parameters:
+        - name: page
+          in: query
+          description: 页码，默认为1
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量，默认为10，最大为100
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        - name: status
+          in: query
+          description: 筛选状态
+          schema:
+            type: string
+            enum: [all, draft, published]
+            default: all
+        - name: sort
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [created_at, updated_at]
+            default: updated_at
+        - name: order
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SurveySummary'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      summary: 创建问卷
+      description: 创建一个新的问卷
+      operationId: createSurvey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurveyCreate'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Survey'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /surveys/{id}:
+    get:
+      summary: 获取问卷详情
+      description: 获取单个问卷的详细信息，包括问题和选项
+      operationId: getSurvey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Survey'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      summary: 更新问卷
+      description: 更新问卷信息
+      operationId: updateSurvey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurveyUpdate'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Survey'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      summary: 删除问卷
+      description: 删除一个问卷
+      operationId: deleteSurvey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /surveys/{id}/publish:
+    post:
+      summary: 发布问卷
+      description: 将问卷状态设置为已发布
+      operationId: publishSurvey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 发布成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Survey'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /surveys/{id}/unpublish:
+    post:
+      summary: 取消发布问卷
+      description: 将问卷状态设置为草稿
+      operationId: unpublishSurvey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取消发布成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Survey'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /surveys/{id}/responses:
+    get:
+      summary: 获取问卷回复列表
+      description: 获取指定问卷的回复列表
+      operationId: listSurveyResponses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: 页码，默认为1
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量，默认为10，最大为100
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        - name: sort
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [created_at]
+            default: created_at
+        - name: order
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Response'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      summary: 提交问卷回复
+      description: 提交一个问卷的回复
+      operationId: createSurveyResponse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponseCreate'
+      responses:
+        '201':
+          description: 提交成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /surveys/{id}/stats:
+    get:
+      summary: 获取问卷统计数据
+      description: 获取指定问卷的统计数据
+      operationId: getSurveyStats
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 问卷ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SurveyStats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /responses/{id}:
+    get:
+      summary: 获取回复详情
+      description: 获取单个回复的详细信息
+      operationId: getResponse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 回复ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Response'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      summary: 删除回复
+      description: 删除一个回复
+      operationId: deleteResponse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 回复ID
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /webhooks:
+    get:
+      summary: 获取Webhook列表
+      description: 获取当前用户的Webhook列表
+      operationId: listWebhooks
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      summary: 创建Webhook
+      description: 创建一个新的Webhook
+      operationId: createWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookCreate'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Webhook'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /webhooks/{id}:
+    get:
+      summary: 获取Webhook详情
+      description: 获取单个Webhook的详细信息
+      operationId: getWebhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Webhook ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Webhook'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      summary: 更新Webhook
+      description: 更新Webhook信息
+      operationId: updateWebhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Webhook ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookUpdate'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Webhook'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      summary: 删除Webhook
+      description: 删除一个Webhook
+      operationId: deleteWebhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Webhook ID
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API密钥认证，格式为 "Bearer YOUR_API_KEY"
+  schemas:
+    SurveySummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "survey-123456"
+        title:
+          type: string
+          example: "客户满意度调查"
+        description:
+          type: string
+          example: "了解客户对我们产品和服务的满意度"
+        questions_count:
+          type: integer
+          example: 8
+        responses_count:
+          type: integer
+          example: 124
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-04-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-04-20T15:45:00Z"
+        published:
+          type: boolean
+          example: true
+    Survey:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "survey-123456"
+        title:
+          type: string
+          example: "客户满意度调查"
+        description:
+          type: string
+          example: "了解客户对我们产品和服务的满意度"
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+        settings:
+          $ref: '#/components/schemas/SurveySettings'
+        theme:
+          $ref: '#/components/schemas/SurveyTheme'
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-04-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-04-20T15:45:00Z"
+        published:
+          type: boolean
+          example: true
+    SurveyCreate:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "客户满意度调查"
+        description:
+          type: string
+          example: "了解客户对我们产品和服务的满意度"
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionCreate'
+        settings:
+          $ref: '#/components/schemas/SurveySettings'
+        theme:
+          $ref: '#/components/schemas/SurveyTheme'
+        published:
+          type: boolean
+          default: false
+    SurveyUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "客户满意度调查"
+        description:
+          type: string
+          example: "了解客户对我们产品和服务的满意度"
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionCreate'
+        settings:
+          $ref: '#/components/schemas/SurveySettings'
+        theme:
+          $ref: '#/components/schemas/SurveyTheme'
+        published:
+          type: boolean
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "q1"
+        type:
+          type: string
+          enum: [text, radio, checkbox, dropdown, rating, date, file, section]
+          example: "radio"
+        title:
+          type: string
+          example: "您对我们的产品总体满意度如何？"
+        description:
+          type: string
+          example: "请根据您的使用体验进行评价"
+        required:
+          type: boolean
+          example: true
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionOption'
+        multiline:
+          type: boolean
+          example: false
+        placeholder:
+          type: string
+          example: "请输入..."
+        maxRating:
+          type: integer
+          example: 5
+        ratingType:
+          type: string
+          enum: [number, star, heart]
+          example: "star"
+        minDate:
+          type: string
+          format: date
+          example: "2023-01-01"
+        maxDate:
+          type: string
+          format: date
+          example: "2023-12-31"
+        maxFiles:
+          type: integer
+          example: 1
+        maxSize:
+          type: integer
+          example: 5
+        fileTypes:
+          type: string
+          example: ".pdf,.jpg,.png"
+        validationType:
+          type: string
+          enum: [none, email, phone, url, number, regex]
+          example: "email"
+        validationRegex:
+          type: string
+          example: "^[a-zA-Z0-9]+$"
+        validationMessage:
+          type: string
+          example: "请输入有效的电子邮箱地址"
+    QuestionCreate:
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          type: string
+          enum: [text, radio, checkbox, dropdown, rating, date, file, section]
+          example: "radio"
+        title:
+          type: string
+          example: "您对我们的产品总体满意度如何？"
+        description:
+          type: string
+          example: "请根据您的使用体验进行评价"
+        required:
+          type: boolean
+          default: false
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionOptionCreate'
+        multiline:
+          type: boolean
+          default: false
+        placeholder:
+          type: string
+          example: "请输入..."
+        maxRating:
+          type: integer
+          default: 5
+        ratingType:
+          type: string
+          enum: [number, star, heart]
+          default: "number"
+        minDate:
+          type: string
+          format: date
+          example: "2023-01-01"
+        maxDate:
+          type: string
+          format: date
+          example: "2023-12-31"
+        maxFiles:
+          type: integer
+          default: 1
+        maxSize:
+          type: integer
+          default: 5
+        fileTypes:
+          type: string
+          example: ".pdf,.jpg,.png"
+        validationType:
+          type: string
+          enum: [none, email, phone, url, number, regex]
+          default: "none"
+        validationRegex:
+          type: string
+          example: "^[a-zA-Z0-9]+$"
+        validationMessage:
+          type: string
+          example: "请输入有效的电子邮箱地址"
+    QuestionOption:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "非常满意"
+        value:
+          type: string
+          example: "5"
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/images/very-satisfied.png"
+    QuestionOptionCreate:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          example: "非常满意"
+        value:
+          type: string
+          example: "5"
+        image:
+          type: string
+          format: uri
+          example: "https://example.com/images/very-satisfied.png"
+    SurveySettings:
+      type: object
+      properties:
+        showProgressBar:
+          type: boolean
+          default: true
+        showQuestionNumbers:
+          type: boolean
+          default: true
+        randomizeQuestions:
+          type: boolean
+          default: false
+        collectEmail:
+          type: boolean
+          default: false
+        oneResponsePerUser:
+          type: boolean
+          default: false
+        welcomeScreen:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            title:
+              type: string
+              example: "欢迎参与我们的调查"
+            description:
+              type: string
+              example: "感谢您抽出时间参与本次调查，您的反馈对我们非常重要。"
+        thankYouScreen:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            title:
+              type: string
+              example: "感谢您的参与！"
+            description:
+              type: string
+              example: "您的反馈已成功提交，感谢您的宝贵意见。"
+            redirectUrl:
+              type: string
+              format: uri
+              example: "https://example.com/thank-you"
+            redirectDelay:
+              type: integer
+              example: 5
+    SurveyTheme:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+          example: "#3b82f6"
+        backgroundColor:
+          type: string
+          example: "#ffffff"
+        fontFamily:
+          type: string
+          example: "Inter, sans-serif"
+        borderRadius:
+          type: string
+          example: "0.5rem"
+        questionSpacing:
+          type: string
+          example: "1.5rem"
+        preset:
+          type: string
+          enum: [default, modern, minimal, colorful]
+          default: "default"
+    Response:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "response-123456"
+        survey_id:
+          type: string
+          example: "survey-123456"
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-04-16T09:23:00Z"
+        user_agent:
+          type: string
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        ip_address:
+          type: string
+          example: "192.168.1.1"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+    ResponseCreate:
+      type: object
+      required:
+        - answers
+      properties:
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerCreate'
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+    Answer:
+      type: object
+      properties:
+        question_id:
+          type: string
+          example: "q1"
+        value:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+            - type: number
+            - type: "null"
+          example: "5"
+    AnswerCreate:
+      type: object
+      required:
+        - question_id
+        - value
+      properties:
+        question_id:
+          type: string
+          example: "q1"
+        value:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+            - type: number
+            - type: "null"
+          example: "5"
+    SurveyStats:
+      type: object
+      properties:
+        total_responses:
+          type: integer
+          example: 124
+        completion_rate:
+          type: number
+          format: float
+          example: 98.5
+        average_time:
+          type: string
+          example: "3:42"
+        question_stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionStats'
+    QuestionStats:
+      type: object
+      properties:
+        question_id:
+          type: string
+          example: "q1"
+        question_title:
+          type: string
+          example: "您对我们的产品总体满意度如何？"
+        question_type:
+          type: string
+          example: "radio"
+        total_answers:
+          type: integer
+          example: 124
+        stats:
+          oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/OptionStats'
+            - type: array
+              items:
+                type: string
+              example: ["很好用", "界面简洁", "功能丰富"]
+            - type: object
+              properties:
+                min:
+                  type: number
+                  example: 1
+                max:
+                  type: number
+                  example: 5
+                average:
+                  type: number
+                  format: float
+                  example: 4.2
+    OptionStats:
+      type: object
+      properties:
+        option:
+          type: string
+          example: "非常满意"
+        count:
+          type: integer
+          example: 45
+        percentage:
+          type: number
+          format: float
+          example: 36.3
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "webhook-123456"
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/webhook"
+        events:
+          type: array
+          items:
+            type: string
+            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ["response.created"]
+        active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-04-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-04-20T15:45:00Z"
+    WebhookCreate:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/webhook"
+        events:
+          type: array
+          items:
+            type: string
+            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ["response.created"]
+        active:
+          type: boolean
+          default: true
+    WebhookUpdate:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://example.com/webhook"
+        events:
+          type: array
+          items:
+            type: string
+            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ["response.created", "response.deleted"]
+        active:
+          type: boolean
+    PaginationMeta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        total_pages:
+          type: integer
+          example: 3
+        total_count:
+          type: integer
+          example: 25
+        limit:
+          type: integer
+          example: 10
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "validation_error"
+            message:
+              type: string
+              example: "请求参数验证失败"
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 未授权
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "unauthorized"
+                  message:
+                    type: string
+                    example: "无效的API密钥或未提供API密钥"
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "not_found"
+                  message:
+                    type: string
+                    example: "请求的资源不存在"
+    ServerError:
+      description: 服务器错误
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: "server_error"
+                  message:
+                    type: string
+                    example: "服务器内部错误"

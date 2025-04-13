@@ -1,0 +1,27 @@
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "问卷星 - 专业的在线问卷调查平台",
+  description: "创建专业问卷，收集有价值的数据，简单易用的问卷设计工具",
+    generator: 'v0.dev'
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="zh-CN" className="scroll-smooth">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
+
+
+import './globals.css'

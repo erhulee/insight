@@ -1,0 +1,256 @@
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
+
+export default function Home() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <header className="border-b">
+        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
+            <FileText className="h-6 w-6" />
+            <span>问卷星</span>
+          </Link>
+          <nav className="ml-auto flex gap-4 sm:gap-6">
+            <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
+              我的问卷
+            </Link>
+            <Link href="/templates" className="text-sm font-medium hover:underline underline-offset-4">
+              模板中心
+            </Link>
+            <Link href="/pricing" className="text-sm font-medium hover:underline underline-offset-4">
+              价格方案
+            </Link>
+            <Link href="/developer" className="text-sm font-medium hover:underline underline-offset-4">
+              开发者中心
+            </Link>
+          </nav>
+          <div className="ml-4 flex items-center gap-4">
+            <Link href="/login">
+              <Button variant="outline" size="sm">
+                登录
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm">注册</Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+      <main className="flex-1">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-gray-100">
+          <div className="container px-4 mx-auto md:px-6">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+              <div className="space-y-4">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                  创建专业问卷，收集有价值的数据
+                </h1>
+                <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  简单易用的问卷设计工具，强大的数据分析功能，帮助您获取洞察，做出更好的决策。
+                </p>
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Link href="/dashboard/create">
+                    <Button size="lg" className="gap-1">
+                      <PlusCircle className="h-4 w-4" />
+                      创建问卷
+                    </Button>
+                  </Link>
+                  <Link href="/templates">
+                    <Button size="lg" variant="outline">
+                      浏览模板
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              <div className="mx-auto lg:mr-0 lg:ml-auto">
+                <div className="rounded-lg border bg-background p-8 shadow-sm">
+                  <div className="space-y-2.5">
+                    <div className="h-2 w-20 rounded-lg bg-primary/20" />
+                    <div className="h-2 w-full rounded-lg bg-muted" />
+                    <div className="h-2 w-full rounded-lg bg-muted" />
+                    <div className="h-2 w-3/4 rounded-lg bg-muted" />
+                  </div>
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-4 w-4 rounded-full bg-primary/20" />
+                      <div className="h-2 w-full rounded-lg bg-muted" />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="h-4 w-4 rounded-full bg-muted" />
+                      <div className="h-2 w-full rounded-lg bg-muted" />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="h-4 w-4 rounded-full bg-muted" />
+                      <div className="h-2 w-full rounded-lg bg-muted" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-10 md:py-24 lg:py-32">
+          <div className="container  mx-auto px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="relative">
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">一站式问卷解决方案</h2>
+                  <div className="inline-block rounded-lg bg-green-100 text-green-900 px-3 py-1 text-sm absolute -top-2 right-0 translate-x-1/2 ">核心功能</div>
+                </div>
+                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  我们提供从问卷设计、发布、数据收集到分析的全流程支持
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className=" flex gap-2 items-center">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-xl font-bold">可视化编辑</h3>
+                </div>
+                <p className="mt-2 text-gray-500">拖拽式编辑器，支持多种题型，轻松创建专业问卷</p>
+              </div>
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className=" flex gap-2 items-center">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <User className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-xl font-bold">问卷管理</h3>
+                </div>
+                <p className="mt-2 text-gray-500">集中管理所有问卷，控制发布状态，设置访问权限</p>
+              </div>
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className=" flex gap-2 items-center">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <BarChart3 className="h-4 w-4" />
+                  </div>
+                  <h3 className="text-xl font-bold">数据分析</h3>
+                </div>
+                <p className="mt-2 text-gray-500">实时数据统计，多维度分析，图表可视化展示结果</p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">开发者工具</div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">强大的API和开发者工具</h2>
+                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  将问卷功能集成到您的应用程序中，或构建自定义解决方案
+                </p>
+              </div>
+            </div>
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Code className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-xl font-bold">RESTful API</h3>
+                <p className="mt-2 text-gray-500">全面的API，支持问卷创建、管理和数据收集</p>
+              </div>
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Puzzle className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-xl font-bold">自渲染工具</h3>
+                <p className="mt-2 text-gray-500">使用OpenAPI规范自动生成问卷界面</p>
+              </div>
+              <div className="rounded-lg border bg-background p-6 shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 text-xl font-bold">Webhooks</h3>
+                <p className="mt-2 text-gray-500">实时事件通知，支持自动化工作流</p>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <Button asChild size="lg">
+                <Link href="/developer">探索开发者中心</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="border-t bg-gray-50">
+        <div className="container mx-auto flex flex-col gap-4 py-10 md:flex-row md:gap-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 font-bold text-lg text-primary">
+              <FileText className="h-5 w-5" />
+              <span>问卷星</span>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">专业的在线问卷调查平台</p>
+          </div>
+          <div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-3">
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">产品</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    功能介绍
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    模板中心
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    价格方案
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">支持</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    帮助中心
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    使用教程
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    联系我们
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">关于</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    公司介绍
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    隐私政策
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="text-gray-500 hover:text-gray-900">
+                    服务条款
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="container py-4 text-center text-sm text-gray-500 px-4 sm:px-6 lg:px-8">
+          &copy; {new Date().getFullYear()} 问卷星. 保留所有权利.
+        </div>
+      </footer>
+    </div>
+  )
+}
