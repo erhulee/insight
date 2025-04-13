@@ -1,0 +1,142 @@
+"use client"
+
+import type React from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { FileText, Lock, User, ArrowRight } from "lucide-react"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { create } from "../login/service"
+const formSchema = z.object({
+  username: z.string().min(2).max(50),
+  account: z.string().min(8).max(12),
+  password: z.string().min(6).max(20),
+  confirmPassword: z.string().min(6).max(20),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+})
+export default function RegisterPage() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  })
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const { account, password, username } = values
+    const user = await create(account, password, username)
+  }
+
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b">
+        <div className="container flex h-16 items-center px-4">
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
+            <FileText className="h-6 w-6" />
+            <span>EchoInsight</span>
+          </Link>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold">创建账号</CardTitle>
+              <CardDescription>输入你的信息来创建一个账户。</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>用户名称</FormLabel>
+                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input placeholder="shadcn" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="account"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>账号</FormLabel>
+                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input placeholder="shadcn" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>密码</FormLabel>
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input placeholder="••••••••"{...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>确认密码</FormLabel>
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <FormControl>
+                            <Input placeholder="••••••••"{...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" >
+                      {false ? (
+                        <span className="flex items-center gap-1">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          创建账号...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          创建账号
+                          <ArrowRight className="h-4 w-4" />
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <div className="text-center text-sm">
+                已有账号?{" "}
+                <Link href="/login" className="text-primary hover:underline">
+                  立即登陆
+                </Link>
+              </div>
+            </CardFooter>
+          </Card>
+        </div>
+      </main>
+    </div>
+  )
+}

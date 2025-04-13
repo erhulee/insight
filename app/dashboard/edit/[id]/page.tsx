@@ -1,6 +1,6 @@
 "use client"
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, use } from "react"
 import { useRouter } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import type { Question, Survey } from "@/lib/types"
@@ -33,7 +33,7 @@ import { QuestionItem } from "@/components/survey-editor/question-item"
 import { QuestionConfig } from "@/components/survey-editor/question-config"
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { DevicePreview } from "@/components/survey-editor/device-preview"
-import { scrollToElement, saveToLocalStorage, getFromLocalStorage } from "@/lib/utils"
+import { scrollToElement, saveToLocalStorage } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
 
 // 问题类型定义
@@ -48,7 +48,12 @@ const questionTypes = [
   { id: "section", name: "分节标题", icon: <Layout className="h-4 w-4" /> },
 ]
 
-export default function EditSurveyPage({ params }: { params: { id: string } }) {
+export default function EditSurveyPage(props: {
+  params: Promise<{
+    id: string
+  }>
+}) {
+  const params = use(props.params);
   const router = useRouter()
   const [survey, setSurvey] = useState<Survey>({
     id: params.id,
@@ -69,28 +74,6 @@ export default function EditSurveyPage({ params }: { params: { id: string } }) {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // 加载问卷数据
-  // useEffect(() => {
-  //   // 模拟从API加载数据
-  //   // 在实际应用中，这里应该从API获取问卷数据
-  //   const loadedSurvey = getFromLocalStorage<Survey>(`survey_${params.id}`, {
-  //     id: params.id,
-  //     title: "新问卷",
-  //     description: "",
-  //     questions: [],
-  //     createdAt: new Date().toISOString(),
-  //     updatedAt: new Date().toISOString(),
-  //     published: false,
-  //   })
-
-  //   // setSurvey(loadedSurvey)
-  //   setQuestions(loadedSurvey.questions || [])
-
-  //   // 如果有问题，选中第一个问题
-  //   if (loadedSurvey.questions && loadedSurvey.questions.length > 0) {
-  //     setSelectedQuestionId(loadedSurvey.questions[0].id)
-  //   }
-  // }, [params.id])
 
   // 监听问题变化，更新未保存状态
   useEffect(() => {
@@ -401,7 +384,7 @@ export default function EditSurveyPage({ params }: { params: { id: string } }) {
       <div className="min-h-screen bg-background flex flex-col">
         {/* 顶部导航栏 */}
         <header className="border-b sticky top-0 z-10 bg-background">
-          <div className="container flex h-16 items-center justify-between px-4">
+          <div className=" flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" onClick={handleBackToDashboard}>
                 <ArrowLeft className="h-5 w-5" />
