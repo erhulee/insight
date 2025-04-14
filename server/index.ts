@@ -6,18 +6,63 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 export const appRouter = router({
-    GetSurveyList: procedure.query(async (...args) => {
+    GetUserInfo: procedure.query(async (...args) => {
         const cookieStore = await cookies()
         const token = cookieStore.get("session")?.value
         const payload: any = await decrypt(token)
         const userId: string = payload['userId']
-        console.log("userIf:", userId)
-        const surveyList = await prisma.survey.findMany({
+        return await prisma.user.findUnique({
             where: {
-                ownerId: userId
+                id: userId
             }
         })
-        return surveyList
+    }),
+    GetSurvey: procedure.input(z.object({
+        id: z.string(),
+    })).query(async (opt) => {
+        try {
+            const cookieStore = await cookies()
+            const token = cookieStore.get("session")?.value
+            const payload: any = await decrypt(token)
+            const userId: string = payload['userId']
+            const survey = await prisma.survey.findUnique({
+                where: {
+                    ownerId: userId,
+                    id: opt.input.id
+                }
+            })
+            if (survey) {
+                return {
+                    ...survey,
+                    questions: JSON.parse(survey.questions ?? "[]")
+                }
+            } else {
+                return null
+            }
+        } catch (e) {
+            console.log(e)
+            return null
+        }
+    }),
+    GetSurveyList: procedure.query(async () => {
+        try {
+            const cookieStore = await cookies()
+            const token = cookieStore.get("session")?.value
+            const payload: any = await decrypt(token)
+            const userId: string = payload['userId']
+            const surveyList = await prisma.survey.findMany({
+                where: {
+                    ownerId: userId
+                }
+            })
+            return surveyList.map(item => ({
+                ...item,
+                questions: JSON.parse(item.questions ?? "[]")
+            }))
+        } catch (e) {
+            console.log(e)
+            return []
+        }
     }),
     CreateSurvey: procedure.input(z.object({
         name: z.string().optional(),

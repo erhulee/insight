@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, Search, FileText } from "lucide-react"
+import { PlusCircle, Search, FileText, AudioLines } from "lucide-react"
 import { SurveyOverview } from "@/components/dashboard/survey-overview"
 import { trpc } from "@/app/_trpc/client";
 
@@ -52,8 +52,8 @@ export default function DashboardPage() {
       <header className="border-b">
         <div className="flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <FileText className="h-6 w-6" />
-            <span>问卷星</span>
+            <AudioLines></AudioLines>
+            <span>Insight</span>
           </Link>
 
           <nav className="flex items-center gap-4">

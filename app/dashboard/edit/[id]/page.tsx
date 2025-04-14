@@ -16,13 +16,6 @@ import {
   Plus,
   ArrowLeft,
   Share2,
-  FileTextIcon,
-  ListChecksIcon,
-  AlignLeft,
-  CalendarIcon,
-  Upload,
-  BarChart4,
-  Layout,
   Settings,
   Palette,
   Smartphone,
@@ -35,18 +28,17 @@ import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { DevicePreview } from "@/components/survey-editor/device-preview"
 import { scrollToElement, saveToLocalStorage } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
+import { preset } from "@/components/survey-editor/buildin/form-item"
+import { publish } from "./service"
+import { RenameInput } from "./components/rename-input"
+import { trpc } from "@/app/_trpc/client"
 
 // 问题类型定义
-const questionTypes = [
-  { id: "text", name: "文本题", icon: <AlignLeft className="h-4 w-4" /> },
-  { id: "radio", name: "单选题", icon: <FileTextIcon className="h-4 w-4" /> },
-  { id: "checkbox", name: "多选题", icon: <ListChecksIcon className="h-4 w-4" /> },
-  { id: "dropdown", name: "下拉选择", icon: <BarChart4 className="h-4 w-4" /> },
-  { id: "rating", name: "评分题", icon: <BarChart4 className="h-4 w-4" /> },
-  { id: "date", name: "日期", icon: <CalendarIcon className="h-4 w-4" /> },
-  { id: "file", name: "文件上传", icon: <Upload className="h-4 w-4" /> },
-  { id: "section", name: "分节标题", icon: <Layout className="h-4 w-4" /> },
-]
+const questionTypes = preset.map((item) => ({
+  id: item.key,
+  name: item.name,
+  icon: <item.icon className="h-4 w-4"></item.icon>
+}))
 
 export default function EditSurveyPage(props: {
   params: Promise<{
@@ -55,14 +47,10 @@ export default function EditSurveyPage(props: {
 }) {
   const params = use(props.params);
   const router = useRouter()
-  const [survey, setSurvey] = useState<Survey>({
-    id: params.id,
-    title: "新问卷",
-    description: "",
-    questions: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    published: false,
+  const { data: survey } = trpc.GetSurvey.useQuery({
+    id: params.id
+  }, {
+    initialData: {}
   })
 
   const [questions, setQuestions] = useState<Question[]>([])
@@ -75,10 +63,6 @@ export default function EditSurveyPage(props: {
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
 
 
-  // 监听问题变化，更新未保存状态
-  useEffect(() => {
-    setHasUnsavedChanges(true)
-  }, [questions, survey.title, survey.description])
 
   // 添加问题
   const handleAddQuestion = (type: string) => {
@@ -122,6 +106,8 @@ export default function EditSurveyPage(props: {
   // 更新问题
   const handleUpdateQuestion = (updatedQuestion: Question) => {
     const updatedQuestions = questions.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
+    console.log("handleUpdateQuestion", updatedQuestion, updatedQuestions)
+
     setQuestions(updatedQuestions)
   }
 
@@ -233,36 +219,18 @@ export default function EditSurveyPage(props: {
 
   // 发布问卷
   const handlePublishSurvey = async () => {
-    setIsSaving(true)
-
-    try {
-      // 更新问卷数据
-      const updatedSurvey = {
-        ...survey,
-        questions,
-        published: true,
-        updatedAt: new Date().toISOString(),
-      }
-
-      // 模拟API保存
-      saveToLocalStorage(`survey_${params.id}`, updatedSurvey)
-
-      setSurvey(updatedSurvey)
-      setHasUnsavedChanges(false)
-
+    const ok = await publish(params.id)
+    if (ok) {
       toast({
         title: "发布成功",
         description: "问卷已成功发布，现在可以分享给他人填写",
       })
-    } catch (error) {
-      console.error("发布问卷失败:", error)
+    } else {
       toast({
         title: "发布失败",
         description: "发布问卷时出现错误，请重试",
         variant: "destructive",
       })
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -378,6 +346,7 @@ export default function EditSurveyPage(props: {
       </div>
     )
   }
+  console.log("questions:", questions)
 
   return (
     <DragDropProvider>
@@ -389,12 +358,7 @@ export default function EditSurveyPage(props: {
               <Button variant="ghost" size="icon" onClick={handleBackToDashboard}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <Input
-                value={survey.title}
-                onChange={handleTitleChange}
-                className="max-w-[300px] font-medium"
-                placeholder="问卷标题"
-              />
+              <RenameInput id={survey.id} title={survey.title}></RenameInput>
               {saveSuccess && (
                 <div className="flex items-center text-green-600 text-sm">
                   <CheckCircle className="h-4 w-4 mr-1" />

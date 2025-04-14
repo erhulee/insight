@@ -1,15 +1,22 @@
+
+"use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
+import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap, AudioLines } from "lucide-react"
 import { FeatureCard } from "@/components/feature-card"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { trpc } from "./_trpc/client";
 
 export default function Home() {
+  // 登录态获取
+  const userInfo = trpc.GetUserInfo.useQuery()
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
         <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <span>EchoInsight</span>
+            <AudioLines></AudioLines>
+            <span>Insight</span>
           </Link>
           <nav className="ml-auto flex gap-4 sm:gap-6">
             <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
@@ -25,7 +32,14 @@ export default function Home() {
               开发者中心
             </Link>
           </nav>
-          <div className="ml-4 flex items-center gap-4">
+          {userInfo.data ? (
+            <div className="ml-4 flex items-center gap-4">
+              <Avatar>
+                <AvatarFallback>{userInfo.data?.username}</AvatarFallback>
+              </Avatar>
+            </div>
+
+          ) : <div className="ml-4 flex items-center gap-4">
             <Link href="/login">
               <Button variant="outline" size="sm">
                 登录
@@ -34,7 +48,7 @@ export default function Home() {
             <Link href="/register">
               <Button size="sm">注册</Button>
             </Link>
-          </div>
+          </div>}
         </div>
       </header>
       <main className="flex-1">

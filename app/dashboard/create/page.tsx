@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, PlusCircle, LayoutTemplateIcon as Template, ArrowLeft, Loader2 } from "lucide-react"
+import { FileText, PlusCircle, LayoutTemplateIcon as Template, ArrowLeft, Loader2, AudioLines } from "lucide-react"
 import { saveToLocalStorage } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
 import { RedirectHandler } from "@/components/redirect-handler"
@@ -47,7 +47,6 @@ const FEATURED_TEMPLATES = [
 ]
 
 export default function CreateSurveyPage() {
-  const router = useRouter()
   const [title, setTitle] = useState("新问卷")
   const [description, setDescription] = useState("")
   const [isCreating, setIsCreating] = useState(false)
@@ -156,11 +155,11 @@ export default function CreateSurveyPage() {
 
       {/* 顶部导航栏 */}
       <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2 font-bold text-xl text-primary">
-              <FileText className="h-6 w-6" />
-              <span>问卷星</span>
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
+              <AudioLines></AudioLines>
+              <span>Insight</span>
             </Link>
             <h1 className="text-lg font-medium">创建问卷</h1>
           </div>
@@ -174,7 +173,7 @@ export default function CreateSurveyPage() {
       </header>
 
       {/* 主要内容区域 */}
-      <main className="container px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="max-w-4xl mx-auto">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="blank" className="gap-2">

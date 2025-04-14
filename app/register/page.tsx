@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Lock, User, ArrowRight } from "lucide-react"
+import { FileText, Lock, User, ArrowRight, AudioLines } from "lucide-react"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -35,8 +35,8 @@ export default function RegisterPage() {
       <header className="border-b">
         <div className="container flex h-16 items-center px-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <FileText className="h-6 w-6" />
-            <span>EchoInsight</span>
+            <AudioLines></AudioLines>
+            <span>Insight</span>
           </Link>
         </div>
       </header>

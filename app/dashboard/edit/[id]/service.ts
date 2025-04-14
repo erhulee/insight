@@ -1,0 +1,36 @@
+'use server'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient();
+export async function publish(id: string,) {
+    try {
+        const survey = await prisma.survey.update({
+            where: {
+                id,
+            },
+            data: {
+                published: true
+            }
+        })
+        return survey.published
+    } catch (e) {
+        console.log("error:", e)
+        return false
+    }
+}
+
+export async function rename(id: string, name: string) {
+    try {
+        await prisma.survey.update({
+            where: {
+                id,
+            },
+            data: {
+                name
+            }
+        })
+        return true
+    } catch (e) {
+        console.log("error:", e)
+        return false
+    }
+}
