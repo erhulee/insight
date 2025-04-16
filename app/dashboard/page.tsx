@@ -5,32 +5,45 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, Search, FileText, AudioLines } from "lucide-react"
+import { PlusCircle, Search, FileText } from "lucide-react"
 import { SurveyOverview } from "@/components/dashboard/survey-overview"
 import { trpc } from "@/app/_trpc/client";
+import { InsightBrand } from "@/components/common/insight-brand"
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
-  const { data: surveys, isLoading, error } = trpc.GetSurveyList.useQuery(undefined, {
+  const { data: surveys, isLoading, error, refetch } = trpc.GetSurveyList.useQuery(undefined, {
     initialData: []
   })
   console.log("surveys:", surveys)
   // 创建新问卷
   const mutation = trpc.CreateSurvey.useMutation({
     onSuccess: (data) => {
+      refetch()
       console.log("CreateSurvey success:", data)
-      // 重定向到编辑页面
       // window.location.href = `/dashboard/edit/${data.id}`
     },
     onError: (error) => {
       console.error("CreateSurvey error:", error)
     },
   })
-  const handleCreateSurvey = () => {
+  const deleteMutation = trpc.DeleteSurvey.useMutation({
+    onSuccess: (data) => {
+      refetch()
+      console.log("DeleteSurvey success:", data)
+    },
+    onError: (error) => {
+      console.error("DeleteSurvey error:", error)
+    },
+  })
+  const handleCreateSurvey = async () => {
     mutation.mutate({})
     // 重定向到编辑页面
     // window.location.href = `/dashboard/edit/${newSurveyId}`
+  }
+  const handleDeleteSurvey = async (id: string) => {
+    deleteMutation.mutate({ id })
   }
 
   // 过滤问卷
@@ -51,11 +64,7 @@ export default function DashboardPage() {
       {/* 顶部导航栏 */}
       <header className="border-b">
         <div className="flex h-16 items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <AudioLines></AudioLines>
-            <span>Insight</span>
-          </Link>
-
+          <InsightBrand></InsightBrand>
           <nav className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm font-medium">
               我的问卷
@@ -126,7 +135,7 @@ export default function DashboardPage() {
             ) : filteredSurveys.length > 0 ? (
               // 问卷列表
               filteredSurveys.map((survey) => (
-                <SurveyOverview key={survey.id} survey={survey}></SurveyOverview>
+                <SurveyOverview key={survey.id} survey={survey} handleDelete={handleDeleteSurvey}></SurveyOverview>
               ))
             ) : (
               // 空状态

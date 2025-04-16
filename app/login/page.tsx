@@ -4,15 +4,15 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { FileText, Mail, Lock, ArrowRight, AudioLines } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { Mail, Lock, ArrowRight, AudioLines } from "lucide-react"
+import { toast } from "sonner"
 import { create } from "./service"
+import { InsightBrand } from "@/components/common/insight-brand"
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -74,10 +74,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
         <div className="container flex h-16 items-center px-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <AudioLines></AudioLines>
-            <span>Insight</span>
-          </Link>
+          <InsightBrand></InsightBrand>
         </div>
       </header>
 

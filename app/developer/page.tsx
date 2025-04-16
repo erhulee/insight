@@ -1,20 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { FileText, Key, Code, BookOpen, Terminal, Puzzle, Zap, ChevronRight, ExternalLink, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 export default function DeveloperPage() {
-  const router = useRouter()
-
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast({
-      title: "已复制",
+    toast("已复制", {
       description: "代码已复制到剪贴板",
     })
   }

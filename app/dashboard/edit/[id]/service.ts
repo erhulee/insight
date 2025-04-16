@@ -18,6 +18,25 @@ export async function publish(id: string,) {
     }
 }
 
+export async function unpublish(id: string,) {
+    console.log("unpublish", id)
+    try {
+        const survey = await prisma.survey.update({
+            where: {
+                id,
+            },
+            data: {
+                published: false
+            }
+        })
+        return survey.published == false
+    } catch (e) {
+        console.log("error:", e)
+        return false
+    }
+}
+
+
 export async function rename(id: string, name: string) {
     try {
         await prisma.survey.update({

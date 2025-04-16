@@ -11,6 +11,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { create } from "../login/service"
+import { InsightBrand } from "@/components/common/insight-brand"
 const formSchema = z.object({
   username: z.string().min(2).max(50),
   account: z.string().min(8).max(12),
@@ -34,10 +35,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
         <div className="container flex h-16 items-center px-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <AudioLines></AudioLines>
-            <span>Insight</span>
-          </Link>
+          <InsightBrand></InsightBrand>
         </div>
       </header>
 
@@ -102,7 +100,7 @@ export default function RegisterPage() {
                           <FormLabel>确认密码</FormLabel>
                           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
-                            <Input placeholder="••••••••"{...field} />
+                            <Input placeholder="••••••••" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -124,7 +122,6 @@ export default function RegisterPage() {
                   </div>
                 </form>
               </Form>
-
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">

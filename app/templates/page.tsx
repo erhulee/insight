@@ -11,10 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Search, Tag, Users, BarChart, Briefcase, GraduationCap, Heart, ShoppingCart } from "lucide-react"
+import { FileText, Search, Tag, Users, BarChart, Briefcase, GraduationCap, Heart, ShoppingCart, LayoutDashboard } from "lucide-react"
 import { saveToLocalStorage } from "@/lib/utils"
-import { toast } from "@/components/ui/use-toast"
 import { RedirectHandler } from "@/components/redirect-handler"
+import { toast } from "sonner"
+import { InsightBrand } from "@/components/common/insight-brand"
+import { UserInfoAvatar } from "@/components/common/userInfoAvatar"
 
 // 模板数据
 const TEMPLATES = [
@@ -185,8 +187,7 @@ export default function TemplatesPage() {
       saveToLocalStorage(`survey_${surveyId}`, newSurvey)
 
       // 显示成功消息
-      toast({
-        title: "问卷创建成功",
+      toast("问卷创建成功", {
         description: "正在跳转到编辑页面...",
       })
 
@@ -194,10 +195,8 @@ export default function TemplatesPage() {
       setRedirectToEdit(true)
     } catch (error) {
       console.error("创建问卷失败:", error)
-      toast({
-        title: "创建失败",
+      toast("创建失败", {
         description: "创建问卷时出现错误，请重试",
-        variant: "destructive",
       })
       setIsCreating(false)
     }
@@ -209,37 +208,27 @@ export default function TemplatesPage() {
 
       {/* 顶部导航栏 */}
       <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <FileText className="h-6 w-6" />
-            <span>问卷星</span>
-          </Link>
-          <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              我的问卷
-            </Link>
-            <Link href="/templates" className="text-sm font-medium text-primary">
-              模板中心
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              价格方案
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="outline" size="sm">
-                进入工作台
-              </Button>
-            </Link>
+        <div className=" flex h-16 items-center justify-between px-4">
+          <InsightBrand></InsightBrand>
+          <div className=" flex flex-row gap-4" >
+            <nav className="flex items-center gap-4 sm:gap-6">
+              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                我的问卷
+              </Link>
+              <Link href="/templates" className="text-sm font-medium text-primary">
+                模板中心
+              </Link>
+            </nav>
+            <UserInfoAvatar></UserInfoAvatar>
           </div>
         </div>
       </header>
 
       {/* 主要内容区域 */}
-      <main className="container px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">
           {/* 标题 */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 flex flex-col justify-start items-start">
             <h1 className="text-3xl font-bold mb-2">问卷模板库</h1>
             <p className="text-muted-foreground">选择一个专业设计的模板，快速开始您的问卷调查</p>
           </div>

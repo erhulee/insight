@@ -27,7 +27,7 @@ export default function SurveyShare() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className=" flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex items-center gap-2 font-bold text-xl text-primary">
               <FileText className="h-6 w-6" />
@@ -45,7 +45,7 @@ export default function SurveyShare() {
         </div>
       </header>
       <main className="flex-1 py-6">
-        <div className="container px-4 max-w-3xl">
+        <div className="container mx-auto px-4 max-w-3xl">
           <div className="grid gap-6">
             <Card>
               <CardHeader>

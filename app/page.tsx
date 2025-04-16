@@ -2,22 +2,17 @@
 "use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap, AudioLines } from "lucide-react"
+import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
 import { FeatureCard } from "@/components/feature-card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { trpc } from "./_trpc/client";
 
+import { InsightBrand } from "@/components/common/insight-brand"
+import { UserInfoAvatar } from "@/components/common/userInfoAvatar"
 export default function Home() {
-  // 登录态获取
-  const userInfo = trpc.GetUserInfo.useQuery()
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
         <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-            <AudioLines></AudioLines>
-            <span>Insight</span>
-          </Link>
+          <InsightBrand></InsightBrand>
           <nav className="ml-auto flex gap-4 sm:gap-6">
             <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
               我的问卷
@@ -25,30 +20,11 @@ export default function Home() {
             <Link href="/templates" className="text-sm font-medium hover:underline underline-offset-4">
               模板中心
             </Link>
-            <Link href="/pricing" className="text-sm font-medium hover:underline underline-offset-4">
-              价格方案
-            </Link>
             <Link href="/developer" className="text-sm font-medium hover:underline underline-offset-4">
               开发者中心
             </Link>
           </nav>
-          {userInfo.data ? (
-            <div className="ml-4 flex items-center gap-4">
-              <Avatar>
-                <AvatarFallback>{userInfo.data?.username}</AvatarFallback>
-              </Avatar>
-            </div>
-
-          ) : <div className="ml-4 flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="outline" size="sm">
-                登录
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm">注册</Button>
-            </Link>
-          </div>}
+          <UserInfoAvatar></UserInfoAvatar>
         </div>
       </header>
       <main className="flex-1">
@@ -74,30 +50,6 @@ export default function Home() {
                       浏览模板
                     </Button>
                   </Link>
-                </div>
-              </div>
-              <div className="mx-auto lg:mr-0 lg:ml-auto">
-                <div className="rounded-lg border bg-background p-8 shadow-sm">
-                  <div className="space-y-2.5">
-                    <div className="h-2 w-20 rounded-lg bg-primary/20" />
-                    <div className="h-2 w-full rounded-lg bg-muted" />
-                    <div className="h-2 w-full rounded-lg bg-muted" />
-                    <div className="h-2 w-3/4 rounded-lg bg-muted" />
-                  </div>
-                  <div className="mt-6 space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="h-4 w-4 rounded-full bg-primary/20" />
-                      <div className="h-2 w-full rounded-lg bg-muted" />
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="h-4 w-4 rounded-full bg-muted" />
-                      <div className="h-2 w-full rounded-lg bg-muted" />
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="h-4 w-4 rounded-full bg-muted" />
-                      <div className="h-2 w-full rounded-lg bg-muted" />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

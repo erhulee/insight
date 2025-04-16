@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { getFromLocalStorage } from "@/lib/utils"
 
 export default function ApiExplorerPage() {
@@ -175,10 +175,8 @@ export default function ApiExplorerPage() {
         setIsLoading(false)
       } catch (error) {
         console.error("加载OpenAPI规范失败:", error)
-        toast({
-          title: "加载失败",
+        toast("加载失败", {
           description: "加载API规范时出现错误",
-          variant: "destructive",
         })
         setIsLoading(false)
       }
@@ -223,10 +221,8 @@ export default function ApiExplorerPage() {
   // 执行API请求
   const handleExecuteRequest = () => {
     if (!selectedEndpoint || !selectedMethod || !selectedApiKey) {
-      toast({
-        title: "无法执行请求",
+      toast("无法执行请求", {
         description: "请选择端点、方法和API密钥",
-        variant: "destructive",
       })
       return
     }
@@ -385,8 +381,7 @@ export default function ApiExplorerPage() {
   // 复制代码
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast({
-      title: "已复制",
+    toast("已复制", {
       description: "代码已复制到剪贴板",
     })
   }
@@ -425,12 +420,11 @@ export default function ApiExplorerPage() {
       case "curl":
         return `curl -X ${selectedMethod.toUpperCase()} "${url}" \\
 -H "Authorization: Bearer ${selectedApiKey}" \\
--H "Content-Type: application/json"${
-          hasBody
+-H "Content-Type: application/json"${hasBody
             ? ` \\
 -d '${requestBody}'`
             : ""
-        }`
+          }`
 
       case "javascript":
         return `const response = await fetch("${url}", {
@@ -438,12 +432,11 @@ export default function ApiExplorerPage() {
   headers: {
     "Authorization": "Bearer ${selectedApiKey}",
     "Content-Type": "application/json"
-  }${
-    hasBody
-      ? `,
+  }${hasBody
+            ? `,
   body: JSON.stringify(${requestBody})`
-      : ""
-  }
+            : ""
+          }
 });
 
 const data = await response.json();
@@ -457,13 +450,12 @@ headers = {
     "Content-Type": "application/json"
 }
 
-${
-  hasBody
-    ? `payload = ${requestBody}
+${hasBody
+            ? `payload = ${requestBody}
 
 `
-    : ""
-}response = requests.${selectedMethod}("${url}", headers=headers${hasBody ? ", json=payload" : ""})
+            : ""
+          }response = requests.${selectedMethod}("${url}", headers=headers${hasBody ? ", json=payload" : ""})
 data = response.json()
 print(data)`
 
@@ -478,12 +470,11 @@ curl_setopt_array($curl, [
     CURLOPT_HTTPHEADER => [
         "Authorization: Bearer ${selectedApiKey}",
         "Content-Type: application/json"
-    ]${
-      hasBody
-        ? `,
+    ]${hasBody
+            ? `,
     CURLOPT_POSTFIELDS => '${requestBody}'`
-        : ""
-    }
+            : ""
+          }
 ]);
 
 $response = curl_exec($curl);
@@ -553,17 +544,16 @@ print_r($data);`
                                 onClick={() => handleSelectEndpoint(path, method)}
                               >
                                 <span
-                                  className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                    method === "get"
-                                      ? "bg-blue-100 text-blue-800"
-                                      : method === "post"
-                                        ? "bg-green-100 text-green-800"
-                                        : method === "put"
-                                          ? "bg-amber-100 text-amber-800"
-                                          : method === "delete"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-gray-100 text-gray-800"
-                                  }`}
+                                  className={`px-2 py-0.5 rounded text-xs font-medium ${method === "get"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : method === "post"
+                                      ? "bg-green-100 text-green-800"
+                                      : method === "put"
+                                        ? "bg-amber-100 text-amber-800"
+                                        : method === "delete"
+                                          ? "bg-red-100 text-red-800"
+                                          : "bg-gray-100 text-gray-800"
+                                    }`}
                                 >
                                   {method.toUpperCase()}
                                 </span>
@@ -587,17 +577,16 @@ print_r($data);`
                     <CardHeader>
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded text-xs font-medium ${
-                            selectedMethod === "get"
-                              ? "bg-blue-100 text-blue-800"
-                              : selectedMethod === "post"
-                                ? "bg-green-100 text-green-800"
-                                : selectedMethod === "put"
-                                  ? "bg-amber-100 text-amber-800"
-                                  : selectedMethod === "delete"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-gray-100 text-gray-800"
-                          }`}
+                          className={`px-2 py-0.5 rounded text-xs font-medium ${selectedMethod === "get"
+                            ? "bg-blue-100 text-blue-800"
+                            : selectedMethod === "post"
+                              ? "bg-green-100 text-green-800"
+                              : selectedMethod === "put"
+                                ? "bg-amber-100 text-amber-800"
+                                : selectedMethod === "delete"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                            }`}
                         >
                           {selectedMethod.toUpperCase()}
                         </span>

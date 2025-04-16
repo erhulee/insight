@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, BarChart3, Clock } from "lucide-react"
+import { FileText, BarChart3, Clock, DeleteIcon, Trash2Icon } from "lucide-react"
 import { Button } from "../ui/button"
 import Link from "next/link"
 // 格式化日期
@@ -16,9 +16,14 @@ export function SurveyOverview(props: {
         id: string;
         description: string;
         name: string;
+        updatedAt: string
+        questions: any[]
+        published: boolean
     }
+    handleDelete: (id: string) => Promise<void>
 }) {
     const { survey } = props
+
     return (
         <Card key={survey.id} className="overflow-hidden">
             <CardHeader className="p-4 pb-2">
@@ -48,6 +53,11 @@ export function SurveyOverview(props: {
                         <Link href={`/dashboard/edit/${survey.id}`}>
                             <FileText className="h-4 w-4" />
                         </Link>
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => {
+                        props.handleDelete(survey.id)
+                    }}  >
+                        <Trash2Icon className="h-4 w-4"></Trash2Icon>
                     </Button>
                     {survey.published && (
                         <Button variant="ghost" size="icon" asChild>

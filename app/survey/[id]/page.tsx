@@ -11,8 +11,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { FileText, ArrowRight } from "lucide-react"
 import type { Survey, Question } from "@/lib/types"
 import { getFromLocalStorage, validateEmail, validatePhone, validateUrl } from "@/lib/utils"
-import { toast } from "@/components/ui/use-toast"
 import { RedirectHandler } from "@/components/redirect-handler"
+import { toast } from "sonner"
 
 export default function SurveyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -32,19 +32,15 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         const loadedSurvey = getFromLocalStorage<Survey>(`survey_${params.id}`, null)
 
         if (!loadedSurvey) {
-          toast({
-            title: "问卷不存在",
+          toast("问卷不存在", {
             description: "您访问的问卷不存在或已被删除",
-            variant: "destructive",
           })
           return
         }
 
         if (!loadedSurvey.published) {
-          toast({
-            title: "问卷未发布",
+          toast("问卷未发布", {
             description: "此问卷尚未发布，无法访问",
-            variant: "destructive",
           })
           return
         }
@@ -65,10 +61,8 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         setIsLoading(false)
       } catch (error) {
         console.error("加载问卷失败:", error)
-        toast({
-          title: "加载失败",
+        toast("加载失败", {
           description: "加载问卷时出现错误",
-          variant: "destructive",
         })
       }
     }, 1000)
@@ -264,8 +258,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
       setRedirectToThanks(true)
     } catch (error) {
       console.error("提交问卷失败:", error)
-      toast({
-        title: "提交失败",
+      toast("提交失败", {
         description: "提交问卷时出现错误，请重试",
         variant: "destructive",
       })
@@ -349,9 +342,8 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
               id={question.id}
               value={answers[question.id] || ""}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md ${
-                errors[question.id] ? "border-destructive" : "border-input"
-              }`}
+              className={`w-full px-3 py-2 border rounded-md ${errors[question.id] ? "border-destructive" : "border-input"
+                }`}
             >
               <option value="">请选择...</option>
               {question.options?.map((option, index) => (
@@ -371,11 +363,10 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
                   key={index}
                   type="button"
                   onClick={() => handleAnswerChange(question.id, index + 1)}
-                  className={`w-10 h-10 rounded-md flex items-center justify-center border ${
-                    answers[question.id] === index + 1
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background hover:bg-muted"
-                  }`}
+                  className={`w-10 h-10 rounded-md flex items-center justify-center border ${answers[question.id] === index + 1
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background hover:bg-muted"
+                    }`}
                 >
                   {index + 1}
                 </button>

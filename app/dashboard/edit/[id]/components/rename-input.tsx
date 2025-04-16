@@ -5,13 +5,12 @@ export function RenameInput(props: {
     title: string,
     id: string
 }) {
-    const handleTitleChange = (value) => {
-        console.log("rename", value)
-        // rename(props.id, props.title)
-    }
     return (<Input
-        value={props.title}
-        onChange={handleTitleChange}
+        defaultValue={props.title}
+        onInput={(value: any) => {
+            console.log("rename", value.target.value)
+            rename(props.id, value.target.value)
+        }}
         className="max-w-[300px] font-medium"
         placeholder="问卷标题"
     />)

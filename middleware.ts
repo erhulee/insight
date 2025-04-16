@@ -7,14 +7,13 @@ export async function middleware(request: NextRequest) {
         const decoded: any = await decrypt(token);
         const newHeaders = new Headers(request.headers);
         newHeaders.set('x-user-id', decoded.userId);
-
         return NextResponse.next({
             request: {
                 headers: newHeaders,
             },
         });
     } catch (error) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        // return NextResponse.redirect(new URL('/login', request.url));
     }
 }
 

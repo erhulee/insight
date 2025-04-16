@@ -6,16 +6,20 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 export const appRouter = router({
-    GetUserInfo: procedure.query(async (...args) => {
+    GetUserInfo: procedure.query(async () => {
         const cookieStore = await cookies()
         const token = cookieStore.get("session")?.value
         const payload: any = await decrypt(token)
-        const userId: string = payload['userId']
-        return await prisma.user.findUnique({
-            where: {
-                id: userId
-            }
-        })
+        if (!payload) {
+            return null
+        } else {
+            const userId: string = payload['userId']
+            return await prisma.user.findUnique({
+                where: {
+                    id: userId
+                }
+            })
+        }
     }),
     GetSurvey: procedure.input(z.object({
         id: z.string(),
@@ -82,6 +86,22 @@ export const appRouter = router({
         })
         return survey
     }),
+    DeleteSurvey: procedure.input(z.object({
+        id: z.string(),
+    })).mutation(async (opt) => {
+        const { id } = opt.input;
+        const cookieStore = await cookies()
+        const token = cookieStore.get("session")?.value
+        const payload: any = await decrypt(token)
+        const userId: string = payload['userId']
+        const ok = await prisma.survey.delete({
+            where: {
+                ownerId: userId,
+                id: id
+            }
+        })
+        return Boolean(ok)
+    })
 });
 
 // export type definition of API

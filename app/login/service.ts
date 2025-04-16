@@ -1,7 +1,8 @@
 'use server'
 
-import { createSession } from '@/lib/session';
+import { createSession, decrypt, deleteSession } from '@/lib/session';
 import { PrismaClient } from '@prisma/client'
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 const prisma = new PrismaClient();
 // app/actions.js
@@ -15,4 +16,8 @@ export async function create(account: string, password: string, username: string
     })
     await createSession(User.id)
     redirect("/dashboard")
+}
+
+export async function logout() {
+    await deleteSession()
 }

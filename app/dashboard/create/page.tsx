@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { v4 as uuidv4 } from "uuid"
 import { Button } from "@/components/ui/button"
@@ -9,10 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, PlusCircle, LayoutTemplateIcon as Template, ArrowLeft, Loader2, AudioLines } from "lucide-react"
+import { PlusCircle, LayoutTemplateIcon as Template, ArrowLeft, Loader2, AudioLines } from "lucide-react"
 import { saveToLocalStorage } from "@/lib/utils"
-import { toast } from "@/components/ui/use-toast"
 import { RedirectHandler } from "@/components/redirect-handler"
+import { toast } from "sonner"
+import { InsightBrand } from "@/components/common/insight-brand"
 
 // 模板数据
 const FEATURED_TEMPLATES = [
@@ -57,8 +57,7 @@ export default function CreateSurveyPage() {
   // 创建空白问卷
   const handleCreateBlankSurvey = async () => {
     if (!title.trim()) {
-      toast({
-        title: "请输入问卷标题",
+      toast("请输入问卷标题", {
         variant: "destructive",
       })
       return
@@ -157,10 +156,7 @@ export default function CreateSurveyPage() {
       <header className="border-b">
         <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
-              <AudioLines></AudioLines>
-              <span>Insight</span>
-            </Link>
+            <InsightBrand></InsightBrand>
             <h1 className="text-lg font-medium">创建问卷</h1>
           </div>
           <Button variant="ghost" size="sm" asChild>
