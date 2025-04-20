@@ -17,6 +17,7 @@ import {
   Smartphone,
   Braces,
   Brush,
+  LinkIcon,
 } from "lucide-react"
 import { QuestionConfig } from "@/components/survey-editor/buildin/form-config/question-config"
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
@@ -32,6 +33,8 @@ import { Canvas } from "./components/canvas"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { InsightBrand } from "@/components/common/insight-brand"
 import { JsonEditor } from "./components/jsonEditor"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { ShareConfig } from "./components/shareConfig"
 
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
@@ -71,8 +74,8 @@ export default function EditSurveyPage(props: {
       })
     },
   })
+  const [sheetVisible, setSheetVisible] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [activeTab, setActiveTab] = useState<"design" | "json" | "previwe">("design")
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null)
   // 添加问题
@@ -111,13 +114,7 @@ export default function EditSurveyPage(props: {
 
   // 返回问卷列表
   const handleBackToDashboard = () => {
-    if (hasUnsavedChanges) {
-      if (confirm("您有未保存的更改，确定要离开吗？")) {
-        router.push("/dashboard")
-      }
-    } else {
-      router.push("/dashboard")
-    }
+    router.push("/dashboard")
   }
 
   // 分享问卷
@@ -162,52 +159,51 @@ export default function EditSurveyPage(props: {
     return (<div>程序异常</div>)
   } else {
     return (
-      <DragDropProvider>
-        <div className="min-h-screen bg-background flex flex-col">
-          {/* 顶部导航栏 */}
-          <header className="border-b sticky top-0 z-10 bg-background">
-            <div className=" flex h-16 items-center justify-between px-4">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={handleBackToDashboard}>
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <InsightBrand></InsightBrand>
-                {/* <div className="flex items-center text-green-600 text-sm">
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* 顶部导航栏 */}
+        <header className="border-b sticky top-0 z-10 bg-background">
+          <div className=" flex h-16 items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" onClick={handleBackToDashboard}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <InsightBrand></InsightBrand>
+              {/* <div className="flex items-center text-green-600 text-sm">
                   <CheckCircle className="h-4 w-4 mr-1" />
                   已保存
                 </div> */}
-              </div>
-              <div className="flex items-center gap-2">
-                {survey.published ? <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(false) }} className="gap-1">
-                  <Smartphone className="h-4 w-4" />
-                  取消发布
-                </Button> : (
-                  <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(true) }} className="gap-1">
-                    <Smartphone className="h-4 w-4" />
-                    发布
-                  </Button>
-                )}
-
-                <Button variant="outline" size="sm" onClick={handleShareSurvey} className="gap-1">
-                  <Share2 className="h-4 w-4" />
-                  分享
-                </Button>
-
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={handleSaveSurvey}
-                  className="gap-1"
-                >
-
-                  <Save className="h-4 w-4" />
-                  保存
-                </Button>
-              </div>
             </div>
-          </header>
+            <div className="flex items-center gap-2">
+              {survey.published ? <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(false) }} className="gap-1">
+                <Smartphone className="h-4 w-4" />
+                取消发布
+              </Button> : (
+                <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(true) }} className="gap-1">
+                  <Smartphone className="h-4 w-4" />
+                  发布
+                </Button>
+              )}
 
-          {/* 主要内容区域 - 三栏布局 */}
+              <Button variant="outline" size="sm" onClick={handleShareSurvey} className="gap-1">
+                <Share2 className="h-4 w-4" />
+                分享
+              </Button>
+
+              <Button
+                variant="default"
+                size="sm"
+                onClick={handleSaveSurvey}
+                className="gap-1"
+              >
+
+                <Save className="h-4 w-4" />
+                保存
+              </Button>
+            </div>
+          </div>
+        </header>
+        {/* 主要内容区域 - 三栏布局 */}
+        <DragDropProvider>
           <div className="flex-1 flex overflow-hidden">
             {/* 左侧面板 - 问题类型 */}
             <div className="w-64 border-r bg-muted/30 overflow-y-auto hidden lg:block">
@@ -255,27 +251,15 @@ export default function EditSurveyPage(props: {
                     size="sm"
                     className="w-full justify-start gap-1"
                     onClick={() => {
-                      setSelectedQuestionId(null)
+                      setSheetVisible(true)
                     }}
                   >
                     <Settings className="h-4 w-4" />
                     基本设置
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start gap-1"
-                    onClick={() => {
-                      setSelectedQuestionId(null)
-                    }}
-                  >
-                    <Palette className="h-4 w-4" />
-                    主题样式
-                  </Button>
                 </div>
               </div>
             </div>
-
             {/* 中间面板 - 问题列表/预览 */}
             <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
@@ -305,7 +289,6 @@ export default function EditSurveyPage(props: {
                 questions={questions}></Canvas>}
               {activeTab === "previwe" && <DevicePreview><Preview survey={survey} questions={questions}></Preview></DevicePreview>}
             </div>
-
             {/* 右侧面板 - 问题设置 */}
             <div className="w-80 border-l bg-muted/30 overflow-hidden hidden md:block">
               <div className="border-b p-4">
@@ -330,9 +313,37 @@ export default function EditSurveyPage(props: {
               </ScrollArea>
             </div>
           </div>
+        </DragDropProvider>
+        {/* 发布配置 */}
+        <div>
+          <Sheet open={sheetVisible} onOpenChange={(open) => {
+            console.log("open", open)
+            setSheetVisible(open)
+          }}>
+            <SheetContent className=" w-96">
+              <SheetHeader>
+                <SheetTitle className=" flex flex-row gap-2 items-center  " >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                    <LinkIcon className="h-4 w-4" />
+                  </div>
+                  用户满意度调查
+                </SheetTitle>
+                <SheetDescription>
+                  创建于 2023-04-15 · 124 份回复
+                </SheetDescription>
+              </SheetHeader>
+              <div className="grid gap-4 py-4">
+                <ShareConfig></ShareConfig>
+              </div>
+              <SheetFooter>
+                <SheetClose asChild>
+                  <Button type="submit">Save changes</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
-      </DragDropProvider>
+      </div>
     )
   }
-
 }
