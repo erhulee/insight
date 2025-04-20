@@ -5,6 +5,17 @@ import { PrismaClient } from '@prisma/client'
 import { z } from "zod";
 
 const prisma = new PrismaClient();
+const getUid = async () => {
+    try {
+        const cookieStore = await cookies()
+        const token = cookieStore.get("session")?.value
+        const payload: any = await decrypt(token)
+        const userId: string = payload['userId']
+        return userId
+    } catch (e) {
+        throw new Error("未登录")
+    }
+}
 export const appRouter = router({
     GetUserInfo: procedure.query(async () => {
         const cookieStore = await cookies()
@@ -21,14 +32,65 @@ export const appRouter = router({
             })
         }
     }),
+    UpdateUserInfo: procedure.input(z.object({
+        name: z.string().optional(),
+        current_password: z.string().optional(),
+        password: z.string().optional(),
+    })).mutation(async (opt) => {
+        const uid = await getUid()
+        const { name, password, current_password } = opt.input;
+        if (name) {
+            const user = await prisma.user.update({
+                where: {
+                    id: uid
+                },
+                data: {
+                    username: name
+                }
+            })
+            if (user == null) return false
+        }
+        if (password && current_password) {
+            const user = await prisma.user.update({
+                where: {
+                    id: uid,
+                    password: current_password
+                },
+                data: {
+                    password: password
+                }
+            })
+            if (user == null) return false
+        }
+        return true
+    }),
+    SaveSurvey: procedure.input(z.object({
+        id: z.string(),
+        questions: z.any()
+    })).mutation(async (opt) => {
+        console.log("SaveSurvey:", opt.input)
+        try {
+            const response = await prisma.survey.update({
+                where: {
+                    id: opt.input.id
+                },
+                data: {
+                    questions: opt.input.questions
+                }
+            })
+            console.log("SaveSurvey:", response)
+            return response
+        } catch (e) {
+            console.log(e)
+            return null
+        }
+
+    }),
     GetSurvey: procedure.input(z.object({
         id: z.string(),
     })).query(async (opt) => {
         try {
-            const cookieStore = await cookies()
-            const token = cookieStore.get("session")?.value
-            const payload: any = await decrypt(token)
-            const userId: string = payload['userId']
+            const userId = await getUid()
             const survey = await prisma.survey.findUnique({
                 where: {
                     ownerId: userId,
@@ -59,12 +121,18 @@ export const appRouter = router({
                     ownerId: userId
                 }
             })
+            const _questions = (question: string | object) => {
+                if (typeof question === "string") {
+                    return JSON.parse(question)
+                } else {
+                    return question
+                }
+            }
             return surveyList.map(item => ({
                 ...item,
-                questions: JSON.parse(item.questions ?? "[]")
+                questions: _questions(item.questions ?? [])
             }))
         } catch (e) {
-            console.log(e)
             return []
         }
     }),
@@ -82,6 +150,7 @@ export const appRouter = router({
                 ownerId: userId,
                 name: name,
                 description: description,
+                questions: JSON.stringify([])
             }
         })
         return survey

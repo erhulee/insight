@@ -6,8 +6,9 @@ import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Download, BarChart3, PieChart, ListFilter } from "lucide-react"
+import { Download, BarChart3, PieChart, ListFilter } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { InsightBrand } from "@/components/common/insight-brand"
 
 export default function SurveyResults() {
   const { id } = useParams()
@@ -85,12 +86,9 @@ export default function SurveyResults() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 border-b bg-background">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2 font-bold text-xl text-primary">
-              <FileText className="h-6 w-6" />
-              <span>问卷星</span>
-            </Link>
+            <InsightBrand></InsightBrand>
             <h1 className="text-lg font-medium">{survey.title} - 数据分析</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -107,7 +105,7 @@ export default function SurveyResults() {
         </div>
       </header>
       <main className="flex-1 py-6">
-        <div className="container px-4">
+        <div className="container mx-auto px-4">
           <div className="grid gap-6">
             <div className="grid gap-4 md:grid-cols-3">
               <Card>

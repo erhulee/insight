@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { GripVertical, Trash2, Copy } from "lucide-react"
 import { useDragDrop } from "./drag-drop-context"
 import { cn } from "@/lib/utils"
+import { Badge } from "../ui/badge"
 
 interface QuestionItemProps {
   question: Question
@@ -79,7 +80,6 @@ export function QuestionItem({
       case "text":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             <input
               type="text"
@@ -93,7 +93,6 @@ export function QuestionItem({
       case "radio":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <div className="space-y-1">
@@ -116,7 +115,6 @@ export function QuestionItem({
       case "checkbox":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <div className="space-y-1">
@@ -134,7 +132,6 @@ export function QuestionItem({
       case "dropdown":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <select className="w-full px-3 py-2 border rounded-md bg-background" disabled={isPreview}>
@@ -150,7 +147,6 @@ export function QuestionItem({
       case "rating":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <div className="flex space-x-2">
@@ -173,7 +169,6 @@ export function QuestionItem({
       case "date":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <input type="date" className="w-full px-3 py-2 border rounded-md bg-background" disabled={isPreview} />
@@ -182,7 +177,6 @@ export function QuestionItem({
       case "file":
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.required && <span className="text-destructive text-sm">*</span>}
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
             <div className="border-2 border-dashed border-muted-foreground/20 rounded-md p-4 text-center">
@@ -200,14 +194,12 @@ export function QuestionItem({
       case "section":
         return (
           <div className="space-y-2">
-            <h3 className="text-lg font-medium">{question.title}</h3>
             {question.description && <p className="text-sm text-muted-foreground">{question.description}</p>}
           </div>
         )
       default:
         return (
           <div className="space-y-2">
-            <p className="text-sm font-medium">{question.title}</p>
             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
           </div>
         )
@@ -222,7 +214,7 @@ export function QuestionItem({
         isSelected && !isPreview && "selected border-primary",
         isPreview && "preview-item",
       )}
-      onClick={() => !isPreview && onSelect(question.id)}
+      onClick={() => onSelect(question.id)}
       draggable={!isPreview}
       onDragStart={safeDragStart}
       onDragEnd={safeDragEnd}
@@ -236,25 +228,26 @@ export function QuestionItem({
               <GripVertical className="h-5 w-5 text-muted-foreground" />
             </div>
           )}
-          <span className="text-xs bg-muted px-2 py-1 rounded-md">
-            {question.type === "section"
-              ? "分节"
-              : question.type === "text"
-                ? "文本"
-                : question.type === "radio"
-                  ? "单选"
-                  : question.type === "checkbox"
-                    ? "多选"
-                    : question.type === "dropdown"
-                      ? "下拉"
-                      : question.type === "rating"
-                        ? "评分"
-                        : question.type === "date"
-                          ? "日期"
-                          : question.type === "file"
-                            ? "文件"
-                            : "问题"}
-          </span>
+          <Badge variant="secondary">  {question.type === "section"
+            ? "分节"
+            : question.type === "text"
+              ? "文本"
+              : question.type === "radio"
+                ? "单选"
+                : question.type === "checkbox"
+                  ? "多选"
+                  : question.type === "dropdown"
+                    ? "下拉"
+                    : question.type === "rating"
+                      ? "评分"
+                      : question.type === "date"
+                        ? "日期"
+                        : question.type === "file"
+                          ? "文件"
+                          : "问题"}</Badge>
+
+          <p className="text-sm font-medium">{question.title}</p>
+
         </div>
         {!isPreview && (
           <div className="question-actions flex items-center gap-1">

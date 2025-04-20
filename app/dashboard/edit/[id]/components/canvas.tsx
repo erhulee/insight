@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Settings } from "lucide-react"
-import { useState } from "react"
+import { Plus } from "lucide-react"
 import { v4 as uuidv4 } from "uuid"
 import { QuestionItem } from "@/components/survey-editor/question-item"
 import { Question } from "@/lib/types"
@@ -13,7 +12,7 @@ type Props = {
     questions: any[]
     selectedQuestionId: string | null
     onQuestionsChange: (questions: any[]) => void
-    onQuestionSelect: (id: string) => void
+    onQuestionSelect: (question: any) => void
 }
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
@@ -22,7 +21,7 @@ const questionTypes = preset.map((item) => ({
     icon: <item.icon className="h-4 w-4"></item.icon>
 }))
 export function Canvas(props: Props) {
-    const { questions, survey, onQuestionsChange } = props;
+    const { questions, survey, onQuestionsChange, selectedQuestionId } = props;
     // 复制问题
     const handleDuplicateQuestion = (id: string) => {
         const questionToDuplicate = questions.find((q) => q.id === id)
@@ -88,7 +87,7 @@ export function Canvas(props: Props) {
 
         const updatedQuestions = [...questions, newQuestion]
         onQuestionsChange(updatedQuestions)
-        setSelectedQuestionId(newQuestion.id)
+        // setSelectedQuestionId(newQuestion.id)
         // 滚动到新添加的问题
         setTimeout(() => {
             scrollToElement(newQuestion.id, 100)
@@ -125,11 +124,13 @@ export function Canvas(props: Props) {
                             question={question}
                             isSelected={selectedQuestionId === question.id}
                             isPreview={false}
-                            onSelect={setSelectedQuestionId}
+                            onSelect={() => {
+                                props.onQuestionSelect(question)
+                            }}
                             onDelete={handleDeleteQuestion}
                             onDuplicate={handleDuplicateQuestion}
                             questions={questions}
-                            setQuestions={setQuestions}
+                            setQuestions={() => { }}
                         />
                     ))
                 )}
@@ -157,28 +158,6 @@ export function Canvas(props: Props) {
                                 </Button>
                             ))}
                         </div>
-                    </TabsContent>
-                    <TabsContent value="settings" className="mt-4">
-                        {/* <div className="space-y-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full justify-start gap-1"
-                                onClick={() => setActiveTab("settings")}
-                            >
-                                <Settings className="h-4 w-4" />
-                                基本设置
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full justify-start gap-1"
-                                onClick={() => setActiveTab("theme")}
-                            >
-                                <Palette className="h-4 w-4" />
-                                主题样式
-                            </Button>
-                        </div> */}
                     </TabsContent>
                 </Tabs>
             </div>

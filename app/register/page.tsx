@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, Lock, User, ArrowRight, AudioLines } from "lucide-react"
+import { Lock, User, ArrowRight } from "lucide-react"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -29,8 +29,6 @@ export default function RegisterPage() {
     const { account, password, username } = values
     const user = await create(account, password, username)
   }
-
-
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
@@ -56,7 +54,6 @@ export default function RegisterPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>用户名称</FormLabel>
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
                             <Input placeholder="shadcn" {...field} />
                           </FormControl>
@@ -70,7 +67,6 @@ export default function RegisterPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>账号</FormLabel>
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
                             <Input placeholder="shadcn" {...field} />
                           </FormControl>
@@ -84,7 +80,6 @@ export default function RegisterPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>密码</FormLabel>
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
                             <Input placeholder="••••••••"{...field} />
                           </FormControl>
@@ -98,7 +93,6 @@ export default function RegisterPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>确认密码</FormLabel>
-                          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                           <FormControl>
                             <Input placeholder="••••••••" {...field} />
                           </FormControl>

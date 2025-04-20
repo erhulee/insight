@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,11 +8,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, ArrowRight, AudioLines } from "lucide-react"
+import { Mail, Lock, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { create } from "./service"
 import { InsightBrand } from "@/components/common/insight-brand"
-
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -21,7 +19,6 @@ export default function LoginPage() {
     password: "",
     rememberMe: false,
   })
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -44,10 +41,8 @@ export default function LoginPage() {
     create()
     // Validate form
     if (!formData.email || !formData.password) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Please fill in all required fields",
-        variant: "destructive",
       })
       return
     }
@@ -60,10 +55,8 @@ export default function LoginPage() {
       // router.push("/dashboard")
     } catch (error) {
       console.error("Login error:", error)
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Failed to log in. Please check your credentials and try again.",
-        variant: "destructive",
       })
     } finally {
       setIsLoading(false)

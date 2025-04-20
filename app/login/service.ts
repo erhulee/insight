@@ -1,8 +1,7 @@
 'use server'
 
-import { createSession, decrypt, deleteSession } from '@/lib/session';
+import { createSession, deleteSession } from '@/lib/session';
 import { PrismaClient } from '@prisma/client'
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 const prisma = new PrismaClient();
 // app/actions.js

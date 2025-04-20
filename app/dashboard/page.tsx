@@ -6,9 +6,9 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlusCircle, Search, FileText } from "lucide-react"
-import { SurveyOverview } from "@/components/dashboard/survey-overview"
+import { SurveyOverview } from "@/app/developer/components/survey-overview"
 import { trpc } from "@/app/_trpc/client";
-import { InsightBrand } from "@/components/common/insight-brand"
+import { LayoutHeader } from "@/components/layout-header"
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -16,7 +16,6 @@ export default function DashboardPage() {
   const { data: surveys, isLoading, error, refetch } = trpc.GetSurveyList.useQuery(undefined, {
     initialData: []
   })
-  console.log("surveys:", surveys)
   // 创建新问卷
   const mutation = trpc.CreateSurvey.useMutation({
     onSuccess: (data) => {
@@ -62,23 +61,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}
-      <header className="border-b">
-        <div className="flex h-16 items-center justify-between px-4">
-          <InsightBrand></InsightBrand>
-          <nav className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm font-medium">
-              我的问卷
-            </Link>
-            <Link href="/templates" className="text-sm font-medium text-muted-foreground">
-              模板中心
-            </Link>
-            <Link href="/account" className="text-sm font-medium text-muted-foreground">
-              账户设置
-            </Link>
-          </nav>
-        </div>
-      </header>
-
+      <LayoutHeader></LayoutHeader>
       {/* 主要内容区域 */}
       <main className="container px-4 py-6 mx-auto">
         <div className="flex flex-col gap-6">
@@ -135,7 +118,7 @@ export default function DashboardPage() {
             ) : filteredSurveys.length > 0 ? (
               // 问卷列表
               filteredSurveys.map((survey) => (
-                <SurveyOverview key={survey.id} survey={survey} handleDelete={handleDeleteSurvey}></SurveyOverview>
+                <SurveyOverview key={survey.id} survey={survey as any} handleDelete={handleDeleteSurvey}></SurveyOverview>
               ))
             ) : (
               // 空状态

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, BarChart3, Clock, DeleteIcon, Trash2Icon } from "lucide-react"
-import { Button } from "../ui/button"
+import { FileText, BarChart3, Clock, Trash2Icon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 // 格式化日期
 const formatDate = (dateString: string) => {
@@ -23,11 +24,13 @@ export function SurveyOverview(props: {
     handleDelete: (id: string) => Promise<void>
 }) {
     const { survey } = props
-
     return (
         <Card key={survey.id} className="overflow-hidden">
             <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-lg">{survey.name}</CardTitle>
+                <CardTitle className="text-lg flex gap-2 items-center">
+                    <Badge variant={survey.published ? "default" : "secondary"} >{survey.published ? "已发布" : "草稿"}</Badge>
+                    {survey.name}
+                </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     <span>更新于 {formatDate(survey.updatedAt)}</span>
@@ -40,12 +43,7 @@ export function SurveyOverview(props: {
             </CardContent>
             <CardFooter className="p-4 pt-0 flex justify-between">
                 <div className="flex items-center gap-2">
-                    <span
-                        className={`text-xs px-2 py-1 rounded-full ${survey.published ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
-                            }`}
-                    >
-                        {survey.published ? "已发布" : "草稿"}
-                    </span>
+
                     <span className="text-xs text-muted-foreground">{survey.questions?.length} 个问题</span>
                 </div>
                 <div className="flex gap-1">

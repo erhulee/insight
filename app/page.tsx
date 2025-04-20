@@ -4,29 +4,11 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
 import { FeatureCard } from "@/components/feature-card"
-
-import { InsightBrand } from "@/components/common/insight-brand"
-import { UserInfoAvatar } from "@/components/common/userInfoAvatar"
+import { LayoutHeader } from "@/components/layout-header"
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
-          <InsightBrand></InsightBrand>
-          <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
-              我的问卷
-            </Link>
-            <Link href="/templates" className="text-sm font-medium hover:underline underline-offset-4">
-              模板中心
-            </Link>
-            <Link href="/developer" className="text-sm font-medium hover:underline underline-offset-4">
-              开发者中心
-            </Link>
-          </nav>
-          <UserInfoAvatar></UserInfoAvatar>
-        </div>
-      </header>
+      <LayoutHeader></LayoutHeader>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-gray-100">
           <div className="container px-4 mx-auto md:px-6">
@@ -41,8 +23,12 @@ export default function Home() {
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Link href="/dashboard/create">
                     <Button size="lg" className="gap-1">
-                      <PlusCircle className="h-4 w-4" />
                       创建问卷
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard">
+                    <Button size="lg" variant="outline" className="gap-1">
+                      我的问卷
                     </Button>
                   </Link>
                   <Link href="/templates">

@@ -12,6 +12,7 @@ export interface Survey {
 
 export interface Question {
   id: string
+  name: string
   type: string
   title: string
   description?: string
