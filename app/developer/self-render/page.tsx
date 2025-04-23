@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
 import { getFromLocalStorage } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function SelfRenderPage() {
   const [activeTab, setActiveTab] = useState<"upload" | "url" | "editor">("upload")
@@ -229,8 +229,7 @@ export default function SelfRenderPage() {
       setRenderedSurvey(mockSurvey)
       setIsRendering(false)
 
-      toast({
-        title: "渲染成功",
+      toast("渲染成功", {
         description: "问卷已成功渲染",
       })
     }, 2000)

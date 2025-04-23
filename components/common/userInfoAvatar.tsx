@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";

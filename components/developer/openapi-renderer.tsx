@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge"
 import { Copy, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 interface OpenApiRendererProps {
   specUrl: string
@@ -66,8 +66,7 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast({
-      title: "已复制",
+    toast("已复制", {
       description: "代码已复制到剪贴板",
     })
   }

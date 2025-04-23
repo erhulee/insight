@@ -1,8 +1,7 @@
 
-"use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
+import { BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
 import { FeatureCard } from "@/components/feature-card"
 import { LayoutHeader } from "@/components/layout-header"
 export default function Home() {

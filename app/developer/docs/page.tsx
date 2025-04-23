@@ -10,15 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { OpenApiRenderer } from "@/components/developer/openapi-renderer"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 export default function ApiDocsPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast({
-      title: "已复制",
+    toast("已复制", {
       description: "代码已复制到剪贴板",
     })
   }
