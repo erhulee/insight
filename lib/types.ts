@@ -16,44 +16,7 @@ export interface Question {
   id: string
   name: string
   type: QuestionType
-  title: string
-  description?: string
-  required?: boolean
-
-  // 选项类问题（单选、多选、下拉）
-  options?: QuestionOption[]
-  randomize?: boolean
-
-  // 文本题
-  placeholder?: string
-  multiline?: boolean
-  minLength?: number
-  maxLength?: number
-
-  // 评分题
-  maxRating?: number
-  ratingType?: string
-
-  // 日期题
-  minDate?: string
-  maxDate?: string
-
-  // 文件上传题
-  maxFiles?: number
-  maxSize?: number
-  fileTypes?: string
-
-  // 条件逻辑
-  hasLogic?: boolean
-  logicCondition?: string
-  logicValue?: string
-  logicAction?: string
-  logicTarget?: string
-
-  // 验证
-  validationType?: string
-  validationRegex?: string
-  validationMessage?: string
+  attr: Record<string, any>
 }
 
 export interface QuestionOption {

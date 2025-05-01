@@ -7,17 +7,12 @@ import type { Question } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-  Save,
   Eye,
-  ArrowLeft,
-  Share2,
-  Settings,
-  Smartphone,
   Braces,
   Brush,
   LinkIcon,
 } from "lucide-react"
-import { QuestionConfig } from "@/components/survey-editor/buildin/form-config"
+
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { DevicePreview } from "@/components/survey-editor/device-preview"
 import { scrollToElement, } from "@/lib/utils"
@@ -27,19 +22,16 @@ import { publish, unpublish } from "./service"
 import { RenameInput } from "./components/rename-input"
 import { trpc } from "@/app/_trpc/client"
 import { Preview } from "./components/preview"
-import { Canvas } from "./components/canvas"
+import { Canvas } from "./components/EditCanvas"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { InsightBrand } from "@/components/common/insight-brand"
 import { JsonEditor } from "./components/jsonEditor"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { ShareConfig } from "./components/shareConfig"
+import { EditHeader } from "./components/EditHeader"
+import { WidgetPanel } from "./components/WidgetPanel"
+import { QuestionConfig } from "./components/QuestionConfig"
+import { cloneDeep } from "lodash-es"
 
-// 问题类型定义
-const questionTypes = preset.map((item) => ({
-  id: item.type,
-  name: item.title,
-  icon: <item.icon className="h-4 w-4"></item.icon>
-}))
 
 export default function EditSurveyPage(props: {
   params: Promise<{
@@ -59,20 +51,20 @@ export default function EditSurveyPage(props: {
       setQuestions(survey.questions)
     }
   }, [survey])
+  console.log("survey:::::", survey)
   const saveMutation = trpc.SaveSurvey.useMutation({})
   const [sheetVisible, setSheetVisible] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [activeTab, setActiveTab] = useState<"design" | "json" | "previwe">("design")
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null)
   // 添加问题
-  const handleAddQuestion = (type: string) => {
+  const handleAddQuestion = (type: QuestionType) => {
     const meta = preset.find((item) => item.type === type)!
     const newQuestion: Question = {
       id: uuidv4(),
       type,
-      title: type === "section" ? "分节标题" : "新问题",
-      required: false,
-      name: meta.title
+      name: meta.title,
+      attr: {},
     }
     const updatedQuestions = [...questions, newQuestion]
     setQuestions(updatedQuestions)
@@ -84,11 +76,22 @@ export default function EditSurveyPage(props: {
   }
 
   // 更新问题
-  const handleUpdateQuestion = (updatedQuestion: Question) => {
-    const updatedQuestions = questions.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
-    setQuestions(updatedQuestions)
+  const handleUpdateQuestion = (action: "update-attr", values: Record<string, any>) => {
+    switch (action) {
+      case "update-attr":
+        const oldQuestions = cloneDeep(questions);
+        oldQuestions.forEach((q) => {
+          if (q.id === selectedQuestionId) {
+            if (q.attr == null) {
+              q.attr = {}
+            }
+            Object.assign(q.attr, values)
+          }
+        })
+        console.log("更新问题:", oldQuestions)
+        setQuestions(oldQuestions)
+    }
   }
-
   // 保存问卷
   const handleSaveSurvey = async () => {
     try {
@@ -101,18 +104,14 @@ export default function EditSurveyPage(props: {
       toast.warning("保存失败")
     }
   }
-
-
   // 返回问卷列表
   const handleBackToDashboard = () => {
     router.push("/dashboard")
   }
-
   // 分享问卷
   const handleShareSurvey = () => {
     router.push(`/dashboard/share/${params.id}`)
   }
-
   // 发布问卷
   const handlePublishSurvey = async (published: boolean) => {
     if (published) {
@@ -142,7 +141,6 @@ export default function EditSurveyPage(props: {
     }
 
   }
-
   // 获取选中的问题
   const selectedQuestion = questions.find((q) => q.id === selectedQuestionId)
   if (isError || survey == null) {
@@ -151,103 +149,18 @@ export default function EditSurveyPage(props: {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         {/* 顶部导航栏 */}
-        <header className="border-b sticky top-0 z-10 bg-background">
-          <div className=" flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={handleBackToDashboard}>
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <InsightBrand></InsightBrand>
-              {/* <div className="flex items-center text-green-600 text-sm">
-                  <CheckCircle className="h-4 w-4 mr-1" />
-                  已保存
-                </div> */}
-            </div>
-            <div className="flex items-center gap-2">
-              {survey.published ? <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(false) }} className="gap-1">
-                <Smartphone className="h-4 w-4" />
-                取消发布
-              </Button> : (
-                <Button variant="outline" size="sm" onClick={() => { handlePublishSurvey(true) }} className="gap-1">
-                  <Smartphone className="h-4 w-4" />
-                  发布
-                </Button>
-              )}
-
-              <Button variant="outline" size="sm" onClick={handleShareSurvey} className="gap-1">
-                <Share2 className="h-4 w-4" />
-                分享
-              </Button>
-
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleSaveSurvey}
-                className="gap-1"
-              >
-
-                <Save className="h-4 w-4" />
-                保存
-              </Button>
-            </div>
-          </div>
-        </header>
+        <EditHeader
+          handleSaveSurvey={handleSaveSurvey}
+          handleShareSurvey={handleShareSurvey}
+          handlePublishSurvey={handlePublishSurvey}
+          handleBackToDashboard={handleBackToDashboard}
+          published={survey.published}
+        ></EditHeader>
         {/* 主要内容区域 - 三栏布局 */}
         <DragDropProvider>
           <div className="flex-1 flex overflow-hidden">
             {/* 左侧面板 - 问题类型 */}
-            <div className="w-64 border-r bg-muted/30 overflow-y-auto hidden lg:block">
-              <div className="p-4 border-b">
-                <h3 className="text-sm font-medium mb-2">基础模块</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {questionTypes.map((type) => (
-                    <Button
-                      key={type.id}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleAddQuestion(type.id)}
-                      className="justify-start gap-1 h-auto py-2"
-                    >
-                      {type.icon}
-                      <span className="text-xs">{type.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4 border-b">
-                <h3 className="text-sm font-medium mb-2">高级模块</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {questionTypes.slice(4).map((type) => (
-                    <Button
-                      key={type.id}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleAddQuestion(type.id)}
-                      className="justify-start gap-1 h-auto py-2"
-                    >
-                      {type.icon}
-                      <span className="text-xs">{type.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4">
-                <h3 className="text-sm font-medium mb-2">问卷设置</h3>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start gap-1"
-                    onClick={() => {
-                      setSheetVisible(true)
-                    }}
-                  >
-                    <Settings className="h-4 w-4" />
-                    基本设置
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <WidgetPanel handleAddQuestion={handleAddQuestion}></WidgetPanel>
             {/* 中间面板 - 问题列表/预览 */}
             {isLoading ? <div>loading...</div> : <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
@@ -291,7 +204,9 @@ export default function EditSurveyPage(props: {
               <ScrollArea className="h-[calc(100vh-8rem)]">
                 <div className="p-4">
                   {selectedQuestion ? (
-                    <QuestionConfig question={selectedQuestion} onUpdate={handleUpdateQuestion} />
+                    <QuestionConfig question={selectedQuestion} onUpdate={(attr) => {
+                      handleUpdateQuestion("update-attr", attr)
+                    }} />
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <p>选择一个问题来配置其属性</p>
@@ -305,10 +220,7 @@ export default function EditSurveyPage(props: {
         </DragDropProvider>
         {/* 发布配置 */}
         <div>
-          <Sheet open={sheetVisible} onOpenChange={(open) => {
-            console.log("open", open)
-            setSheetVisible(open)
-          }}>
+          <Sheet open={sheetVisible} onOpenChange={setSheetVisible}>
             <SheetContent className=" w-96">
               <SheetHeader>
                 <SheetTitle className=" flex flex-row gap-2 items-center  " >
