@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import type { Question } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Save,
@@ -13,18 +12,17 @@ import {
   ArrowLeft,
   Share2,
   Settings,
-  Palette,
   Smartphone,
   Braces,
   Brush,
   LinkIcon,
 } from "lucide-react"
-import { QuestionConfig } from "@/components/survey-editor/buildin/form-config/question-config"
+import { QuestionConfig } from "@/components/survey-editor/buildin/form-config"
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { DevicePreview } from "@/components/survey-editor/device-preview"
 import { scrollToElement, } from "@/lib/utils"
 import { toast } from "sonner"
-import { preset } from "@/components/survey-editor/buildin/form-item"
+import { preset, QuestionType } from "@/components/survey-editor/buildin/form-item"
 import { publish, unpublish } from "./service"
 import { RenameInput } from "./components/rename-input"
 import { trpc } from "@/app/_trpc/client"
@@ -38,8 +36,8 @@ import { ShareConfig } from "./components/shareConfig"
 
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
-  id: item.key,
-  name: item.name,
+  id: item.type,
+  name: item.title,
   icon: <item.icon className="h-4 w-4"></item.icon>
 }))
 
@@ -50,7 +48,7 @@ export default function EditSurveyPage(props: {
 }) {
   const params = use(props.params);
   const router = useRouter()
-  const { data: survey, isError, refetch } = trpc.GetSurvey.useQuery({
+  const { data: survey, isError, refetch, isLoading } = trpc.GetSurvey.useQuery({
     id: params.id
   }, {
     initialData: {} as any
@@ -61,32 +59,20 @@ export default function EditSurveyPage(props: {
       setQuestions(survey.questions)
     }
   }, [survey])
-  const saveMutation = trpc.SaveSurvey.useMutation({
-    onSuccess: (data) => {
-      refetch()
-      toast("保存成功", {
-        description: "问卷已成功保存",
-      })
-    },
-    onError: (error) => {
-      toast("保存失败", {
-        description: "保存问卷时出现错误，请重试",
-      })
-    },
-  })
+  const saveMutation = trpc.SaveSurvey.useMutation({})
   const [sheetVisible, setSheetVisible] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [activeTab, setActiveTab] = useState<"design" | "json" | "previwe">("design")
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null)
   // 添加问题
   const handleAddQuestion = (type: string) => {
-    const schema = preset.find((item) => item.key === type)!
+    const meta = preset.find((item) => item.type === type)!
     const newQuestion: Question = {
       id: uuidv4(),
       type,
       title: type === "section" ? "分节标题" : "新问题",
       required: false,
-      name: schema.name
+      name: meta.title
     }
     const updatedQuestions = [...questions, newQuestion]
     setQuestions(updatedQuestions)
@@ -105,10 +91,15 @@ export default function EditSurveyPage(props: {
 
   // 保存问卷
   const handleSaveSurvey = async () => {
-    saveMutation.mutate({
-      id: params.id,
-      questions: JSON.stringify(questions)
-    })
+    try {
+      await saveMutation.mutate({
+        id: params.id,
+        questions: JSON.stringify(questions)
+      })
+      toast.success("保存成功")
+    } catch {
+      toast.warning("保存失败")
+    }
   }
 
 
@@ -138,7 +129,6 @@ export default function EditSurveyPage(props: {
       }
     } else {
       const ok = await unpublish(params.id)
-      console.log("取消发布", ok)
       if (ok) {
         refetch()
         toast("已取消发布", {
@@ -210,7 +200,7 @@ export default function EditSurveyPage(props: {
               <div className="p-4 border-b">
                 <h3 className="text-sm font-medium mb-2">基础模块</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {questionTypes.slice(0, 4).map((type) => (
+                  {questionTypes.map((type) => (
                     <Button
                       key={type.id}
                       variant="outline"
@@ -224,7 +214,6 @@ export default function EditSurveyPage(props: {
                   ))}
                 </div>
               </div>
-
               <div className="p-4 border-b">
                 <h3 className="text-sm font-medium mb-2">高级模块</h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -242,7 +231,6 @@ export default function EditSurveyPage(props: {
                   ))}
                 </div>
               </div>
-
               <div className="p-4">
                 <h3 className="text-sm font-medium mb-2">问卷设置</h3>
                 <div className="space-y-2">
@@ -261,7 +249,7 @@ export default function EditSurveyPage(props: {
               </div>
             </div>
             {/* 中间面板 - 问题列表/预览 */}
-            <div className="flex-1 overflow-hidden">
+            {isLoading ? <div>loading...</div> : <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
                 <RenameInput id={survey.id} title={survey.name}></RenameInput>
                 <ToggleGroup type="single" size="sm" value={activeTab} onValueChange={(v) => {
@@ -288,14 +276,15 @@ export default function EditSurveyPage(props: {
                 }}
                 questions={questions}></Canvas>}
               {activeTab === "previwe" && <DevicePreview><Preview survey={survey} questions={questions}></Preview></DevicePreview>}
-            </div>
+            </div>}
+
             {/* 右侧面板 - 问题设置 */}
             <div className="w-80 border-l bg-muted/30 overflow-hidden hidden md:block">
               <div className="border-b p-4">
                 <h3 className="font-medium">问题配置</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {selectedQuestion
-                    ? `编辑 "${selectedQuestion.type === "section" ? "分节" : "问题"}" 的属性和选项`
+                    ? `编辑 "${selectedQuestion.type === QuestionType.Text ? "分节" : "问题"}" 的属性和选项`
                     : "请从左侧选择一个问题进行编辑"}
                 </p>
               </div>

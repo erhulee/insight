@@ -26,3 +26,17 @@ model Survey {
   deletedAt   DateTime?
   published   Boolean   @default(false)
 }
+
+model Questionnaires {
+  id       String @id @default(uuid())
+  surveyId String
+  /**
+   * @note 问卷数据
+   * @example
+   * [
+   * { key: "question1", value: "answer1"},
+   * { key: "question2", value: "answer2"}
+   * ]
+   */
+  Question Json
+}

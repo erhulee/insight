@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
 import { PrismaClient } from '@prisma/client'
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 const prisma = new PrismaClient();
 const getUid = async () => {
@@ -68,7 +69,6 @@ export const appRouter = router({
         id: z.string(),
         questions: z.any()
     })).mutation(async (opt) => {
-        console.log("SaveSurvey:", opt.input)
         try {
             const response = await prisma.survey.update({
                 where: {
@@ -78,13 +78,13 @@ export const appRouter = router({
                     questions: opt.input.questions
                 }
             })
-            console.log("SaveSurvey:", response)
             return response
         } catch (e) {
-            console.log(e)
-            return null
+            throw new TRPCError({
+                message: "保存失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
         }
-
     }),
     GetSurvey: procedure.input(z.object({
         id: z.string(),
@@ -111,30 +111,32 @@ export const appRouter = router({
         }
     }),
     GetSurveyList: procedure.query(async () => {
-        try {
-            const cookieStore = await cookies()
-            const token = cookieStore.get("session")?.value
-            const payload: any = await decrypt(token)
-            const userId: string = payload['userId']
-            const surveyList = await prisma.survey.findMany({
-                where: {
-                    ownerId: userId
-                }
+        const cookieStore = await cookies()
+        const token = cookieStore.get("session")?.value
+        const payload: any = await decrypt(token)
+        if (payload == null) {
+            throw new TRPCError({
+                message: "未登录",
+                code: "UNAUTHORIZED"
             })
-            const _questions = (question: string | object) => {
-                if (typeof question === "string") {
-                    return JSON.parse(question)
-                } else {
-                    return question
-                }
-            }
-            return surveyList.map(item => ({
-                ...item,
-                questions: _questions(item.questions ?? [])
-            }))
-        } catch (e) {
-            return []
         }
+        const userId: string = payload['userId']
+        const surveyList = await prisma.survey.findMany({
+            where: {
+                ownerId: userId
+            }
+        })
+        const _questions = (question: string | object) => {
+            if (typeof question === "string") {
+                return JSON.parse(question)
+            } else {
+                return question
+            }
+        }
+        return surveyList.map(item => ({
+            ...item,
+            questions: _questions(item.questions ?? [])
+        }))
     }),
     CreateSurvey: procedure.input(z.object({
         name: z.string().optional(),

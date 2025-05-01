@@ -1,6 +1,5 @@
 "use client"
 import { useState } from "react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,24 +8,24 @@ import { PlusCircle, Search, FileText } from "lucide-react"
 import { SurveyOverview } from "@/app/developer/components/survey-overview"
 import { trpc } from "@/app/_trpc/client";
 import { LayoutHeader } from "@/components/layout-header"
+import { toast } from "sonner"
 
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
-  const { data: surveys, isLoading, error, refetch } = trpc.GetSurveyList.useQuery(undefined, {
-    initialData: []
+  const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery(undefined, {
+    initialData: [],
   })
+
+  console.log("errrrrr:", error)
+  if (error && error.data?.code == "UNAUTHORIZED") {
+    toast("未登录或登录已过期, 3秒后为您跳转")
+    // 跳转到登陆页
+    window.location.href = "/login"
+    return null
+  }
   // 创建新问卷
-  const mutation = trpc.CreateSurvey.useMutation({
-    onSuccess: (data) => {
-      refetch()
-      console.log("CreateSurvey success:", data)
-      // window.location.href = `/dashboard/edit/${data.id}`
-    },
-    onError: (error) => {
-      console.error("CreateSurvey error:", error)
-    },
-  })
+  const mutation = trpc.CreateSurvey.useMutation({})
   const deleteMutation = trpc.DeleteSurvey.useMutation({
     onSuccess: (data) => {
       refetch()
@@ -37,16 +36,29 @@ export default function DashboardPage() {
     },
   })
   const handleCreateSurvey = async () => {
-    mutation.mutate({})
-    // 重定向到编辑页面
-    // window.location.href = `/dashboard/edit/${newSurveyId}`
+    try {
+      await mutation.mutate({})
+      const id = mutation.data?.id
+      if (id) {
+        toast("创建新问卷成功, 3秒后为您跳转")
+        setTimeout(() => {
+          window.location.href = `/dashboard/edit/${id}`
+        }, 3000)
+      } else {
+        throw "id is empty"
+      }
+    } catch (e) {
+      toast("创建新问卷失败", {
+        description: JSON.stringify(e),
+      })
+    }
   }
   const handleDeleteSurvey = async (id: string) => {
     deleteMutation.mutate({ id })
   }
 
   // 过滤问卷
-  const filteredSurveys = surveys.filter((survey) => {
+  const filteredSurveys = surveys?.filter((survey) => {
     // 根据搜索查询过滤
     const matchesSearch = survey.name.toLowerCase().includes(searchQuery.toLowerCase())
     // 根据标签过滤
@@ -54,10 +66,7 @@ export default function DashboardPage() {
     if (activeTab === "published") return matchesSearch && survey.published
     if (activeTab === "drafts") return matchesSearch && !survey.published
     return matchesSearch
-  })
-
-
-
+  }) ?? []
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}

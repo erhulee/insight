@@ -1,11 +1,10 @@
 "use client"
-
 import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Lock, User, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -24,10 +23,16 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      account: "",
+      password: "",
+      confirmPassword: "",
+      username: ""
+    }
   })
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { account, password, username } = values
-    const user = await create(account, password, username)
+    await create(account, password, username)
   }
   return (
     <div className="min-h-screen flex flex-col">
@@ -55,7 +60,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>用户名称</FormLabel>
                           <FormControl>
-                            <Input placeholder="shadcn" {...field} />
+                            <Input  {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -68,7 +73,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>账号</FormLabel>
                           <FormControl>
-                            <Input placeholder="shadcn" {...field} />
+                            <Input  {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -81,7 +86,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>密码</FormLabel>
                           <FormControl>
-                            <Input placeholder="••••••••"{...field} />
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -94,7 +99,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>确认密码</FormLabel>
                           <FormControl>
-                            <Input placeholder="••••••••" {...field} />
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

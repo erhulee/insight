@@ -6,7 +6,8 @@ import { v4 as uuidv4 } from "uuid"
 import { QuestionItem } from "@/components/survey-editor/question-item"
 import { Question } from "@/lib/types"
 import { scrollToElement, } from "@/lib/utils"
-import { preset } from "@/components/survey-editor/buildin/form-item"
+import { preset, QuestionType } from "@/components/survey-editor/buildin/form-item"
+import { cloneDeep } from "lodash-es"
 type Props = {
     survey: any
     questions: any[]
@@ -16,8 +17,8 @@ type Props = {
 }
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
-    id: item.key,
-    name: item.name,
+    id: item.type,
+    name: item.title,
     icon: <item.icon className="h-4 w-4"></item.icon>
 }))
 export function Canvas(props: Props) {
@@ -38,7 +39,6 @@ export function Canvas(props: Props) {
         updatedQuestions.splice(index + 1, 0, duplicatedQuestion)
 
         onQuestionsChange(updatedQuestions)
-        setSelectedQuestionId(duplicatedQuestion.id)
 
         // 滚动到复制的问题
         setTimeout(() => {
@@ -49,7 +49,6 @@ export function Canvas(props: Props) {
         const updatedQuestions = questions.filter((q) => q.id !== id)
         // 如果删除的是当前选中的问题，选中第一个问题或清除选择
         if (id === selectedQuestionId) {
-            setSelectedQuestionId(updatedQuestions.length > 0 ? updatedQuestions[0].id : null)
         }
         onQuestionsChange(updatedQuestions)
 
@@ -58,33 +57,12 @@ export function Canvas(props: Props) {
 
     }
 
-    const handleAddQuestion = (type: string) => {
-        const newQuestion: Question = {
+    const handleAddQuestion = (type: QuestionType) => {
+        const questionPreset = cloneDeep(preset.find(item => item.type == type))
+        const newQuestion = {
             id: uuidv4(),
-            type,
-            title: type === "section" ? "分节标题" : "新问题",
-            required: false,
+            ...questionPreset
         }
-
-        // 根据问题类型添加特定属性
-        if (type === "radio" || type === "checkbox" || type === "dropdown") {
-            newQuestion.options = [
-                { text: "选项 1", value: "option-1" },
-                { text: "选项 2", value: "option-2" },
-                { text: "选项 3", value: "option-3" },
-            ]
-        } else if (type === "rating") {
-            newQuestion.maxRating = 5
-            newQuestion.ratingType = "number"
-        } else if (type === "text") {
-            newQuestion.placeholder = "请输入..."
-            newQuestion.multiline = false
-        } else if (type === "file") {
-            newQuestion.maxFiles = 1
-            newQuestion.maxSize = 5 // MB
-            newQuestion.fileTypes = ".pdf,.jpg,.png"
-        }
-
         const updatedQuestions = [...questions, newQuestion]
         onQuestionsChange(updatedQuestions)
         // setSelectedQuestionId(newQuestion.id)
@@ -113,7 +91,7 @@ export function Canvas(props: Props) {
                 {questions.length === 0 ? (
                     <div className="text-center py-12 border-2 border-dashed rounded-lg">
                         <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
-                        <Button onClick={() => handleAddQuestion("text")}>
+                        <Button onClick={() => handleAddQuestion(QuestionType.Text)}>
                             <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
                         </Button>
                     </div>

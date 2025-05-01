@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
@@ -10,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, Lock, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
-import { create } from "./service"
 import { InsightBrand } from "@/components/common/insight-brand"
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -33,12 +31,8 @@ export default function LoginPage() {
       rememberMe: checked,
     }))
   }
-
-
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("hanmdleSub")
     e.preventDefault()
-    create()
     // Validate form
     if (!formData.email || !formData.password) {
       toast("Error", {
@@ -46,13 +40,8 @@ export default function LoginPage() {
       })
       return
     }
-
     setIsLoading(true)
-
     try {
-
-      // Redirect to dashboard
-      // router.push("/dashboard")
     } catch (error) {
       console.error("Login error:", error)
       toast("Error", {
@@ -70,13 +59,12 @@ export default function LoginPage() {
           <InsightBrand></InsightBrand>
         </div>
       </header>
-
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-              <CardDescription>Enter your email and password to access your account</CardDescription>
+              <CardTitle className="text-2xl font-bold">注册</CardTitle>
+              <CardDescription>输入您的电子邮件地址和密码以访问您的账户</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit}>
@@ -100,7 +88,7 @@ export default function LoginPage() {
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">密码</Label>
                       <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                        Forgot password?
+                        忘记密码?
                       </Link>
                     </div>
                     <div className="relative">
@@ -124,17 +112,10 @@ export default function LoginPage() {
                     </Label>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <span className="flex items-center gap-1">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Signing in...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        Sign in
-                        <ArrowRight className="h-4 w-4" />
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1">
+                      确认注册
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
                   </Button>
                 </div>
               </form>

@@ -1,19 +1,8 @@
-import { CheckboxSchema } from "./checkbox"
-import { RadioSchema } from "./radio"
-import { RatingSchema } from "./rating"
-import { TextSchema } from "./text"
-import { DateSchema } from "./date"
-import { DropdownSchema } from "./dropdown"
-import { FileSchema } from "./file"
-import { NumberInputSchema } from './number'
+import { meta as TextInputMeta } from "./text-input/textInput"
+import { meta as TextAreaMeta } from "./text-area/textArea"
+export { QuestionType } from "./core/QuestionType"
 export const preset = [
-    // CheckboxSchema,
-    // RadioSchema,
-    // RatingSchema,
-    TextSchema,
-    NumberInputSchema
-    // DateSchema,
-    // DropdownSchema,
-    // FileSchema
+    TextInputMeta,
+    TextAreaMeta
 ]
 
