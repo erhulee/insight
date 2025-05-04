@@ -2,7 +2,6 @@
 import type React from "react"
 import { useState, use, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { v4 as uuidv4 } from "uuid"
 import type { Question } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -12,25 +11,24 @@ import {
   Brush,
   LinkIcon,
 } from "lucide-react"
-
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
-import { DevicePreview } from "@/components/survey-editor/device-preview"
-import { scrollToElement, } from "@/lib/utils"
 import { toast } from "sonner"
-import { preset, QuestionType } from "@/components/survey-editor/buildin/form-item"
+import { QuestionType } from "@/components/survey-editor/buildin/form-item"
 import { publish, unpublish } from "./service"
 import { RenameInput } from "./components/rename-input"
 import { trpc } from "@/app/_trpc/client"
-import { Preview } from "./components/preview"
 import { Canvas } from "./components/EditCanvas"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { JsonEditor } from "./components/jsonEditor"
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { ShareConfig } from "./components/shareConfig"
 import { EditHeader } from "./components/EditHeader"
 import { WidgetPanel } from "./components/WidgetPanel"
 import { QuestionConfig } from "./components/QuestionConfig"
 import { cloneDeep } from "lodash-es"
+import { SurveyPagiNation } from "./components/SurveyPagiNation"
+import { useSnapshot } from "valtio"
+import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from "../../_valtio/runtime"
+import { JsonEditor } from "./components/JsonEditor"
 
 
 export default function EditSurveyPage(props: {
@@ -38,72 +36,50 @@ export default function EditSurveyPage(props: {
     id: string
   }>
 }) {
-  const params = use(props.params);
   const router = useRouter()
+  const runtimeState = useSnapshot(runtimeStore)
+  const selectedQuestionId = runtimeState.selectedQuestionID
+  const params = use(props.params);
   const { data: survey, isError, refetch, isLoading } = trpc.GetSurvey.useQuery({
     id: params.id
   }, {
     initialData: {} as any
   })
   useEffect(() => {
-    //TODO: use diff
-    if (survey?.questions) {
-      setQuestions(survey.questions)
+    if (survey != null) {
+      const questions = (survey as any).questions as unknown as Question[] ?? [];
+      initRuntimeStore({
+        surveyId: survey.id,
+        questions: questions,
+        pageCount: survey.pageCount,
+        currentPage: 1,
+        selectedQuestionID: null,
+        currentQuestion: questions.filter(i => i.ownerPage == 1)
+      })
     }
   }, [survey])
-  console.log("survey:::::", survey)
-  const saveMutation = trpc.SaveSurvey.useMutation({})
   const [sheetVisible, setSheetVisible] = useState(false)
-  const [questions, setQuestions] = useState<Question[]>([])
+
   const [activeTab, setActiveTab] = useState<"design" | "json" | "previwe">("design")
-  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null)
-  // 添加问题
-  const handleAddQuestion = (type: QuestionType) => {
-    const meta = preset.find((item) => item.type === type)!
-    const newQuestion: Question = {
-      id: uuidv4(),
-      type,
-      name: meta.title,
-      attr: {},
-    }
-    const updatedQuestions = [...questions, newQuestion]
-    setQuestions(updatedQuestions)
-    setSelectedQuestionId(newQuestion.id)
-    // 滚动到新添加的问题
-    setTimeout(() => {
-      scrollToElement(newQuestion.id, 100)
-    }, 100)
-  }
 
   // 更新问题
   const handleUpdateQuestion = (action: "update-attr", values: Record<string, any>) => {
+    console.log("handleUpdateQuestion:", action, values)
     switch (action) {
       case "update-attr":
-        const oldQuestions = cloneDeep(questions);
+        const oldQuestions: Question[] = cloneDeep(runtimeState.questions) as any;
         oldQuestions.forEach((q) => {
-          if (q.id === selectedQuestionId) {
+          if (q.field === selectedQuestionId) {
             if (q.attr == null) {
               q.attr = {}
             }
             Object.assign(q.attr, values)
           }
         })
-        console.log("更新问题:", oldQuestions)
-        setQuestions(oldQuestions)
+        updateRuntimeQuestion(oldQuestions)
     }
   }
-  // 保存问卷
-  const handleSaveSurvey = async () => {
-    try {
-      await saveMutation.mutate({
-        id: params.id,
-        questions: JSON.stringify(questions)
-      })
-      toast.success("保存成功")
-    } catch {
-      toast.warning("保存失败")
-    }
-  }
+
   // 返回问卷列表
   const handleBackToDashboard = () => {
     router.push("/dashboard")
@@ -142,7 +118,8 @@ export default function EditSurveyPage(props: {
 
   }
   // 获取选中的问题
-  const selectedQuestion = questions.find((q) => q.id === selectedQuestionId)
+  const selectedQuestion = runtimeState.currentQuestion.find((q) => q.field === selectedQuestionId)
+  console.log("selectedQuestion:", selectedQuestion, selectedQuestionId, runtimeState.currentQuestion)
   if (isError || survey == null) {
     return (<div>程序异常</div>)
   } else {
@@ -150,7 +127,6 @@ export default function EditSurveyPage(props: {
       <div className="min-h-screen bg-background flex flex-col">
         {/* 顶部导航栏 */}
         <EditHeader
-          handleSaveSurvey={handleSaveSurvey}
           handleShareSurvey={handleShareSurvey}
           handlePublishSurvey={handlePublishSurvey}
           handleBackToDashboard={handleBackToDashboard}
@@ -160,11 +136,12 @@ export default function EditSurveyPage(props: {
         <DragDropProvider>
           <div className="flex-1 flex overflow-hidden">
             {/* 左侧面板 - 问题类型 */}
-            <WidgetPanel handleAddQuestion={handleAddQuestion}></WidgetPanel>
+            <WidgetPanel ></WidgetPanel>
             {/* 中间面板 - 问题列表/预览 */}
             {isLoading ? <div>loading...</div> : <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
                 <RenameInput id={survey.id} title={survey.name}></RenameInput>
+                <SurveyPagiNation></SurveyPagiNation>
                 <ToggleGroup type="single" size="sm" value={activeTab} onValueChange={(v) => {
                   setActiveTab(v as any)
                 }}>
@@ -179,16 +156,12 @@ export default function EditSurveyPage(props: {
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
-              {activeTab === "json" && <JsonEditor questions={questions}></JsonEditor>}
+              {activeTab === "json" && <JsonEditor questions={runtimeState.questions}></JsonEditor>}
               {activeTab === "design" && <Canvas
                 selectedQuestionId={selectedQuestionId}
-                onQuestionSelect={question => setSelectedQuestionId(question.id)}
                 survey={survey}
-                onQuestionsChange={(questions) => {
-                  setQuestions(questions)
-                }}
-                questions={questions}></Canvas>}
-              {activeTab === "previwe" && <DevicePreview><Preview survey={survey} questions={questions}></Preview></DevicePreview>}
+              >
+              </Canvas>}
             </div>}
 
             {/* 右侧面板 - 问题设置 */}
@@ -201,10 +174,10 @@ export default function EditSurveyPage(props: {
                     : "请从左侧选择一个问题进行编辑"}
                 </p>
               </div>
-              <ScrollArea className="h-[calc(100vh-8rem)]">
+              <ScrollArea >
                 <div className="p-4">
                   {selectedQuestion ? (
-                    <QuestionConfig question={selectedQuestion} onUpdate={(attr) => {
+                    <QuestionConfig onUpdate={(attr) => {
                       handleUpdateQuestion("update-attr", attr)
                     }} />
                   ) : (

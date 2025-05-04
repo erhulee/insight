@@ -25,6 +25,7 @@ model Survey {
   questions   Json
   deletedAt   DateTime?
   published   Boolean   @default(false)
+  pageCount   Int       @default(1)
 }
 
 model Questionnaires {

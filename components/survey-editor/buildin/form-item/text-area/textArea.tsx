@@ -114,7 +114,7 @@ export const meta: IFormItemMeta = {
         {
             name: 'placeholder',
             title: '引导提示文案',
-            type: FormItemConfigSetterType.Input,
+            type: FormItemConfigSetterType.Textarea,
             placeholder: '限制20字',
         }
     ]

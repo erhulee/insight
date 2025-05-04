@@ -6,17 +6,35 @@ import {
     ArrowLeft,
     Share2,
     Smartphone,
-
 } from "lucide-react"
+import { trpc } from "@/app/_trpc/client"
+import { runtimeStore } from "@/app/dashboard/_valtio/runtime"
+import { useSnapshot } from "valtio"
+import { toast } from "sonner"
 type Props = {
     handleBackToDashboard: () => void,
     handlePublishSurvey: (published: boolean) => void,
     handleShareSurvey: () => void,
-    handleSaveSurvey: () => void,
     published: boolean
 }
 export function EditHeader(props: Props) {
-    const { handleBackToDashboard, handleSaveSurvey, handleShareSurvey, handlePublishSurvey, published } = props
+    const runtimeState = useSnapshot(runtimeStore)
+    const saveMutation = trpc.SaveSurvey.useMutation({})
+    const handleSaveSurvey = () => {
+        saveMutation.mutate({
+            id: runtimeState.surveyId,
+            questions: JSON.stringify(runtimeState.questions),
+            pageCnt: runtimeState.pageCount
+        }, {
+            onSuccess: () => {
+                toast.success("保存成功")
+            },
+            onError: () => {
+                toast.error("保存失败")
+            }
+        })
+    }
+    const { handleBackToDashboard, handleShareSurvey, handlePublishSurvey, published } = props
     return (
         <header className="border-b sticky top-0 z-10 bg-background">
             <div className=" flex h-16 items-center justify-between px-4">

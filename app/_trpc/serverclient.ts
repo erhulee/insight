@@ -7,7 +7,7 @@ const createCaller = createCallerFactory(appRouter);
 export const serverClient = createCaller({
     links: [
         httpBatchLink({
-            url: process.env.TRPC_URL ?? "http://localhost:3000/api/trpc"
+            url: process.env.TRPC_URL ?? "http://localhost:3001/api/trpc"
         }),
     ],
 });

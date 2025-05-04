@@ -200,3 +200,8 @@ html body[data-scroll-locked] {
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
   }
 }
+
+.ant-form-item-label label {
+  color: rgba(44, 44, 44, 0.85) !important;
+  font-weight: 500 !important;
+}

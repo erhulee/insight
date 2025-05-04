@@ -3,17 +3,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus } from "lucide-react"
 import { v4 as uuidv4 } from "uuid"
-import { QuestionItem } from "@/components/survey-editor/question-item"
 import { Question } from "@/lib/types"
 import { scrollToElement, } from "@/lib/utils"
 import { preset, QuestionType } from "@/components/survey-editor/buildin/form-item"
 import { cloneDeep } from "lodash-es"
+import { EditQuestionItem } from "./EditQuestionItem"
+import { useSnapshot } from "valtio"
+import { addQuestion, deleteQuestion, runtimeStore, selectQuestion } from "@/app/dashboard/_valtio/runtime"
 type Props = {
     survey: any
-    questions: any[]
-    selectedQuestionId: string | null
-    onQuestionsChange: (questions: any[]) => void
-    onQuestionSelect: (question: any) => void
 }
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
@@ -22,57 +20,51 @@ const questionTypes = preset.map((item) => ({
     icon: <item.icon className="h-4 w-4"></item.icon>
 }))
 export function Canvas(props: Props) {
-    const { questions, survey, onQuestionsChange, selectedQuestionId } = props;
+    const runtimeState = useSnapshot(runtimeStore);
+    const questions = runtimeState.currentQuestion;
+    const { survey } = props;
+    const handleSelectQuestion = (question: Question) => {
+        console.log("handleSelectQuestion:", question)
+        selectQuestion(question)
+    }
     // 复制问题
     const handleDuplicateQuestion = (id: string) => {
-        const questionToDuplicate = questions.find((q) => q.id === id)
+        const questionToDuplicate = questions.find((q) => q.field === id)!
         if (!questionToDuplicate) return
 
         const duplicatedQuestion: Question = {
             ...JSON.parse(JSON.stringify(questionToDuplicate)),
             id: uuidv4(),
-            title: `${questionToDuplicate.title} (复制)`,
         }
 
-        const index = questions.findIndex((q) => q.id === id)
+        const index = questions.findIndex((q) => q.field === id)
         const updatedQuestions = [...questions]
         updatedQuestions.splice(index + 1, 0, duplicatedQuestion)
-
-        onQuestionsChange(updatedQuestions)
-
         // 滚动到复制的问题
         setTimeout(() => {
-            scrollToElement(duplicatedQuestion.id, 100)
+            scrollToElement(duplicatedQuestion.field, 100)
         }, 100)
     }
     const handleDeleteQuestion = (id: string) => {
-        const updatedQuestions = questions.filter((q) => q.id !== id)
-        // 如果删除的是当前选中的问题，选中第一个问题或清除选择
-        if (id === selectedQuestionId) {
-        }
-        onQuestionsChange(updatedQuestions)
-
+        deleteQuestion(id)
     }
     const handleDescriptionChange = () => {
-
     }
 
     const handleAddQuestion = (type: QuestionType) => {
         const questionPreset = cloneDeep(preset.find(item => item.type == type))
-        const newQuestion = {
-            id: uuidv4(),
+        const newQuestion: Question = {
+            field: uuidv4(),
             ...questionPreset
-        }
-        const updatedQuestions = [...questions, newQuestion]
-        onQuestionsChange(updatedQuestions)
+        } as any
+        addQuestion(newQuestion)
         // setSelectedQuestionId(newQuestion.id)
         // 滚动到新添加的问题
         setTimeout(() => {
-            scrollToElement(newQuestion.id, 100)
+            scrollToElement(newQuestion.field, 100)
         }, 100)
     }
     // 渲染预览内容
-
     return <div className="h-full flex flex-col">
         <div className="flex-1 overflow-y-auto p-4">
             {/* 问卷描述 */}
@@ -97,18 +89,15 @@ export function Canvas(props: Props) {
                     </div>
                 ) : (
                     questions.map((question) => (
-                        <QuestionItem
-                            key={question.id}
+                        <EditQuestionItem
+                            key={question.field}
                             question={question}
-                            isSelected={selectedQuestionId === question.id}
                             isPreview={false}
                             onSelect={() => {
-                                props.onQuestionSelect(question)
+                                handleSelectQuestion(question)
                             }}
                             onDelete={handleDeleteQuestion}
                             onDuplicate={handleDuplicateQuestion}
-                            questions={questions}
-                            setQuestions={() => { }}
                         />
                     ))
                 )}

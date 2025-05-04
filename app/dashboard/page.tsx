@@ -17,7 +17,6 @@ export default function DashboardPage() {
     initialData: [],
   })
 
-  console.log("errrrrr:", error)
   if (error && error.data?.code == "UNAUTHORIZED") {
     toast("未登录或登录已过期, 3秒后为您跳转")
     // 跳转到登陆页

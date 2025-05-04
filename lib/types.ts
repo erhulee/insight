@@ -10,13 +10,15 @@ export interface Survey {
   published: boolean
   settings?: SurveySettings
   theme?: SurveyTheme
+  pageCount: number
 }
 
 export interface Question {
-  id: string
+  field: string
   name: string
   type: QuestionType
   attr: Record<string, any>
+  ownerPage: number
 }
 
 export interface QuestionOption {

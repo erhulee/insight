@@ -2,6 +2,8 @@ export enum FormItemConfigSetterType {
     Select = "Select",
     Range = "Range",
     Input = "Input",
+    Textarea = "Textarea",
+    Option = "Option",
 }
 interface IFormItemConfig {
     /**
@@ -32,7 +34,16 @@ type RangeSetter = IFormItemConfig & {
 
 type InputSetter = IFormItemConfig & {
     type: FormItemConfigSetterType.Input,
+    placeholder?: string,
+}
+
+type TextAreaSetter = IFormItemConfig & {
+    type: FormItemConfigSetterType.Textarea,
     placeholder: string,
 }
 
-export type FormItemConfigSetter = SelectSetter | RangeSetter | InputSetter
+type OptionSetter = IFormItemConfig & {
+    type: FormItemConfigSetterType.Option,
+}
+
+export type FormItemConfigSetter = SelectSetter | RangeSetter | InputSetter | TextAreaSetter | OptionSetter

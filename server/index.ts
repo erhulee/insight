@@ -4,6 +4,7 @@ import { decrypt } from "@/lib/session";
 import { PrismaClient } from '@prisma/client'
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { Question } from "@/lib/types";
 
 const prisma = new PrismaClient();
 const getUid = async () => {
@@ -67,7 +68,8 @@ export const appRouter = router({
     }),
     SaveSurvey: procedure.input(z.object({
         id: z.string(),
-        questions: z.any()
+        questions: z.any(),
+        pageCnt: z.number(),
     })).mutation(async (opt) => {
         try {
             const response = await prisma.survey.update({
@@ -75,7 +77,8 @@ export const appRouter = router({
                     id: opt.input.id
                 },
                 data: {
-                    questions: opt.input.questions
+                    questions: opt.input.questions,
+                    pageCount: opt.input.pageCnt
                 }
             })
             return response
@@ -98,10 +101,8 @@ export const appRouter = router({
                 }
             })
             if (survey) {
-                return {
-                    ...survey,
-                    questions: JSON.parse(survey.questions ?? "[]")
-                }
+                survey.questions = JSON.parse(survey.questions ?? "[]") as any[] // TODO: 类型不匹配，需要修复，暂时先这样用着，后面再改
+                return survey
             } else {
                 return null
             }
@@ -147,12 +148,43 @@ export const appRouter = router({
         const token = cookieStore.get("session")?.value
         const payload: any = await decrypt(token)
         const userId: string = payload['userId']
-        const survey = await prisma.survey.create({
-            data: {
+
+        try {
+            const survey = await prisma.survey.create({
+                data: {
+                    ownerId: userId,
+                    name: name,
+                    description: description,
+                    questions: JSON.stringify([]),
+                    pageCount: 1
+                }
+            })
+            return survey
+        } catch (e) {
+            console.log("err:", e)
+            throw new TRPCError({
+                message: "创建失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
+        }
+    }),
+    InsertSurveyNewPage: procedure.input(z.object({
+        id: z.string(),
+    })).mutation(async (opt) => {
+        const { id } = opt.input;
+        const cookieStore = await cookies()
+        const token = cookieStore.get("session")?.value
+        const payload: any = await decrypt(token)
+        const userId: string = payload['userId']
+        const survey = await prisma.survey.update({
+            where: {
                 ownerId: userId,
-                name: name,
-                description: description,
-                questions: JSON.stringify([])
+                id: id
+            },
+            data: {
+                pageCount: {
+                    increment: 1
+                }
             }
         })
         return survey

@@ -1,6 +1,6 @@
 import { Question } from "@/lib/types";
 import { QuestionType } from "../form-item";
-import { Input } from "antd";
+import { Input, Radio } from "antd";
 
 export function QuestionRender(props: {
     question: Question
@@ -9,40 +9,15 @@ export function QuestionRender(props: {
     switch (question.type) {
         case QuestionType.Text:
             return (
-                <div className="space-y-2">
-                    {question.required && <span className="text-destructive text-sm">*</span>}
-                    <input
-                        type="text"
-                        className="w-full px-3 py-2 border rounded-md bg-muted/50"
-                        placeholder={question.placeholder || "请输入..."}
-                    />
-                    {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
-                </div>
+                <Input  ></Input>
             )
         case QuestionType.TextArea:
             return (<Input.TextArea></Input.TextArea>)
-        // case "radio":
-        //     return (
-        //         <div className="space-y-2">
-        //             {question.required && <span className="text-destructive text-sm">*</span>}
-        //             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
-        //             <div className="space-y-1">
-        //                 {question.options?.map((option, index) => (
-        //                     <div key={index} className="flex items-center space-x-2">
-        //                         <input
-        //                             type="radio"
-        //                             name={`question-${question.id}`}
-        //                             id={`option-${question.id}-${index}`}
-        //                             disabled={isPreview}
-        //                         />
-        //                         <label htmlFor={`option-${question.id}-${index}`} className="text-sm">
-        //                             {option.text}
-        //                         </label>
-        //                     </div>
-        //                 ))}
-        //             </div>
-        //         </div>
-        //     )
+        case QuestionType.Radio:
+            return <Radio.Group disabled options={question.attr['options'].map((i: string) => ({
+                label: i,
+                value: i
+            }))} ></Radio.Group>
         // case "checkbox":
         //     return (
         //         <div className="space-y-2">

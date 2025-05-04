@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { createContext, useContext, useState, useCallback } from "react"
 import type { Question } from "@/lib/types"
@@ -14,12 +13,11 @@ interface DragDropContextProps {
   handleDrop: (
     e: React.DragEvent,
     questions: Question[],
-    setQuestions: React.Dispatch<React.SetStateAction<Question[]>>,
+    setQuestions: (questions: Question[]) => void,
   ) => void
 }
 
 const DragDropContext = createContext<DragDropContextProps | undefined>(undefined)
-
 export function DragDropProvider({ children }: { children: React.ReactNode }) {
   const [isDragging, setIsDragging] = useState(false)
   const [draggedItem, setDraggedItem] = useState<Question | null>(null)
@@ -102,6 +100,8 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
     (e: React.DragEvent, questions: Question[], setQuestions: React.Dispatch<React.SetStateAction<Question[]>>) => {
       e.preventDefault()
 
+      console.log("draggedItem:", draggedItem)
+      console.log("dragOverItemId:", dragOverItemId)
       if (draggedItem && dragOverItemId) {
         try {
           // 获取拖动项和目标项的索引

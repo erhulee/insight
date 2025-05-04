@@ -1,4 +1,5 @@
 export enum QuestionType {
     Text = "text",
-    TextArea = "textarea"
+    TextArea = "textarea",
+    Radio = "radio",
 }

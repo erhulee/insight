@@ -5,10 +5,12 @@ import type { Question } from "@/lib/types"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { GripVertical, Trash2, Copy } from "lucide-react"
-import { useDragDrop } from "./drag-drop-context"
 import { cn } from "@/lib/utils"
-import { Badge } from "../ui/badge"
-import { QuestionRender } from "./buildin/form-runtime/question-render"
+import { Badge } from "antd"
+import { useDragDrop } from "@/components/survey-editor/drag-drop-context"
+import { QuestionRender } from "@/components/survey-editor/buildin/form-runtime/question-render"
+import { useSnapshot } from "valtio"
+import { runtimeStore } from "@/app/dashboard/_valtio/runtime"
 
 interface QuestionItemProps {
   question: Question
@@ -17,29 +19,26 @@ interface QuestionItemProps {
   onSelect: (id: string) => void
   onDelete: (id: string) => void
   onDuplicate: (id: string) => void
-  questions: Question[]
-  setQuestions: (questions: Question[]) => void
 }
 
-export function QuestionItem({
+export function EditQuestionItem({
   question,
-  isSelected,
   isPreview,
   onSelect,
   onDelete,
   onDuplicate,
-  questions,
-  setQuestions,
 }: QuestionItemProps) {
   const { handleDragStart, handleDragEnd, handleDragOver, handleDrop } = useDragDrop()
+  const selectedQuestionID = useSnapshot(runtimeStore).selectedQuestionID
+  const isSelected = selectedQuestionID == question.field
   const cardRef = useRef<HTMLDivElement>(null)
 
   // 确保元素ID始终存在
   useEffect(() => {
     if (cardRef.current) {
-      cardRef.current.id = question.id
+      cardRef.current.id = question.field
     }
-  }, [question.id])
+  }, [question.field])
 
   // 安全的拖拽处理函数
   const safeDragStart = (e: React.DragEvent) => {
@@ -60,16 +59,16 @@ export function QuestionItem({
 
   const safeDragOver = (e: React.DragEvent) => {
     try {
-      handleDragOver(e, question.id)
+      handleDragOver(e, question.field)
     } catch (error) {
       console.error("Error in drag over:", error)
     }
   }
 
   const safeDrop = (e: React.DragEvent) => {
-    console.log("safeDrop:", e, question, setQuestions)
+    const questions: any = []
     try {
-      handleDrop(e, questions, setQuestions)
+      // handleDrop(e, questions, setQuestions)
     } catch (error) {
       console.error("Error in drop:", error)
     }
@@ -78,11 +77,11 @@ export function QuestionItem({
     <Card
       ref={cardRef}
       className={cn(
-        "question-item group mb-4 transition-all",
+        "question-item group transition-all",
         isSelected && !isPreview && "selected border-primary",
         isPreview && "preview-item",
       )}
-      onClick={() => onSelect(question.id)}
+      onClick={() => onSelect(question.field)}
       draggable={!isPreview}
       onDragStart={safeDragStart}
       onDragEnd={safeDragEnd}
@@ -96,7 +95,7 @@ export function QuestionItem({
               <GripVertical className="h-5 w-5 text-muted-foreground" />
             </div>
           )}
-          <Badge variant="secondary">{question.name}</Badge>
+          <Badge >{question.name}</Badge>
         </div>
         {!isPreview && (
           <div className="question-actions flex items-center gap-1">
@@ -105,7 +104,7 @@ export function QuestionItem({
               size="icon"
               onClick={(e) => {
                 e.stopPropagation()
-                onDuplicate(question.id)
+                onDuplicate(question.field)
               }}
               title="复制问题"
               className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -117,7 +116,7 @@ export function QuestionItem({
               size="icon"
               onClick={(e) => {
                 e.stopPropagation()
-                onDelete(question.id)
+                onDelete(question.field)
               }}
               title="删除问题"
               className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"

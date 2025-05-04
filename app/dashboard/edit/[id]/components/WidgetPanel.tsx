@@ -1,16 +1,35 @@
+"use client";
+import { addQuestion, runtimeStore } from "@/app/dashboard/_valtio/runtime";
 import { preset, QuestionType } from "@/components/survey-editor/buildin/form-item"
 import { Button } from "@/components/ui/button"
+import { Question } from "@/lib/types";
 import { Settings } from "lucide-react";
+import { v4 as uuidv4 } from "uuid"
+import { useSnapshot } from "valtio";
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
     id: item.type,
     name: item.title,
     icon: <item.icon className="h-4 w-4"></item.icon>
 }))
-export function WidgetPanel(props: {
-    handleAddQuestion: (type: QuestionType) => void,
-}) {
-    const { handleAddQuestion } = props;
+export function WidgetPanel() {
+    const currentPageIndex = useSnapshot(runtimeStore).currentPage
+    const handleAddQuestion = (questionType: QuestionType) => {
+        const meta = preset.find((item) => item.type === questionType)!
+        const newQuestion: Question = {
+            field: uuidv4(),
+            type: questionType,
+            name: meta.title,
+            attr: meta.attrs.reduce((pre, cur) => {
+                return {
+                    ...pre,
+                    [cur.name]: cur.defaultValue
+                }
+            }, {}),
+            ownerPage: currentPageIndex,
+        }
+        addQuestion(newQuestion)
+    }
     return (
         <div className="w-64 border-r bg-muted/30 overflow-y-auto hidden lg:block">
             <div className="p-4 border-b">
@@ -55,7 +74,6 @@ export function WidgetPanel(props: {
                         size="sm"
                         className="w-full justify-start gap-1"
                         onClick={() => {
-                            // setSheetVisible(true)
                         }}
                     >
                         <Settings className="h-4 w-4" />
