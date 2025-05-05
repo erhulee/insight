@@ -11,7 +11,6 @@ import { EditQuestionItem } from "./EditQuestionItem"
 import { useSnapshot } from "valtio"
 import { addQuestion, deleteQuestion, runtimeStore, selectQuestion } from "@/app/dashboard/_valtio/runtime"
 type Props = {
-    survey: any
 }
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
@@ -22,9 +21,7 @@ const questionTypes = preset.map((item) => ({
 export function Canvas(props: Props) {
     const runtimeState = useSnapshot(runtimeStore);
     const questions = runtimeState.currentQuestion;
-    const { survey } = props;
     const handleSelectQuestion = (question: Question) => {
-        console.log("handleSelectQuestion:", question)
         selectQuestion(question)
     }
     // 复制问题
@@ -68,7 +65,7 @@ export function Canvas(props: Props) {
     return <div className="h-full flex flex-col">
         <div className="flex-1 overflow-y-auto p-4">
             {/* 问卷描述 */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
                 <Textarea
                     value={survey.description}
                     onChange={handleDescriptionChange}
@@ -76,7 +73,7 @@ export function Canvas(props: Props) {
                     className="resize-none"
                     rows={2}
                 />
-            </div>
+            </div> */}
 
             {/* 问题列表 */}
             <div className="space-y-4">

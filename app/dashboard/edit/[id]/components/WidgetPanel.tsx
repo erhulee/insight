@@ -16,14 +16,17 @@ export function WidgetPanel() {
     const currentPageIndex = useSnapshot(runtimeStore).currentPage
     const handleAddQuestion = (questionType: QuestionType) => {
         const meta = preset.find((item) => item.type === questionType)!
+        const id = uuidv4();
         const newQuestion: Question = {
-            field: uuidv4(),
+            field: id,
+            id: id,
             type: questionType,
             name: meta.title,
             attr: meta.attrs.reduce((pre, cur) => {
                 return {
                     ...pre,
-                    [cur.name]: cur.defaultValue
+                    [cur.name]: cur.defaultValue,
+                    field: id,
                 }
             }, {}),
             ownerPage: currentPageIndex,

@@ -15,6 +15,7 @@ export interface Survey {
 
 export interface Question {
   field: string
+  id: string
   name: string
   type: QuestionType
   attr: Record<string, any>

@@ -71,6 +71,7 @@
     "recharts": "2.15.0",
     "recoil": "^0.7.7",
     "sonner": "^1.7.1",
+    "superjson": "^2.2.2",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "latest",

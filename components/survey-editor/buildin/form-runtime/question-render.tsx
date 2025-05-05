@@ -1,6 +1,6 @@
 import { Question } from "@/lib/types";
 import { QuestionType } from "../form-item";
-import { Input, Radio } from "antd";
+import { Checkbox, Input, Radio } from "antd";
 
 export function QuestionRender(props: {
     question: Question
@@ -9,7 +9,7 @@ export function QuestionRender(props: {
     switch (question.type) {
         case QuestionType.Text:
             return (
-                <Input  ></Input>
+                <Input placeholder={question.attr['placeholder'] || ""}  ></Input>
             )
         case QuestionType.TextArea:
             return (<Input.TextArea></Input.TextArea>)
@@ -18,6 +18,11 @@ export function QuestionRender(props: {
                 label: i,
                 value: i
             }))} ></Radio.Group>
+        case QuestionType.Checkbox:
+            return <Checkbox.Group disabled options={question.attr['options'].map((i: string) => ({
+                label: i,
+                value: i
+            }))} ></Checkbox.Group>
         // case "checkbox":
         //     return (
         //         <div className="space-y-2">
