@@ -21,6 +21,7 @@ export function QuestionConfig({ onUpdate }: QuestionConfigProps) {
     // 渲染基本配置选项
     const configList = questionInfo.config || []
     useEffect(() => {
+        console.log("selectQuestion.attr:", selectQuestion.attr)
         formClient.setFieldsValue(selectQuestion.attr)
     }, [selectQuestion.field])
     return (
@@ -44,7 +45,7 @@ export function QuestionConfig({ onUpdate }: QuestionConfigProps) {
                             configList.map((config) => {
                                 const { name, title, type } = config;
                                 const attr = selectQuestion.attr;
-                                console.log(" attr[name]:", selectQuestion, attr, name, attr[name])
+                                console.log(" attr[name]:", attr, name, attr[name])
                                 return (
                                     <Form.Item
                                         rootClassName=""

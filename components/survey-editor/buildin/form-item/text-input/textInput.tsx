@@ -67,14 +67,8 @@ export const meta: IFormItemMeta = {
             propType: "Object",
             description: '这是用于字数限制',
             defaultValue: {
-                max: {
-                    placeholder: '500',
-                    value: 500
-                },
-                min: {
-                    placeholder: '0',
-                    value: 0
-                }
+                max: "500",
+                min: "0"
             }
         }
     ],

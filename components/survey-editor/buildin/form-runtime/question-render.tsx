@@ -12,7 +12,7 @@ export function QuestionRender(props: {
                 <Input placeholder={question.attr['placeholder'] || ""}  ></Input>
             )
         case QuestionType.TextArea:
-            return (<Input.TextArea></Input.TextArea>)
+            return (<Input.TextArea placeholder={question.attr['placeholder'] || ""}></Input.TextArea>)
         case QuestionType.Radio:
             return <Radio.Group disabled options={question.attr['options'].map((i: string) => ({
                 label: i,

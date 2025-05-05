@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Insight - 专业的在线问卷调查平台",
   description: "创建专业问卷，收集有价值的数据，简单易用的问卷设计工具",
 }
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 export default function RootLayout({
   children,
@@ -18,7 +19,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="scroll-smooth">
       <body className={`${inter.className}`}>
-        <Provider>{children}</Provider>
+        <AntdRegistry>
+          <Provider>
+            {children}
+          </Provider>
+        </AntdRegistry>
         <Toaster />
       </body>
     </html>

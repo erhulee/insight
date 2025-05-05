@@ -80,6 +80,17 @@ export const meta: IFormItemMeta = {
     ],
     config: [
         {
+            name: "title",
+            title: "问题名称",
+            type: FormItemConfigSetterType.Input,
+        },
+        {
+            name: "field",
+            title: "表单字段",
+            type: FormItemConfigSetterType.Input,
+            placeholder: "可以直接使用随机ID"
+        },
+        {
             name: 'valid',
             title: '内容限制格式',
             type: FormItemConfigSetterType.Select,

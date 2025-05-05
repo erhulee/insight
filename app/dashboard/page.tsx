@@ -13,9 +13,7 @@ import { toast } from "sonner"
 export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
-  const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery(undefined, {
-    initialData: [],
-  })
+  const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery()
 
   if (error && error.data?.code == "UNAUTHORIZED") {
     toast("未登录或登录已过期, 3秒后为您跳转")
@@ -28,10 +26,8 @@ export default function DashboardPage() {
   const deleteMutation = trpc.DeleteSurvey.useMutation({
     onSuccess: (data) => {
       refetch()
-      console.log("DeleteSurvey success:", data)
     },
     onError: (error) => {
-      console.error("DeleteSurvey error:", error)
     },
   })
   const handleCreateSurvey = async () => {

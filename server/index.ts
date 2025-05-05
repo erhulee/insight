@@ -127,17 +127,26 @@ export const appRouter = router({
                 ownerId: userId
             }
         })
-        const _questions = (question: string | object) => {
+        const _questions = (question: string | any) => {
             if (typeof question === "string") {
                 return JSON.parse(question)
             } else {
                 return question
             }
         }
-        return surveyList.map(item => ({
-            ...item,
-            questions: _questions(item.questions ?? [])
+        const transformList = await Promise.all(surveyList.map(async item => {
+            const questionnairesInfo = await prisma.questionnaires.findMany({
+                where: {
+                    surveyId: item.id
+                }
+            });
+            return {
+                ...item,
+                questions: _questions(item.questions ?? []),
+                questionnairesCnt: questionnairesInfo.length
+            }
         }))
+        return transformList
     }),
     CreateSurvey: procedure.input(z.object({
         name: z.string().optional(),

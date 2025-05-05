@@ -20,6 +20,7 @@ export function SurveyOverview(props: {
         updatedAt: string
         questions: any[]
         published: boolean
+        questionnairesCnt: number
     }
     handleDelete: (id: string) => Promise<void>
 }) {
@@ -32,7 +33,7 @@ export function SurveyOverview(props: {
                     <div className=" flex-1">
                         {survey.name}
                     </div>
-                    <Badge variant="outline" className=" border-green-300 bg-green-100 text-green-600 opacity-50" >3份</Badge>
+                    <Badge variant="outline" className=" border-green-300 bg-green-100 text-green-600 opacity-50" >{survey.questionnairesCnt}份回答</Badge>
                 </CardTitle>
                 <CardDescription className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />

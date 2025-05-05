@@ -1,6 +1,7 @@
 import { FormItemConfigSetter, FormItemConfigSetterType } from "../form-item/core/IFormItemConfig";
 import { Input, Select } from "antd";
 import { OptionSetter } from "./optionSetter";
+import { RangeSetter } from "./rangeSetter";
 
 export function ConfigSetter(props: {
     configSetter: FormItemConfigSetter,
@@ -15,14 +16,9 @@ export function ConfigSetter(props: {
             return <Input.TextArea className=" w-full" ></Input.TextArea>
         case FormItemConfigSetterType.Select:
             const options = configSetter.options;
-            return <Select options={options} > </Select>
+            return <Select options={options}> </Select>
         case FormItemConfigSetterType.Range:
-            return <div className="flex flex-row gap-1 items-center" >
-                <span className="text-xs text-gray-700 opacity-80">最小值:</span>
-                <Input placeholder="" className=" flex-1  h-8 focus-visible:shadow-none mr-2" type="number" />
-                <span className="text-xs text-gray-700 opacity-80">最大值:</span>
-                <Input placeholder="" className=" flex-1 h-8 focus-visible:shadow-none" type="number" />
-            </div>
+            return <RangeSetter></RangeSetter>
         case FormItemConfigSetterType.Option:
             return <OptionSetter></OptionSetter>
         default:
