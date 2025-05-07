@@ -6,7 +6,7 @@ export { QuestionType } from "./core/QuestionType"
 export const preset = [
     TextInputMeta,
     TextAreaMeta,
+    CheckboxMeta,
     RadioMeta,
-    CheckboxMeta
 ]
 
