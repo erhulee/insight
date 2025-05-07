@@ -1,7 +1,7 @@
 import { procedure, router } from "./trpc";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
-import { PrismaClient, Questionnaires } from '@prisma/client'
+const { PrismaClient, Questionnaires } = require('@prisma/client');
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 

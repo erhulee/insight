@@ -1,7 +1,7 @@
 'use server'
 
 import { createSession, deleteSession } from '@/lib/session';
-import { PrismaClient } from '@prisma/client'
+const { PrismaClient } = require('@prisma/client');
 import { redirect } from 'next/navigation';
 const prisma = new PrismaClient();
 // app/actions.js

@@ -1,14 +1,15 @@
 "use client";
 import { QuestionType } from "@/components/survey-editor/buildin/form-item";
-import { Form, Input } from "antd";
+import { Checkbox, Form, Input, Radio } from "antd";
 import { Button } from "@/components/ui/button";
-import TextArea from "antd/es/input/TextArea";
-import FormItem from "antd/es/form/FormItem";
-import CheckboxGroup from "antd/es/checkbox/Group";
-import RadioGroup from "antd/es/radio/Group";
+
 import { Question } from "@/lib/types";
 import { trpc } from "../_trpc/client";
 
+const FormItem = Form.Item;
+const { TextArea } = Input;
+const RadioGroup = Radio.Group;
+const CheckboxGroup = Checkbox.Group;
 export function SurveyForm(props: {
     surveyId: string,
     question: Question[],

@@ -9,11 +9,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// datasource db {
-//   provider = "mysql"
-//   url      = env("DATABASE_URL")
-// }
-
 model User {
   id       String @id @default(uuid())
   account  String @unique
@@ -37,14 +32,6 @@ model Survey {
 model Questionnaires {
   id        String   @id @default(uuid())
   surveyId  String
-  /**
-   * @note 问卷数据
-   * @example
-   * [
-   * { key: "question1", value: "answer1"},
-   * { key: "question2", value: "answer2"}
-   * ]
-   */
   Question  Json
   createdAt DateTime @default(now())
 }
