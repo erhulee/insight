@@ -24,29 +24,22 @@ export default function DashboardPage() {
   // 创建新问卷
   const mutation = trpc.CreateSurvey.useMutation({})
   const deleteMutation = trpc.DeleteSurvey.useMutation({
-    onSuccess: (data) => {
-      refetch()
-    },
-    onError: (error) => {
-    },
-  })
+    onSuccess: () => refetch()
+  });
   const handleCreateSurvey = async () => {
-    try {
-      await mutation.mutate({})
-      const id = mutation.data?.id
-      if (id) {
+    mutation.mutate({}, {
+      onSuccess: (data) => {
         toast("创建新问卷成功, 3秒后为您跳转")
         setTimeout(() => {
-          window.location.href = `/dashboard/edit/${id}`
+          window.location.href = `/dashboard/edit/${data.id}`
         }, 3000)
-      } else {
-        throw "id is empty"
+      },
+      onError: (error) => {
+        toast("创建新问卷失败", {
+          description: JSON.stringify(error),
+        })
       }
-    } catch (e) {
-      toast("创建新问卷失败", {
-        description: JSON.stringify(e),
-      })
-    }
+    })
   }
   const handleDeleteSurvey = async (id: string) => {
     deleteMutation.mutate({ id })

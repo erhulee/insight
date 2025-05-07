@@ -1,10 +1,10 @@
 import { procedure, router } from "./trpc";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/session";
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Questionnaires } from '@prisma/client'
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { Question } from "@/lib/types";
+
 
 const prisma = new PrismaClient();
 const getUid = async () => {
@@ -15,7 +15,10 @@ const getUid = async () => {
         const userId: string = payload['userId']
         return userId
     } catch (e) {
-        throw new Error("未登录")
+        throw new TRPCError({
+            message: "未登录",
+            code: "UNAUTHORIZED"
+        })
     }
 }
 export const appRouter = router({
@@ -66,6 +69,28 @@ export const appRouter = router({
         }
         return true
     }),
+    SubmitSurver: procedure.input(z.object({
+        surveyId: z.string(),
+        values: z.any(),
+    })).mutation(async (opt) => {
+        try {
+            const survey = await prisma.questionnaires.create({
+                data: {
+                    surveyId: opt.input.surveyId,
+                    Question: opt.input.values,
+                    createdAt: new Date(),
+                }
+            })
+            return survey
+        } catch (e) {
+            console.log(e)
+            throw new TRPCError({
+                message: "提交失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
+        }
+
+    }),
     SaveSurvey: procedure.input(z.object({
         id: z.string(),
         questions: z.any(),
@@ -111,6 +136,75 @@ export const appRouter = router({
             return null
         }
     }),
+    GetSurveyResult: procedure.input(z.object({
+        id: z.string(),
+    })).query(async (opt) => {
+        const cookieStore = await cookies()
+        const token = cookieStore.get("session")?.value
+        const payload: any = await decrypt(token)
+        if (payload == null) {
+            throw new TRPCError({
+                message: "未登录",
+                code: "UNAUTHORIZED"
+            })
+        }
+        const userId: string = payload['userId']
+        const survey = await prisma.survey.findFirst({
+            where: {
+                ownerId: userId,
+                id: opt.input.id
+            }
+        })
+        if (survey == null) {
+            throw new TRPCError({
+                message: "问卷不存在",
+                code: "NOT_FOUND"
+            })
+        }
+        //@ts-ignore
+        survey.questions = JSON.parse(survey.questions ?? "[]") // TODO: 类型不匹配，需要修复，暂时先这样用着，后面再改
+        let questionnaires: Questionnaires[] = []
+        try {
+            questionnaires = await prisma.questionnaires.findMany({
+                where: {
+                    surveyId: opt.input.id,
+                    // 近30天
+                    createdAt: {
+                        gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+                        lte: new Date()
+                    }
+                }
+            })
+        } catch { }
+
+
+        // 计算按小时的回复个数趋势数据
+        const hourlyTrend = questionnaires.reduce((acc, curr) => {
+            const date = new Date(curr.createdAt);
+            const hour = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:00`;
+            acc[hour] = (acc[hour] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+
+        // 填充缺失的小时段
+        const startDate = new Date(new Date().setDate(new Date().getDate() - 30));
+        const endDate = new Date();
+        for (let d = startDate; d <= endDate; d.setHours(d.getHours() + 1)) {
+            const hour = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:00`;
+            if (!hourlyTrend[hour]) {
+                hourlyTrend[hour] = 0;
+            }
+        }
+        const trendList = Object.entries(hourlyTrend).map(([date, count]) => ({
+            date,
+            count
+        })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        return {
+            survey,
+            questionnaires,
+            trendList
+        }
+    }),
     GetSurveyList: procedure.query(async () => {
         const cookieStore = await cookies()
         const token = cookieStore.get("session")?.value
@@ -135,11 +229,14 @@ export const appRouter = router({
             }
         }
         const transformList = await Promise.all(surveyList.map(async item => {
-            const questionnairesInfo = await prisma.questionnaires.findMany({
-                where: {
-                    surveyId: item.id
-                }
-            });
+            let questionnairesInfo: Array<Questionnaires> = []
+            try {
+                questionnairesInfo = await prisma.questionnaires.findMany({
+                    where: {
+                        surveyId: item.id
+                    }
+                });
+            } catch { }
             return {
                 ...item,
                 questions: _questions(item.questions ?? []),

@@ -7,12 +7,21 @@ import FormItem from "antd/es/form/FormItem";
 import CheckboxGroup from "antd/es/checkbox/Group";
 import RadioGroup from "antd/es/radio/Group";
 import { Question } from "@/lib/types";
+import { trpc } from "../_trpc/client";
 
 export function SurveyForm(props: {
+    surveyId: string,
     question: Question[],
-    handleSubmit: (values: Record<string, any>) => void
 }) {
     const [form] = Form.useForm();
+    const submitMutation = trpc.SubmitSurver.useMutation({})
+    const handleSubmit = () => {
+        const values = form.getFieldsValue();
+        submitMutation.mutateAsync({
+            surveyId: props.surveyId,
+            values
+        })
+    }
     return <div className=" bg-white" >
         <Form layout="vertical" form={form} >
             {props.question.map((q, index) => {
@@ -25,7 +34,7 @@ export function SurveyForm(props: {
             })}
             <div className=" w-52 mx-auto">
                 <Button variant="default" onClick={() => {
-                    props.handleSubmit(form.getFieldsValue())
+                    handleSubmit()
                 }} className=" w-52 mx-auto" >提交</Button>
             </div>
         </Form>

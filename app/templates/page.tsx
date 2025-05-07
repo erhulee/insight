@@ -182,15 +182,10 @@ export default function TemplatesPage() {
         updatedAt: new Date().toISOString(),
         published: false,
       }
-
-      // 保存到本地存储（实际应用中应该调用API）
-      saveToLocalStorage(`survey_${surveyId}`, newSurvey)
-
       // 显示成功消息
       toast("问卷创建成功", {
         description: "正在跳转到编辑页面...",
       })
-
       // 设置重定向标志
       setRedirectToEdit(true)
     } catch (error) {

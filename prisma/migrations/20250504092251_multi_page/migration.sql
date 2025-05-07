@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Survey` ADD COLUMN `pageCount` INTEGER NOT NULL DEFAULT 1;

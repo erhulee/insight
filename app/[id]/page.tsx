@@ -2,7 +2,6 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/comp
 import { Question } from "@/lib/types";
 import { PrismaClient } from "@prisma/client"
 import { SurveyForm } from "./Form";
-import { submit } from "./action";
 const prisma = new PrismaClient();
 
 export default async function SurveyPage(props: { params: Promise<{ id: string }> }) {
@@ -12,12 +11,6 @@ export default async function SurveyPage(props: { params: Promise<{ id: string }
             id: params.id
         }
     })
-    const handleSubmit = async (values: Record<string, any>) => {
-        "use server"
-        console.log("values:", values)
-        const response = await submit(params.id, values)
-        console.log("response:", response)
-    }
     const questionList = JSON.parse(survey?.questions || "[]") as Question[]
     if (!survey) {
         return (
@@ -37,7 +30,7 @@ export default async function SurveyPage(props: { params: Promise<{ id: string }
             </div>
         )
     } else {
-        return <SurveyForm question={questionList} handleSubmit={handleSubmit}></SurveyForm>
+        return <SurveyForm question={questionList} surveyId={params.id} ></SurveyForm>
     }
 }
 
