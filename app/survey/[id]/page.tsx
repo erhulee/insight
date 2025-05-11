@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { FileText, ArrowRight } from "lucide-react"
 import type { Survey, Question } from "@/lib/types"
 import { getFromLocalStorage, validateEmail, validatePhone, validateUrl } from "@/lib/utils"
-import { RedirectHandler } from "@/components/redirect-handler"
+
 import { toast } from "sonner"
 
 export default function SurveyPage({ params }: { params: { id: string } }) {
@@ -453,8 +453,6 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-screen bg-background">
-      {redirectToThanks && <RedirectHandler redirectPath={`/survey/${params.id}/thanks`} />}
-
       <header className="border-b">
         <div className="container flex h-16 items-center px-4">
           <div className="flex items-center gap-2 font-bold text-xl text-primary">

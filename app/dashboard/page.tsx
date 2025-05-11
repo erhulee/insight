@@ -14,32 +14,16 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
   const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery()
-
   if (error && error.data?.code == "UNAUTHORIZED") {
     toast("未登录或登录已过期, 3秒后为您跳转")
-    // 跳转到登陆页
-    // window.location.href = "/login"
     return null
   }
   // 创建新问卷
-  const mutation = trpc.CreateSurvey.useMutation({})
   const deleteMutation = trpc.DeleteSurvey.useMutation({
     onSuccess: () => refetch()
   });
   const handleCreateSurvey = async () => {
-    mutation.mutate({}, {
-      onSuccess: (data) => {
-        toast("创建新问卷成功, 3秒后为您跳转")
-        setTimeout(() => {
-          window.location.href = `/dashboard/edit/${data.id}`
-        }, 3000)
-      },
-      onError: (error) => {
-        toast("创建新问卷失败", {
-          description: JSON.stringify(error),
-        })
-      }
-    })
+    window.location.href = "/dashboard/create"
   }
   const handleDeleteSurvey = async (id: string) => {
     deleteMutation.mutate({ id })

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FileText, CheckCircle, Home } from "lucide-react"
 import type { Survey } from "@/lib/types"
 import { getFromLocalStorage } from "@/lib/utils"
-import { RedirectHandler } from "@/components/redirect-handler"
+
 
 export default function ThanksPage({ params }: { params: { id: string } }) {
   const [survey, setSurvey] = useState<Survey | null>(null)
@@ -68,8 +68,6 @@ export default function ThanksPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-screen bg-background">
-      {redirectToHome && <RedirectHandler redirectPath={redirectUrl} />}
-
       <header className="border-b">
         <div className="container flex h-16 items-center px-4">
           <div className="flex items-center gap-2 font-bold text-xl text-primary">
