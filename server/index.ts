@@ -1,7 +1,7 @@
 import { procedure, router } from "./trpc";
 import { cookies } from "next/headers";
 import { createSession, decrypt } from "@/lib/session";
-const { PrismaClient, Questionnaires } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
@@ -90,7 +90,7 @@ export const appRouter = router({
         }
         return true
     }),
-    SubmitSurver: procedure.input(z.object({
+    SubmitSurvey: procedure.input(z.object({
         surveyId: z.string(),
         values: z.any(),
     })).mutation(async (opt) => {
@@ -293,6 +293,41 @@ export const appRouter = router({
         }))
         return transformList
     }),
+    CreateSurveyByTemplate: procedure.input(z.object({
+        templateId: z.string(),
+    })).mutation(async (opt) => {
+        const { templateId } = opt.input;
+        const uid = await getUid()
+        const template = await prisma.surverTemplate.findUnique({
+            where: {
+                id: templateId
+            }
+        })
+        if (template == null) {
+            throw new TRPCError({
+                message: "模板不存在",
+                code: "NOT_FOUND"
+            })
+        }
+        const survey = await prisma.survey.create({
+            data: {
+                ownerId: uid,
+                name: template.name,
+                description: "",
+                //@ts-ignore
+                questions: template.questions,
+                pageCount: 1
+            }
+        })
+        if (survey == null) {
+            throw new TRPCError({
+                message: "创建失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
+        } else {
+            return survey
+        }
+    }),
     CreateSurvey: procedure.input(z.object({
         name: z.string().optional(),
         description: z.string().optional(),
@@ -358,6 +393,45 @@ export const appRouter = router({
             }
         })
         return Boolean(ok)
+    }),
+    GetTemplate: procedure.query(async () => {
+        const templates = await prisma.surverTemplate.findMany({})
+
+        return templates.map(item => {
+            console.log(item.questions, typeof item.questions)
+            return {
+                id: item.id,
+                name: item.name,
+                tags: item.tags.split(","),
+                questionsCnt: 3
+
+            }
+        })
+    }),
+    CreateTemplateSurvey: procedure.input(z.object({
+        name: z.string(),
+        questions: z.any(),
+        tags: z.array(z.string()).optional(),
+    })).mutation(async (opt) => {
+        const { name, questions, tags = [] } = opt.input;
+        const uid = await getUid()
+        try {
+            const template = await prisma.surverTemplate.create({
+                data: {
+                    name: name,
+                    questions: JSON.stringify(questions),
+                    tags: tags.join(","),
+                    createdBy: uid
+                }
+            })
+            return template.id
+        } catch (e) {
+            console.log("error:", e)
+            throw new TRPCError({
+                message: "创建失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
+        }
     })
 });
 

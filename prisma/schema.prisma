@@ -39,3 +39,13 @@ model Questionnaires {
   Question  Json
   createdAt DateTime @default(now())
 }
+
+model SurverTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  tags      String   @default("")
+  pageCount Int      @default(1)
+  questions Json
+  createdAt DateTime @default(now())
+  createdBy String
+}

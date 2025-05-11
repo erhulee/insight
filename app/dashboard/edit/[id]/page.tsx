@@ -10,6 +10,8 @@ import {
   Braces,
   Brush,
   LinkIcon,
+  AlignJustify,
+  BookTemplate,
 } from "lucide-react"
 import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { toast } from "sonner"
@@ -29,6 +31,7 @@ import { SurveyPagiNation } from "./_components/SurveyPagiNation"
 import { useSnapshot } from "valtio"
 import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from "../../_valtio/runtime"
 import { JsonEditor } from "./_components/JsonEditor"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
 export default function EditSurveyPage(props: {
@@ -46,6 +49,7 @@ export default function EditSurveyPage(props: {
     initialData: {} as any
   })
   const udpateSurveyMudation = trpc.UpdateSurvey.useMutation()
+  const saveSurveyAsTemplateMutation = trpc.CreateTemplateSurvey.useMutation()
   useEffect(() => {
     if (survey != null) {
       const questions = (survey as any).questions as unknown as Question[] ?? [];
@@ -82,11 +86,26 @@ export default function EditSurveyPage(props: {
 
   const renameSurvey = async (name: string) => {
     const response = await udpateSurveyMudation.mutateAsync({
-      id: survey.id,
+      id: survey!.id,
       title: name
     })
     refetch()
   }
+
+  const createTemplate = async () => {
+    try {
+      const response = await saveSurveyAsTemplateMutation.mutateAsync({
+        name: survey?.name!,
+        //@ts-ignore
+        questions: survey?.questions,
+        tags: []
+      })
+      toast.success("创建模版成功")
+    } catch {
+      toast.error("创建模版失败")
+    }
+  }
+
   // 返回问卷列表
   const handleBackToDashboard = () => {
     router.push("/dashboard")
@@ -147,7 +166,24 @@ export default function EditSurveyPage(props: {
             {/* 中间面板 - 问题列表/预览 */}
             {isLoading ? <div>loading...</div> : <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
-                <RenameInput id={survey.id} title={survey.name} onUpdate={renameSurvey}></RenameInput>
+                <div className=" flex flex-row items-center" >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <AlignJustify className=" w-4 h-4" ></AlignJustify>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" >
+                      <DropdownMenuItem className=" text-sm" onClick={() => {
+                        createTemplate()
+                      }}>
+                        <BookTemplate></BookTemplate>
+                        <span className=" text-sm" >
+                          保存为模版
+                        </span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <RenameInput id={survey.id} title={survey.name} onUpdate={renameSurvey}></RenameInput>
+                </div>
                 <SurveyPagiNation></SurveyPagiNation>
                 <ToggleGroup type="single" size="sm" value={activeTab} onValueChange={(v) => {
                   setActiveTab(v as any)

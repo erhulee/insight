@@ -11,12 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Search, Tag, Users, BarChart, Briefcase, GraduationCap, Heart, ShoppingCart, LayoutDashboard } from "lucide-react"
-import { saveToLocalStorage } from "@/lib/utils"
+import { Search, Tag, Users, BarChart, Briefcase, GraduationCap, Heart, ShoppingCart, LayoutDashboard } from "lucide-react"
 import { RedirectHandler } from "@/components/redirect-handler"
 import { toast } from "sonner"
 import { InsightBrand } from "@/components/common/insight-brand"
 import { UserInfoAvatar } from "@/components/common/userInfoAvatar"
+import { trpc } from "../_trpc/client"
 
 // 模板数据
 const TEMPLATES = [
@@ -126,7 +126,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 }
 
 export default function TemplatesPage() {
-  const router = useRouter()
+  const templateClient = trpc.GetTemplate.useQuery()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [activeTab, setActiveTab] = useState("all")
@@ -137,64 +137,12 @@ export default function TemplatesPage() {
   // 获取所有类别
   const categories = Array.from(new Set(TEMPLATES.map((template) => template.category)))
 
-  // 过滤模板
-  const filteredTemplates = TEMPLATES.filter((template) => {
-    // 搜索过滤
-    const matchesSearch =
-      template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchQuery.toLowerCase())
-
-    // 类别过滤
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory
-
-    // 标签过滤
-    const matchesTab =
-      activeTab === "all" ||
-      (activeTab === "popular" && template.popular) ||
-      (activeTab === "featured" && template.featured)
-
-    return matchesSearch && matchesCategory && matchesTab
-  })
-
   // 使用模板创建问卷
+  const { mutateAsync, isPending } = trpc.CreateSurveyByTemplate.useMutation()
   const handleUseTemplate = async (templateId: string) => {
-    setIsCreating(true)
-
-    try {
-      // 生成唯一ID
-      const surveyId = `survey-${uuidv4()}`
-      setNewSurveyId(surveyId)
-
-      // 获取模板数据
-      const template = TEMPLATES.find((t) => t.id === templateId)
-
-      if (!template) {
-        throw new Error("模板不存在")
-      }
-
-      // 创建基于模板的问卷数据
-      const newSurvey = {
-        id: surveyId,
-        title: `${template.title} 副本`,
-        description: template.description,
-        questions: [], // 实际应用中应该包含模板的问题
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        published: false,
-      }
-      // 显示成功消息
-      toast("问卷创建成功", {
-        description: "正在跳转到编辑页面...",
-      })
-      // 设置重定向标志
-      setRedirectToEdit(true)
-    } catch (error) {
-      console.error("创建问卷失败:", error)
-      toast("创建失败", {
-        description: "创建问卷时出现错误，请重试",
-      })
-      setIsCreating(false)
-    }
+    mutateAsync({
+      templateId: templateId
+    })
   }
 
   return (
@@ -264,43 +212,40 @@ export default function TemplatesPage() {
             </TabsList>
           </Tabs>
 
-          {/* 模板列表 */}
-          {filteredTemplates.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredTemplates.map((template) => (
-                <Card key={template.id} className="overflow-hidden">
-                  <CardHeader className="p-4 pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{template.title}</CardTitle>
-                        <CardDescription className="line-clamp-2">{template.description}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                        {CATEGORY_ICONS[template.category]}
-                        {template.category}
-                      </span>
-                      <span>{template.questions} 个问题</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => handleUseTemplate(template.id)}
-                      disabled={isCreating}
-                    >
-                      使用此模板
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border rounded-lg">
+
+          {templateClient.isLoading ? <div>loading</div> : <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {templateClient.data?.map((template => (<Card key={template.id} className="overflow-hidden">
+              <CardHeader className="p-4 pb-2">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">{template.name}</CardTitle>
+                    {/* <CardDescription className="line-clamp-2">{template.description}</CardDescription> */}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {/* <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                    {CATEGORY_ICONS[template.category]}
+                    {template.category}
+                  </span> */}
+                  {/* <span>{template.questions} 个问题</span> */}
+                </div>
+              </CardContent>
+              <CardFooter className="p-4 pt-0">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleUseTemplate(template.id)}
+                  disabled={isCreating}
+                >
+                  使用此模板
+                </Button>
+              </CardFooter>
+            </Card>)))}
+          </div>}
+
+          {/* <div className="text-center py-12 border rounded-lg">
               <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <Search className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -316,8 +261,7 @@ export default function TemplatesPage() {
               >
                 清除筛选条件
               </Button>
-            </div>
-          )}
+            </div> */}
         </div>
       </main>
     </div>

@@ -15,7 +15,7 @@ export function SurveyForm(props: {
     question: Question[],
 }) {
     const [form] = Form.useForm();
-    const submitMutation = trpc.SubmitSurver.useMutation({})
+    const submitMutation = trpc.SubmitSurvey.useMutation({})
     const handleSubmit = () => {
         const values = form.getFieldsValue();
         submitMutation.mutateAsync({
