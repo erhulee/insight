@@ -1,6 +1,6 @@
 import { procedure, router } from "./trpc";
 import { cookies } from "next/headers";
-import { decrypt } from "@/lib/session";
+import { createSession, decrypt } from "@/lib/session";
 const { PrismaClient, Questionnaires } = require('@prisma/client');
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -22,6 +22,27 @@ const getUid = async () => {
     }
 }
 export const appRouter = router({
+    Login: procedure.input(z.object({
+        account: z.string(),
+        password: z.string(),
+    })).mutation(async (opt) => {
+        const { account, password } = opt.input;
+        const User = await prisma.user.findUnique({
+            where: {
+                account: account,
+                password: password
+            }
+        })
+        if (User == null) {
+            throw new TRPCError({
+                message: "用户名或密码错误",
+                code: "UNAUTHORIZED"
+            })
+        } else {
+            await createSession(User.id)
+            return User
+        }
+    }),
     GetUserInfo: procedure.query(async () => {
         const cookieStore = await cookies()
         const token = cookieStore.get("session")?.value
@@ -113,6 +134,33 @@ export const appRouter = router({
                 code: "INTERNAL_SERVER_ERROR"
             })
         }
+    }),
+    UpdateSurvey: procedure.input(z.object({
+        id: z.string(),
+        title: z.string().optional(),
+    })).mutation(async (opt) => {
+        const { id, title } = opt.input;
+        const uid = await getUid()
+        try {
+            const response = await prisma.survey.update({
+                where: {
+                    id: id,
+                    ownerId: uid
+                },
+                data: {
+                    name: title
+                }
+            })
+            console.log(response)
+            return response
+
+        } catch {
+            throw new TRPCError({
+                message: "更新失败",
+                code: "INTERNAL_SERVER_ERROR"
+            })
+        }
+
     }),
     GetSurvey: procedure.input(z.object({
         id: z.string(),

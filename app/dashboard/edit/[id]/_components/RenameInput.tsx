@@ -22,7 +22,8 @@ const useClickOutside = (ref: RefObject<HTMLDivElement | null>, callback: () => 
 };
 export function RenameInput(props: {
     title: string,
-    id: string
+    id: string,
+    onUpdate?: (title: string) => void
 }) {
     const { title, id } = props
     const [isEditing, setIsEditing] = useState(false)
@@ -47,7 +48,7 @@ export function RenameInput(props: {
             isEditing ? <Input
                 defaultValue={props.title}
                 onInput={(value: any) => {
-                    rename(props.id, value.target.value)
+                    props.onUpdate?.(value.target.value)
                 }}
                 className="max-w-[300px] font-medium h-9"
                 placeholder="问卷标题"

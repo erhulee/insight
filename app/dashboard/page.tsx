@@ -18,7 +18,7 @@ export default function DashboardPage() {
   if (error && error.data?.code == "UNAUTHORIZED") {
     toast("未登录或登录已过期, 3秒后为您跳转")
     // 跳转到登陆页
-    window.location.href = "/login"
+    // window.location.href = "/login"
     return null
   }
   // 创建新问卷

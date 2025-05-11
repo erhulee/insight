@@ -15,20 +15,20 @@ import { DragDropProvider } from "@/components/survey-editor/drag-drop-context"
 import { toast } from "sonner"
 import { QuestionType } from "@/components/survey-editor/buildin/form-item"
 import { publish, unpublish } from "./service"
-import { RenameInput } from "./components/rename-input"
+import { RenameInput } from "./_components/RenameInput"
 import { trpc } from "@/app/_trpc/client"
-import { Canvas } from "./components/EditCanvas"
+import { Canvas } from "./_components/EditCanvas"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { ShareConfig } from "./components/shareConfig"
-import { EditHeader } from "./components/EditHeader"
-import { WidgetPanel } from "./components/WidgetPanel"
-import { QuestionConfig } from "./components/QuestionConfig"
+import { ShareConfig } from "./_components/shareConfig"
+import { EditHeader } from "./_components/EditHeader"
+import { WidgetPanel } from "./_components/WidgetPanel"
+import { QuestionConfig } from "./_components/QuestionConfig"
 import { cloneDeep } from "lodash-es"
-import { SurveyPagiNation } from "./components/SurveyPagiNation"
+import { SurveyPagiNation } from "./_components/SurveyPagiNation"
 import { useSnapshot } from "valtio"
 import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from "../../_valtio/runtime"
-import { JsonEditor } from "./components/JsonEditor"
+import { JsonEditor } from "./_components/JsonEditor"
 
 
 export default function EditSurveyPage(props: {
@@ -45,6 +45,7 @@ export default function EditSurveyPage(props: {
   }, {
     initialData: {} as any
   })
+  const udpateSurveyMudation = trpc.UpdateSurvey.useMutation()
   useEffect(() => {
     if (survey != null) {
       const questions = (survey as any).questions as unknown as Question[] ?? [];
@@ -64,7 +65,6 @@ export default function EditSurveyPage(props: {
 
   // 更新问题
   const handleUpdateQuestion = (action: "update-attr", values: Record<string, any>) => {
-    console.log("handleUpdateQuestion:", action, values)
     switch (action) {
       case "update-attr":
         const oldQuestions: Question[] = cloneDeep(runtimeState.questions) as any;
@@ -80,6 +80,13 @@ export default function EditSurveyPage(props: {
     }
   }
 
+  const renameSurvey = async (name: string) => {
+    const response = await udpateSurveyMudation.mutateAsync({
+      id: survey.id,
+      title: name
+    })
+    refetch()
+  }
   // 返回问卷列表
   const handleBackToDashboard = () => {
     router.push("/dashboard")
@@ -140,7 +147,7 @@ export default function EditSurveyPage(props: {
             {/* 中间面板 - 问题列表/预览 */}
             {isLoading ? <div>loading...</div> : <div className="flex-1 overflow-hidden">
               <div className=" py-2 px-4 flex justify-between" >
-                <RenameInput id={survey.id} title={survey.name}></RenameInput>
+                <RenameInput id={survey.id} title={survey.name} onUpdate={renameSurvey}></RenameInput>
                 <SurveyPagiNation></SurveyPagiNation>
                 <ToggleGroup type="single" size="sm" value={activeTab} onValueChange={(v) => {
                   setActiveTab(v as any)

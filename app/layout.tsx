@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import Provider from "./_trpc/Provider"
 import { Toaster } from "@/components/ui/sonner"
+import '@ant-design/v5-patch-for-react-19';
 const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Insight - 专业的在线问卷调查平台",

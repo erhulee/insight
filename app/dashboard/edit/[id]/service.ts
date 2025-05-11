@@ -37,19 +37,3 @@ export async function unpublish(id: string,) {
 }
 
 
-export async function rename(id: string, name: string) {
-    try {
-        await prisma.survey.update({
-            where: {
-                id,
-            },
-            data: {
-                name
-            }
-        })
-        return true
-    } catch (e) {
-        console.log("error:", e)
-        return false
-    }
-}
