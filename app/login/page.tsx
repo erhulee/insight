@@ -1,6 +1,6 @@
 "use client"
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +11,21 @@ import { Mail, Lock, ArrowRight } from "lucide-react"
 import { InsightBrand } from "@/components/common/insight-brand"
 import { trpc } from "../_trpc/client"
 import { redirect } from "next/navigation"
+import { useLocalStorage } from "react-use"
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [localValue, updateLocalValue, remove] = useLocalStorage<{
+    account: string,
+    password: string
+  }>("remeberMe")
+  useEffect(() => {
+    if (localValue?.account && localValue?.password) {
+      setFormData({
+        email: localValue?.account,
+        password: localValue?.password,
+        rememberMe: true
+      })
+    }
+  }, [localValue])
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -38,6 +51,14 @@ export default function LoginPage() {
       password: formData.password
     })
     if (res) {
+      if (formData.rememberMe) {
+        updateLocalValue({
+          account: formData.email,
+          password: formData.password
+        })
+      } else {
+        remove()
+      }
       redirect("/dashboard")
     }
   }
@@ -52,8 +73,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">登录</CardTitle>
-              <CardDescription>输入您的电子邮件地址和密码以访问您的账户</CardDescription>
+              <CardTitle className="2xl:text-2xl text-base font-bold">登录</CardTitle>
+              <CardDescription  >输入您的账号和密码以访问您的账户</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -64,7 +85,6 @@ export default function LoginPage() {
                     <Input
                       id="email"
                       name="email"
-                      placeholder="name@example.com"
                       className="pl-10"
                       value={formData.email}
                       onChange={handleChange}
@@ -95,12 +115,12 @@ export default function LoginPage() {
                 <div className="flex items-center space-x-2">
                   <Checkbox id="remember-me" checked={formData.rememberMe} onCheckedChange={handleCheckboxChange} />
                   <Label htmlFor="remember-me" className="text-sm">
-                    Remember me
+                    记住我
                   </Label>
                 </div>
 
               </div>
-              <Button className="w-full mt-4" disabled={isLoading} onClick={
+              <Button className="w-full mt-4" onClick={
                 () => {
                   handleSubmit()
                 }
@@ -113,9 +133,9 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                Don't have an account?{" "}
+                还没有账号?{" "}
                 <Link href="/register" className="text-primary hover:underline">
-                  Sign up
+                  立即注册
                 </Link>
               </div>
             </CardFooter>

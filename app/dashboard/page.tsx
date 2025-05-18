@@ -42,13 +42,15 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}
-      <LayoutHeader></LayoutHeader>
+      <div className=" px-4">
+        <LayoutHeader></LayoutHeader>
+      </div>
       {/* 主要内容区域 */}
-      <main className="container px-4 py-6 mx-auto">
+      <main className="container 2xl:px-4 2xl:py-6 py-4 mx-auto bg-gray-50">
         <div className="flex flex-col gap-6">
           {/* 标题和创建按钮 */}
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">我的问卷</h1>
+            <h1 className="2xl:text-2xl font-bold text-xl">我的问卷</h1>
             <Button onClick={handleCreateSurvey} className="gap-1">
               <PlusCircle className="h-4 w-4" />
               创建问卷
@@ -78,7 +80,7 @@ export default function DashboardPage() {
           </div>
 
           {/* 问卷列表 */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
             {isLoading ? (
               // 加载状态
               Array.from({ length: 6 }).map((_, index) => (

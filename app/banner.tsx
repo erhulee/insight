@@ -15,9 +15,9 @@ export function Banner() {
                 duration: 0.8,
                 ease: "easeInOut",
             }}
-            className=" max-w-[1328px] relative flex flex-col gap-4 items-start justify-center  px-4 h-full w-full"
+            className=" max-w-[1328px] relative flex flex-col gap-4 items-start justify-center 2xl:px-4 h-full w-full"
         >
-            <div className=" max-w-[1328px] absolute top-0 w-full py-8 " >
+            <div className=" max-w-[1328px] absolute top-0 w-full 2xl:py-8 py-1 " >
                 <LayoutHeader hideBorder></LayoutHeader>
             </div>
             <h1 className="text-3xl md:text-5xl dark:text-white text-left font-douyin  ">

@@ -41,7 +41,7 @@ export function UserInfoAvatar() {
     } else {
         return (<div className="ml-4 flex items-center gap-1">
             <Link href="/login">
-                <Button size="sm" className=" w-24" >
+                <Button size="sm" className=" 2xl:w-24" >
                     登录
                     <ArrowRight
                         className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"

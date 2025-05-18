@@ -10,19 +10,18 @@ export function LayoutHeader(props: {
         <header className={`${hideBorder ? "" : "border-b"}  w-full`}>
             <div className="flex h-16 items-center justify-between ">
                 <InsightBrand></InsightBrand>
-                <nav className="flex items-center gap-14">
-                    <Link href="/dashboard" className=" text-base font-medium border-b">
+                <nav className="flex items-center 2xl:gap-14 xl:gap-12 gap-8 2xl:text-base font-medium text-sm">
+                    <Link href="/dashboard" className="border-b">
                         我的问卷
                     </Link>
-                    <Link href="/templates" className="text-base font-medium text-muted-foreground">
+                    <Link href="/templates" className=" text-muted-foreground">
                         模板中心
                     </Link>
-                    <Link href="/developer" className="text-base font-medium text-muted-foreground">
+                    <Link href="/developer" className="text-muted-foreground">
                         开发者中心
                     </Link>
                 </nav>
                 <UserInfoAvatar></UserInfoAvatar>
-
             </div>
         </header>
     )

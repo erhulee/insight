@@ -25,29 +25,33 @@ export default function TemplatesPage() {
       <header className="border-b">
         <div className=" flex h-16 items-center justify-between px-4">
           <InsightBrand></InsightBrand>
-          <div className=" flex flex-row gap-4" >
-            <nav className="flex items-center gap-4 sm:gap-6">
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                我的问卷
-              </Link>
-            </nav>
-            <UserInfoAvatar></UserInfoAvatar>
-          </div>
+          <nav className="flex items-center 2xl:gap-14 xl:gap-12 gap-8 2xl:text-base font-medium text-sm">
+            <Link href="/dashboard" className="text-muted-foreground">
+              我的问卷
+            </Link>
+            <Link href="/templates" className="">
+              模板中心
+            </Link>
+            <Link href="/developer" className="text-muted-foreground">
+              开发者中心
+            </Link>
+          </nav>
+          <UserInfoAvatar></UserInfoAvatar>
         </div>
       </header>
 
       {/* 主要内容区域 */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto lg:px-4 lg:py-8 py-4">
         <div className="max-w-5xl mx-auto">
           {/* 标题 */}
           <div className="text-center mb-8 flex flex-col justify-start items-start">
-            <h1 className="text-3xl font-bold mb-2">问卷模板库</h1>
+            <h1 className="lg:text-3xl font-bold mb-2 text-xl ">问卷模板库</h1>
             <p className="text-muted-foreground">选择一个专业设计的模板，快速开始您的问卷调查</p>
           </div>
 
           {/* 搜索和过滤 */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="relative flex-1">
+          <div className="flex flex-row gap-4 mb-8">
+            <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -63,7 +67,6 @@ export default function TemplatesPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">所有类别</SelectItem>
-
               </SelectContent>
             </Select>
           </div>
@@ -78,7 +81,7 @@ export default function TemplatesPage() {
           </Tabs>
 
           {templateClient.isError ? <NoData></NoData> : templateClient.isLoading ? <div>loading</div> :
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 grid-cols-2">
               {templateClient.data?.map((template => (<TemplateCard questionsCnt={3} key={template.id} templateId={template.id} title={template.name} description={""} tags={[]}></TemplateCard>
               )))}
             </div>}
