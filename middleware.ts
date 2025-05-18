@@ -13,6 +13,7 @@ export async function middleware(request: NextRequest) {
             },
         });
     } catch (error) {
+        console.log("middle ware errpor:", request.url)
         // return NextResponse.redirect(new URL('/login', request.url));
     }
 }

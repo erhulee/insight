@@ -21,7 +21,6 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-
       {/* 顶部导航栏 */}
       <header className="border-b">
         <div className=" flex h-16 items-center justify-between px-4">

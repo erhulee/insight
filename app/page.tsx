@@ -3,42 +3,13 @@ import { Button } from "@/components/ui/button"
 import { BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
 import { FeatureCard } from "@/components/feature-card"
 import { LayoutHeader } from "@/components/layout-header"
+import { Banner } from "./banner"
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <LayoutHeader></LayoutHeader>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-gray-100">
-          <div className="container px-4 mx-auto md:px-6">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-              <div className="space-y-4">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  创建专业问卷，收集有价值的数据
-                </h1>
-                <p className="max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  简单易用的问卷设计工具，强大的数据分析功能，帮助您获取洞察，做出更好的决策。
-                </p>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link href="/dashboard/create">
-                    <Button size="lg" className="gap-1">
-                      创建问卷
-                    </Button>
-                  </Link>
-                  <Link href="/dashboard">
-                    <Button size="lg" variant="outline" className="gap-1">
-                      我的问卷
-                    </Button>
-                  </Link>
-                  <Link href="/templates">
-                    <Button size="lg" variant="outline">
-                      浏览模板
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Banner></Banner>
         <section className="w-full py-10 md:py-24 lg:py-32">
           <div className="container  mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">

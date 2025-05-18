@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { LogOut, UserIcon } from "lucide-react";
+import { ArrowRight, LogOut, UserIcon } from "lucide-react";
 import { trpc } from "@/app/_trpc/client";
 import { logout } from "@/app/login/service";
 export function UserInfoAvatar() {
@@ -39,15 +39,22 @@ export function UserInfoAvatar() {
             </div>
         )
     } else {
-        return (<div className="ml-4 flex items-center gap-4">
+        return (<div className="ml-4 flex items-center gap-1">
             <Link href="/login">
-                <Button variant="outline" size="sm">
+                <Button size="sm" className=" w-24" >
                     登录
+                    <ArrowRight
+                        className="-me-1 ms-2 opacity-60 transition-transform group-hover:translate-x-0.5"
+                        size={16}
+                        strokeWidth={2}
+                        aria-hidden="true"
+                    />
                 </Button>
             </Link>
             <Link href="/register">
-                <Button size="sm">注册</Button>
+                <Button variant="link" size="sm">注册</Button>
             </Link>
+
         </div>)
 
     }
