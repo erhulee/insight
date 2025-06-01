@@ -1,34 +1,50 @@
-"use client"
-import type React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight } from "lucide-react"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { create } from "../login/service"
-import { InsightBrand } from "@/components/common/insight-brand"
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-  account: z.string().min(8).max(12),
-  password: z.string().min(6).max(20),
-  confirmPassword: z.string().min(6).max(20),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-})
+'use client'
+import type React from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { ArrowRight } from 'lucide-react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { create } from '../login/service'
+import { InsightBrand } from '@/components/common/insight-brand'
+const formSchema = z
+  .object({
+    username: z.string().min(2).max(50),
+    account: z.string().min(8).max(12),
+    password: z.string().min(6).max(20),
+    confirmPassword: z.string().min(6).max(20),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 export default function RegisterPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      account: "",
-      password: "",
-      confirmPassword: "",
-      username: ""
-    }
+      account: '',
+      password: '',
+      confirmPassword: '',
+      username: '',
+    },
   })
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { account, password, username } = values
@@ -60,7 +76,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>用户名称</FormLabel>
                           <FormControl>
-                            <Input  {...field} />
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -73,7 +89,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>账号</FormLabel>
                           <FormControl>
-                            <Input  {...field} />
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -105,7 +121,7 @@ export default function RegisterPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full" >
+                    <Button type="submit" className="w-full">
                       {false ? (
                         <span className="flex items-center gap-1">
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -124,7 +140,7 @@ export default function RegisterPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                已有账号?{" "}
+                已有账号?{' '}
                 <Link href="/login" className="text-primary hover:underline">
                   立即登陆
                 </Link>

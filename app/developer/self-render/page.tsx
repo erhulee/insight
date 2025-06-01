@@ -1,33 +1,40 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { FileText, Code, Upload, Check, AlertTriangle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { getFromLocalStorage } from "@/lib/utils"
-import { toast } from "sonner"
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { FileText, Code, Upload, Check, AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { getFromLocalStorage } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function SelfRenderPage() {
-  const [activeTab, setActiveTab] = useState<"upload" | "url" | "editor">("upload")
-  const [specUrl, setSpecUrl] = useState("")
-  const [specContent, setSpecContent] = useState("")
+  const [activeTab, setActiveTab] = useState<'upload' | 'url' | 'editor'>('upload')
+  const [specUrl, setSpecUrl] = useState('')
+  const [specContent, setSpecContent] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isRendering, setIsRendering] = useState(false)
   const [apiKeys, setApiKeys] = useState<any[]>([])
-  const [selectedApiKey, setSelectedApiKey] = useState<string>("")
+  const [selectedApiKey, setSelectedApiKey] = useState<string>('')
   const [renderedSurvey, setRenderedSurvey] = useState<any>(null)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
 
   // 加载API密钥
   useEffect(() => {
-    const storedKeys = getFromLocalStorage<any[]>("api_keys", [])
+    const storedKeys = getFromLocalStorage<any[]>('api_keys', [])
     setApiKeys(storedKeys)
     if (storedKeys.length > 0) {
       setSelectedApiKey(storedKeys[0].key)
@@ -50,20 +57,20 @@ export default function SelfRenderPage() {
         validateSpec(content)
         setIsLoading(false)
       } catch (error) {
-        console.error("Error reading file:", error)
+        console.error('Error reading file:', error)
         toast({
-          title: "读取文件失败",
-          description: "无法读取上传的文件",
-          variant: "destructive",
+          title: '读取文件失败',
+          description: '无法读取上传的文件',
+          variant: 'destructive',
         })
         setIsLoading(false)
       }
     }
     reader.onerror = () => {
       toast({
-        title: "读取文件失败",
-        description: "无法读取上传的文件",
-        variant: "destructive",
+        title: '读取文件失败',
+        description: '无法读取上传的文件',
+        variant: 'destructive',
       })
       setIsLoading(false)
     }
@@ -74,9 +81,9 @@ export default function SelfRenderPage() {
   const handleLoadFromUrl = async () => {
     if (!specUrl) {
       toast({
-        title: "请输入URL",
-        description: "请输入有效的OpenAPI规范URL",
-        variant: "destructive",
+        title: '请输入URL',
+        description: '请输入有效的OpenAPI规范URL',
+        variant: 'destructive',
       })
       return
     }
@@ -94,11 +101,11 @@ export default function SelfRenderPage() {
       setSpecContent(content)
       validateSpec(content)
     } catch (error) {
-      console.error("Error fetching spec:", error)
+      console.error('Error fetching spec:', error)
       toast({
-        title: "加载失败",
-        description: "无法从URL加载OpenAPI规范",
-        variant: "destructive",
+        title: '加载失败',
+        description: '无法从URL加载OpenAPI规范',
+        variant: 'destructive',
       })
     } finally {
       setIsLoading(false)
@@ -117,7 +124,7 @@ export default function SelfRenderPage() {
       } catch {
         // 如果不是JSON，假设是YAML
         // 在实际应用中，这里应该使用YAML解析库
-        errors.push("无法解析规范内容。请确保内容是有效的JSON或YAML格式。")
+        errors.push('无法解析规范内容。请确保内容是有效的JSON或YAML格式。')
         setValidationErrors(errors)
         return
       }
@@ -146,7 +153,7 @@ export default function SelfRenderPage() {
       let hasSurveyEndpoints = false
       if (spec.paths) {
         for (const path in spec.paths) {
-          if (path.includes("/surveys")) {
+          if (path.includes('/surveys')) {
             hasSurveyEndpoints = true
             break
           }
@@ -154,13 +161,13 @@ export default function SelfRenderPage() {
       }
 
       if (!hasSurveyEndpoints) {
-        errors.push("规范中没有问卷相关的端点。自渲染功能需要问卷相关的API端点。")
+        errors.push('规范中没有问卷相关的端点。自渲染功能需要问卷相关的API端点。')
       }
 
       setValidationErrors(errors)
     } catch (error) {
-      console.error("Error validating spec:", error)
-      errors.push("验证规范时出错。请确保内容是有效的OpenAPI规范。")
+      console.error('Error validating spec:', error)
+      errors.push('验证规范时出错。请确保内容是有效的OpenAPI规范。')
       setValidationErrors(errors)
     }
   }
@@ -169,18 +176,18 @@ export default function SelfRenderPage() {
   const handleRenderSurvey = () => {
     if (validationErrors.length > 0) {
       toast({
-        title: "验证失败",
-        description: "请先修复OpenAPI规范中的错误",
-        variant: "destructive",
+        title: '验证失败',
+        description: '请先修复OpenAPI规范中的错误',
+        variant: 'destructive',
       })
       return
     }
 
     if (!selectedApiKey) {
       toast({
-        title: "未选择API密钥",
-        description: "请选择一个API密钥用于访问API",
-        variant: "destructive",
+        title: '未选择API密钥',
+        description: '请选择一个API密钥用于访问API',
+        variant: 'destructive',
       })
       return
     }
@@ -191,27 +198,27 @@ export default function SelfRenderPage() {
     setTimeout(() => {
       // 创建一个模拟的渲染结果
       const mockSurvey = {
-        id: "survey-123456",
-        title: "客户满意度调查",
-        description: "了解客户对我们产品和服务的满意度",
+        id: 'survey-123456',
+        title: '客户满意度调查',
+        description: '了解客户对我们产品和服务的满意度',
         questions: [
           {
-            id: "q1",
-            type: "radio",
-            title: "您对我们的产品总体满意度如何？",
+            id: 'q1',
+            type: 'radio',
+            title: '您对我们的产品总体满意度如何？',
             required: true,
             options: [
-              { text: "非常满意", value: "5" },
-              { text: "满意", value: "4" },
-              { text: "一般", value: "3" },
-              { text: "不满意", value: "2" },
-              { text: "非常不满意", value: "1" },
+              { text: '非常满意', value: '5' },
+              { text: '满意', value: '4' },
+              { text: '一般', value: '3' },
+              { text: '不满意', value: '2' },
+              { text: '非常不满意', value: '1' },
             ],
           },
           {
-            id: "q2",
-            type: "text",
-            title: "您有什么建议可以帮助我们改进产品？",
+            id: 'q2',
+            type: 'text',
+            title: '您有什么建议可以帮助我们改进产品？',
             required: false,
             multiline: true,
           },
@@ -221,16 +228,16 @@ export default function SelfRenderPage() {
           showQuestionNumbers: true,
         },
         theme: {
-          primaryColor: "#3b82f6",
-          backgroundColor: "#ffffff",
+          primaryColor: '#3b82f6',
+          backgroundColor: '#ffffff',
         },
       }
 
       setRenderedSurvey(mockSurvey)
       setIsRendering(false)
 
-      toast("渲染成功", {
-        description: "问卷已成功渲染",
+      toast('渲染成功', {
+        description: '问卷已成功渲染',
       })
     }, 2000)
   }
@@ -243,7 +250,9 @@ export default function SelfRenderPage() {
       <div className="bg-white p-6 rounded-lg border shadow-sm">
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-2">{renderedSurvey.title}</h2>
-          {renderedSurvey.description && <p className="text-gray-600">{renderedSurvey.description}</p>}
+          {renderedSurvey.description && (
+            <p className="text-gray-600">{renderedSurvey.description}</p>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -257,7 +266,7 @@ export default function SelfRenderPage() {
                 </h3>
               </div>
 
-              {question.type === "radio" && (
+              {question.type === 'radio' && (
                 <div className="space-y-2 mt-3">
                   {question.options.map((option: any, optIndex: number) => (
                     <div key={optIndex} className="flex items-center space-x-2">
@@ -276,12 +285,20 @@ export default function SelfRenderPage() {
                 </div>
               )}
 
-              {question.type === "text" && (
+              {question.type === 'text' && (
                 <div className="mt-3">
                   {question.multiline ? (
-                    <textarea className="w-full p-2 border rounded-md" rows={4} placeholder="请输入..."></textarea>
+                    <textarea
+                      className="w-full p-2 border rounded-md"
+                      rows={4}
+                      placeholder="请输入..."
+                    ></textarea>
                   ) : (
-                    <input type="text" className="w-full p-2 border rounded-md" placeholder="请输入..." />
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      placeholder="请输入..."
+                    />
                   )}
                 </div>
               )}
@@ -306,7 +323,10 @@ export default function SelfRenderPage() {
             <span>问卷星</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
               我的问卷
             </Link>
             <Link href="/developer" className="text-sm font-medium text-primary">
@@ -370,10 +390,12 @@ export default function SelfRenderPage() {
                           onChange={(e) => setSpecUrl(e.target.value)}
                         />
                         <Button onClick={handleLoadFromUrl} disabled={isLoading}>
-                          {isLoading ? "加载中..." : "加载"}
+                          {isLoading ? '加载中...' : '加载'}
                         </Button>
                       </div>
-                      <p className="text-xs text-muted-foreground">输入包含OpenAPI规范的URL，支持JSON或YAML格式</p>
+                      <p className="text-xs text-muted-foreground">
+                        输入包含OpenAPI规范的URL，支持JSON或YAML格式
+                      </p>
                     </div>
                   </TabsContent>
 
@@ -390,7 +412,9 @@ export default function SelfRenderPage() {
                           validateSpec(e.target.value)
                         }}
                       />
-                      <p className="text-xs text-muted-foreground">直接编辑OpenAPI规范内容，支持JSON或YAML格式</p>
+                      <p className="text-xs text-muted-foreground">
+                        直接编辑OpenAPI规范内容，支持JSON或YAML格式
+                      </p>
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -442,7 +466,13 @@ export default function SelfRenderPage() {
               <CardFooter>
                 <Button
                   onClick={handleRenderSurvey}
-                  disabled={isLoading || isRendering || !specContent || validationErrors.length > 0 || !selectedApiKey}
+                  disabled={
+                    isLoading ||
+                    isRendering ||
+                    !specContent ||
+                    validationErrors.length > 0 ||
+                    !selectedApiKey
+                  }
                   className="w-full"
                 >
                   {isRendering ? (
@@ -451,7 +481,7 @@ export default function SelfRenderPage() {
                       渲染中...
                     </>
                   ) : (
-                    "渲染问卷"
+                    '渲染问卷'
                   )}
                 </Button>
               </CardFooter>
@@ -472,7 +502,9 @@ export default function SelfRenderPage() {
                   <div className="text-center py-12">
                     <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-medium mb-2">等待渲染</h3>
-                    <p className="text-muted-foreground mb-4">上传或提供OpenAPI规范，然后点击"渲染问卷"按钮</p>
+                    <p className="text-muted-foreground mb-4">
+                      上传或提供OpenAPI规范，然后点击"渲染问卷"按钮
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -531,7 +563,9 @@ export default function SelfRenderPage() {
                 </li>
                 <li>
                   <p className="font-medium">应用渲染结果</p>
-                  <p className="text-muted-foreground">检查渲染结果，如果满意，点击"应用"按钮将其应用到您的系统中。</p>
+                  <p className="text-muted-foreground">
+                    检查渲染结果，如果满意，点击"应用"按钮将其应用到您的系统中。
+                  </p>
                 </li>
               </ol>
             </CardContent>

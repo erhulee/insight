@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Smartphone, Monitor, Tablet } from "lucide-react"
-import { getFromLocalStorage } from "@/lib/utils"
-import type { Survey } from "@/lib/types"
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { FileText, Smartphone, Monitor, Tablet } from 'lucide-react'
+import { getFromLocalStorage } from '@/lib/utils'
+import type { Survey } from '@/lib/types'
 
 export default function SurveyPreviewPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [survey, setSurvey] = useState<Survey | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">("desktop")
+  const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   // 加载问卷数据
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
         setSurvey(loadedSurvey)
         setIsLoading(false)
       } catch (error) {
-        console.error("加载问卷失败:", error)
+        console.error('加载问卷失败:', error)
         setIsLoading(false)
       }
     }, 500)
@@ -51,7 +51,7 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
             <CardDescription>您访问的问卷不存在或已被删除</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={() => router.push("/")} className="w-full">
+            <Button onClick={() => router.push('/')} className="w-full">
               返回首页
             </Button>
           </CardFooter>
@@ -80,20 +80,22 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
                   {question.required && <span className="text-destructive ml-1">*</span>}
                 </h3>
               </div>
-              {question.description && <p className="text-sm text-muted-foreground mb-4">{question.description}</p>}
+              {question.description && (
+                <p className="text-sm text-muted-foreground mb-4">{question.description}</p>
+              )}
 
               {/* 根据问题类型渲染不同的输入控件 */}
               {/* 这里只是预览，不需要实际功能 */}
-              {question.type === "text" && (
+              {question.type === 'text' && (
                 <input
                   type="text"
-                  placeholder={question.placeholder || "请输入..."}
+                  placeholder={question.placeholder || '请输入...'}
                   className="w-full p-2 border rounded-md"
                   disabled
                 />
               )}
 
-              {question.type === "radio" && (
+              {question.type === 'radio' && (
                 <div className="space-y-2">
                   {question.options?.map((option, i) => (
                     <div key={i} className="flex items-center space-x-2">
@@ -104,7 +106,7 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
                 </div>
               )}
 
-              {question.type === "checkbox" && (
+              {question.type === 'checkbox' && (
                 <div className="space-y-2">
                   {question.options?.map((option, i) => (
                     <div key={i} className="flex items-center space-x-2">
@@ -115,7 +117,7 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
                 </div>
               )}
 
-              {question.type === "dropdown" && (
+              {question.type === 'dropdown' && (
                 <select className="w-full p-2 border rounded-md" disabled>
                   <option value="">请选择...</option>
                   {question.options?.map((option, i) => (
@@ -172,11 +174,11 @@ export default function SurveyPreviewPage({ params }: { params: { id: string } }
         <div className="mx-auto flex justify-center">
           <div
             className={`transition-all duration-300 ease-in-out border rounded-lg shadow-sm overflow-hidden ${
-              device === "desktop"
-                ? "w-full max-w-4xl"
-                : device === "tablet"
-                  ? "w-[768px] max-w-full"
-                  : "w-[375px] max-w-full"
+              device === 'desktop'
+                ? 'w-full max-w-4xl'
+                : device === 'tablet'
+                  ? 'w-[768px] max-w-full'
+                  : 'w-[375px] max-w-full'
             }`}
           >
             {renderSurveyContent()}

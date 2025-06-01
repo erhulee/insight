@@ -1,34 +1,41 @@
-"use client"
-import type React from "react"
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Mail, Lock, ArrowRight } from "lucide-react"
-import { InsightBrand } from "@/components/common/insight-brand"
-import { trpc } from "../_trpc/client"
-import { redirect } from "next/navigation"
-import { useLocalStorage } from "react-use"
+'use client'
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Mail, Lock, ArrowRight } from 'lucide-react'
+import { InsightBrand } from '@/components/common/insight-brand'
+import { trpc } from '../_trpc/client'
+import { redirect } from 'next/navigation'
+import { useLocalStorage } from 'react-use'
 export default function LoginPage() {
   const [localValue, updateLocalValue, remove] = useLocalStorage<{
-    account: string,
+    account: string
     password: string
-  }>("remeberMe")
+  }>('remeberMe')
   useEffect(() => {
     if (localValue?.account && localValue?.password) {
       setFormData({
         email: localValue?.account,
         password: localValue?.password,
-        rememberMe: true
+        rememberMe: true,
       })
     }
   }, [localValue])
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
     rememberMe: false,
   })
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,18 +55,18 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     const res = await submitMutation.mutateAsync({
       account: formData.email,
-      password: formData.password
+      password: formData.password,
     })
     if (res) {
       if (formData.rememberMe) {
         updateLocalValue({
           account: formData.email,
-          password: formData.password
+          password: formData.password,
         })
       } else {
         remove()
       }
-      redirect("/dashboard")
+      redirect('/dashboard')
     }
   }
   return (
@@ -74,7 +81,7 @@ export default function LoginPage() {
           <Card>
             <CardHeader className="space-y-1">
               <CardTitle className="2xl:text-2xl text-base font-bold">登录</CardTitle>
-              <CardDescription  >输入您的账号和密码以访问您的账户</CardDescription>
+              <CardDescription>输入您的账号和密码以访问您的账户</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -113,18 +120,22 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="remember-me" checked={formData.rememberMe} onCheckedChange={handleCheckboxChange} />
+                  <Checkbox
+                    id="remember-me"
+                    checked={formData.rememberMe}
+                    onCheckedChange={handleCheckboxChange}
+                  />
                   <Label htmlFor="remember-me" className="text-sm">
                     记住我
                   </Label>
                 </div>
-
               </div>
-              <Button className="w-full mt-4" onClick={
-                () => {
+              <Button
+                className="w-full mt-4"
+                onClick={() => {
                   handleSubmit()
-                }
-              }>
+                }}
+              >
                 <span className="flex items-center gap-1">
                   登陆
                   <ArrowRight className="h-4 w-4" />
@@ -133,7 +144,7 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                还没有账号?{" "}
+                还没有账号?{' '}
                 <Link href="/register" className="text-primary hover:underline">
                   立即注册
                 </Link>

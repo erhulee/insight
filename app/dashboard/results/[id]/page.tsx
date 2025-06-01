@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Download, PieChart, ListFilter } from "lucide-react"
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { InsightBrand } from "@/components/common/insight-brand"
-import { trpc } from "@/app/_trpc/client"
-import { SubmitTrendCard } from "./_components/SubmitTrendCard"
+import { useState } from 'react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Download, PieChart, ListFilter } from 'lucide-react'
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { InsightBrand } from '@/components/common/insight-brand'
+import { trpc } from '@/app/_trpc/client'
+import { SubmitTrendCard } from './_components/SubmitTrendCard'
 
 export default function SurveyResults() {
   const { id } = useParams()
-  const [activeTab, setActiveTab] = useState("summary")
+  const [activeTab, setActiveTab] = useState('summary')
   const { data, isLoading, isError } = trpc.GetSurveyResult.useQuery({
     id: id as string,
   })
@@ -90,11 +90,15 @@ export default function SurveyResults() {
                     <CardHeader>
                       <CardTitle>{question.title}</CardTitle>
                       <CardDescription>
-                        {question.type === "radio" ? "单选题" : question.type === "checkbox" ? "多选题" : "文本题"}
+                        {question.type === 'radio'
+                          ? '单选题'
+                          : question.type === 'checkbox'
+                            ? '多选题'
+                            : '文本题'}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {(question.type === "radio" || question.type === "checkbox") && (
+                      {(question.type === 'radio' || question.type === 'checkbox') && (
                         <div className="space-y-4">
                           <div className="h-[200px] flex items-center justify-center bg-gray-100 rounded-md">
                             <div className="text-center">
@@ -123,7 +127,7 @@ export default function SurveyResults() {
                         </div>
                       )}
 
-                      {question.type === "text" && (
+                      {question.type === 'text' && (
                         <div className="space-y-4">
                           <div className="flex justify-end">
                             <Button variant="outline" size="sm" className="gap-1">

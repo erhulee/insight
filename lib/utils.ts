@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,7 +14,7 @@ export function scrollToElement(elementId: string, offset = 0) {
 
     window.scrollTo({
       top: offsetPosition,
-      behavior: "smooth",
+      behavior: 'smooth',
     })
   }
 }
@@ -52,27 +52,27 @@ export function validateUrl(url: string): boolean {
 
 // 添加设备检测辅助函数
 export function isMobile(): boolean {
-  if (typeof window === "undefined") return false
+  if (typeof window === 'undefined') return false
   return window.innerWidth <= 768
 }
 
 // 添加本地存储辅助函数
 export function saveToLocalStorage(key: string, value: any): void {
-  if (typeof window === "undefined") return
+  if (typeof window === 'undefined') return
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
-    console.error("Error saving to localStorage:", error)
+    console.error('Error saving to localStorage:', error)
   }
 }
 
 export function getFromLocalStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === "undefined") return defaultValue
+  if (typeof window === 'undefined') return defaultValue
   try {
     const item = localStorage.getItem(key)
     return item ? JSON.parse(item) : defaultValue
   } catch (error) {
-    console.error("Error getting from localStorage:", error)
+    console.error('Error getting from localStorage:', error)
     return defaultValue
   }
 }

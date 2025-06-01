@@ -1,7 +1,7 @@
-"use server"
+'use server'
 
-import { revalidatePath } from "next/cache"
-import type { Survey } from "./types"
+import { revalidatePath } from 'next/cache'
+import type { Survey } from './types'
 
 // 创建新问卷
 export async function createSurvey(title: string, description: string) {
@@ -29,7 +29,7 @@ export async function updateSurvey(id: string, data: Partial<Survey>) {
 }
 
 // 更新问卷状态
-export async function updateSurveyStatus(id: string, status: "draft" | "active" | "closed") {
+export async function updateSurveyStatus(id: string, status: 'draft' | 'active' | 'closed') {
   // 这里应该连接数据库更新问卷状态
 
   // 重新验证路径以更新缓存
@@ -69,7 +69,7 @@ export async function getSurveyStats(surveyId: string) {
   return {
     totalResponses: 124,
     completionRate: 98,
-    averageTime: "3:42",
+    averageTime: '3:42',
     questionStats: [],
   }
 }

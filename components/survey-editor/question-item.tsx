@@ -1,14 +1,14 @@
-"use client"
-import type React from "react"
-import { useRef, useEffect } from "react"
-import type { Question } from "@/lib/types"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { GripVertical, Trash2, Copy } from "lucide-react"
-import { useDragDrop } from "./drag-drop-context"
-import { cn } from "@/lib/utils"
-import { Badge } from "../ui/badge"
-import { QuestionRender } from "./buildin/form-runtime/question-render"
+'use client'
+import type React from 'react'
+import { useRef, useEffect } from 'react'
+import type { Question } from '@/lib/types'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { GripVertical, Trash2, Copy } from 'lucide-react'
+import { useDragDrop } from './drag-drop-context'
+import { cn } from '@/lib/utils'
+import { Badge } from '../ui/badge'
+import { QuestionRender } from './buildin/form-runtime/question-render'
 
 interface QuestionItemProps {
   question: Question
@@ -46,7 +46,7 @@ export function QuestionItem({
     try {
       handleDragStart(e, question)
     } catch (error) {
-      console.error("Error in drag start:", error)
+      console.error('Error in drag start:', error)
     }
   }
 
@@ -54,7 +54,7 @@ export function QuestionItem({
     try {
       handleDragEnd(e)
     } catch (error) {
-      console.error("Error in drag end:", error)
+      console.error('Error in drag end:', error)
     }
   }
 
@@ -62,25 +62,25 @@ export function QuestionItem({
     try {
       handleDragOver(e, question.id)
     } catch (error) {
-      console.error("Error in drag over:", error)
+      console.error('Error in drag over:', error)
     }
   }
 
   const safeDrop = (e: React.DragEvent) => {
-    console.log("safeDrop:", e, question, setQuestions)
+    console.log('safeDrop:', e, question, setQuestions)
     try {
       handleDrop(e, questions, setQuestions)
     } catch (error) {
-      console.error("Error in drop:", error)
+      console.error('Error in drop:', error)
     }
   }
   return (
     <Card
       ref={cardRef}
       className={cn(
-        "question-item group mb-4 transition-all",
-        isSelected && !isPreview && "selected border-primary",
-        isPreview && "preview-item",
+        'question-item group mb-4 transition-all',
+        isSelected && !isPreview && 'selected border-primary',
+        isPreview && 'preview-item',
       )}
       onClick={() => onSelect(question.id)}
       draggable={!isPreview}

@@ -1,13 +1,19 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, CheckCircle, Home } from "lucide-react"
-import type { Survey } from "@/lib/types"
-import { getFromLocalStorage } from "@/lib/utils"
-
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { FileText, CheckCircle, Home } from 'lucide-react'
+import type { Survey } from '@/lib/types'
+import { getFromLocalStorage } from '@/lib/utils'
 
 export default function ThanksPage({ params }: { params: { id: string } }) {
   const [survey, setSurvey] = useState<Survey | null>(null)
@@ -24,7 +30,7 @@ export default function ThanksPage({ params }: { params: { id: string } }) {
         setSurvey(loadedSurvey)
         setIsLoading(false)
       } catch (error) {
-        console.error("加载问卷失败:", error)
+        console.error('加载问卷失败:', error)
         setIsLoading(false)
       }
     }, 500)
@@ -62,9 +68,10 @@ export default function ThanksPage({ params }: { params: { id: string } }) {
     )
   }
 
-  const thankYouTitle = survey?.settings?.thankYouScreen?.title || "感谢您的参与！"
-  const thankYouDescription = survey?.settings?.thankYouScreen?.description || "您的反馈对我们非常重要。"
-  const redirectUrl = survey?.settings?.thankYouScreen?.redirectUrl || "/"
+  const thankYouTitle = survey?.settings?.thankYouScreen?.title || '感谢您的参与！'
+  const thankYouDescription =
+    survey?.settings?.thankYouScreen?.description || '您的反馈对我们非常重要。'
+  const redirectUrl = survey?.settings?.thankYouScreen?.redirectUrl || '/'
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,7 +96,9 @@ export default function ThanksPage({ params }: { params: { id: string } }) {
           <CardContent>
             <p className="text-muted-foreground">您的回答已成功提交。</p>
             {survey?.settings?.thankYouScreen?.redirectUrl && (
-              <p className="text-sm text-muted-foreground mt-4">{redirectCountdown}秒后自动跳转...</p>
+              <p className="text-sm text-muted-foreground mt-4">
+                {redirectCountdown}秒后自动跳转...
+              </p>
             )}
           </CardContent>
           <CardFooter className="flex justify-center">

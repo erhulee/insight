@@ -1,17 +1,35 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { FileText, Key, Code, BookOpen, Terminal, Puzzle, Zap, ChevronRight, ExternalLink, Copy } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { toast } from "sonner"
+import Link from 'next/link'
+import {
+  FileText,
+  Key,
+  Code,
+  BookOpen,
+  Terminal,
+  Puzzle,
+  Zap,
+  ChevronRight,
+  ExternalLink,
+  Copy,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { toast } from 'sonner'
 
 export default function DeveloperPage() {
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast("已复制", {
-      description: "代码已复制到剪贴板",
+    toast('已复制', {
+      description: '代码已复制到剪贴板',
     })
   }
 
@@ -25,7 +43,10 @@ export default function DeveloperPage() {
             <span>问卷星</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
               我的问卷
             </Link>
             <Link href="/developer" className="text-sm font-medium text-primary">
@@ -211,7 +232,8 @@ export default function DeveloperPage() {
                   <div>
                     <h3 className="text-lg font-medium mb-2">了解API</h3>
                     <p className="text-muted-foreground mb-4">
-                      浏览API文档，了解可用的端点、请求参数和响应格式。您可以使用API Explorer交互式地测试API。
+                      浏览API文档，了解可用的端点、请求参数和响应格式。您可以使用API
+                      Explorer交互式地测试API。
                     </p>
                     <div className="flex gap-2">
                       <Button asChild variant="outline" size="sm">
@@ -255,7 +277,7 @@ export default function DeveloperPage() {
 });
 
 const data = await response.json();
-console.log(data);`
+console.log(data);`,
                           )
                         }
                       >
@@ -330,7 +352,7 @@ async function getSurveys() {
 }
 
 // 调用函数
-getSurveys();`
+getSurveys();`,
                         )
                       }
                     >
@@ -430,7 +452,7 @@ getSurveys();`}</code>
 }
 
 // 调用函数
-createSurvey();`
+createSurvey();`,
                         )
                       }
                     >
@@ -530,7 +552,7 @@ def get_surveys():
         print(f"其他错误: {err}")
 
 # 调用函数
-get_surveys()`
+get_surveys()`,
                         )
                       }
                     >
@@ -627,7 +649,7 @@ def create_survey():
         print(f"其他错误: {err}")
 
 # 调用函数
-create_survey()`
+create_survey()`,
                         )
                       }
                     >
@@ -736,7 +758,7 @@ create_survey()`}</code>
                           }
 
                           // 调用函数
-                          getSurveys();`
+                          getSurveys();`,
                         )
                       }
                     >
@@ -857,7 +879,10 @@ function createSurvey() {
 }
 
 // 调用函数
-createSurvey();`)}></Button>
+createSurvey();`,
+                        )
+                      }
+                    ></Button>
                   </div>
                 </CardContent>
               </Card>
@@ -879,7 +904,7 @@ createSurvey();`)}></Button>
                         handleCopyCode(
                           `curl -X GET "https://api.wenjuanxing.com/v1/surveys" \\
 -H "Authorization: Bearer YOUR_API_KEY" \\
--H "Content-Type: application/json"`
+-H "Content-Type: application/json"`,
                         )
                       }
                     >
@@ -934,7 +959,7 @@ createSurvey();`)}></Button>
     }
   ],
   "published": false
-}'`
+}'`,
                         )
                       }
                     >
@@ -1068,7 +1093,8 @@ createSurvey();`)}></Button>
                 <div>
                   <h3 className="text-lg font-medium mb-2">API支持哪些认证方式？</h3>
                   <p className="text-muted-foreground">
-                    我们使用Bearer Token认证方式。您需要在请求头中添加"Authorization: Bearer YOUR_API_KEY"。
+                    我们使用Bearer Token认证方式。您需要在请求头中添加"Authorization: Bearer
+                    YOUR_API_KEY"。
                   </p>
                 </div>
 
@@ -1102,31 +1128,46 @@ createSurvey();`)}></Button>
               <CardContent>
                 <ul className="space-y-2">
                   <li>
-                    <Link href="/developer/docs" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/developer/docs"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <BookOpen className="h-4 w-4" />
                       API文档
                     </Link>
                   </li>
                   <li>
-                    <Link href="/developer/api-explorer" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/developer/api-explorer"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <Terminal className="h-4 w-4" />
                       API Explorer
                     </Link>
                   </li>
                   <li>
-                    <Link href="/developer/examples" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/developer/examples"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <Code className="h-4 w-4" />
                       代码示例
                     </Link>
                   </li>
                   <li>
-                    <Link href="/developer/changelog" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/developer/changelog"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <FileText className="h-4 w-4" />
                       API更新日志
                     </Link>
                   </li>
                   <li>
-                    <Link href="/openapi.yaml" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/openapi.yaml"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       OpenAPI规范
                     </Link>
@@ -1142,31 +1183,46 @@ createSurvey();`)}></Button>
               <CardContent>
                 <ul className="space-y-2">
                   <li>
-                    <Link href="/support" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/support"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       技术支持
                     </Link>
                   </li>
                   <li>
-                    <Link href="https://github.com/wenjuanxing/api-examples" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="https://github.com/wenjuanxing/api-examples"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       GitHub示例仓库
                     </Link>
                   </li>
                   <li>
-                    <Link href="https://forum.wenjuanxing.com" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="https://forum.wenjuanxing.com"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       开发者论坛
                     </Link>
                   </li>
                   <li>
-                    <Link href="/blog/developer" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/blog/developer"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       开发者博客
                     </Link>
                   </li>
                   <li>
-                    <Link href="/developer/status" className="flex items-center gap-2 text-primary hover:underline">
+                    <Link
+                      href="/developer/status"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
                       <ExternalLink className="h-4 w-4" />
                       API状态页面
                     </Link>

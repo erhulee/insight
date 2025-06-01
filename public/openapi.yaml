@@ -553,13 +553,13 @@ components:
       properties:
         id:
           type: string
-          example: "survey-123456"
+          example: 'survey-123456'
         title:
           type: string
-          example: "客户满意度调查"
+          example: '客户满意度调查'
         description:
           type: string
-          example: "了解客户对我们产品和服务的满意度"
+          example: '了解客户对我们产品和服务的满意度'
         questions_count:
           type: integer
           example: 8
@@ -569,11 +569,11 @@ components:
         created_at:
           type: string
           format: date-time
-          example: "2023-04-15T10:30:00Z"
+          example: '2023-04-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
-          example: "2023-04-20T15:45:00Z"
+          example: '2023-04-20T15:45:00Z'
         published:
           type: boolean
           example: true
@@ -582,13 +582,13 @@ components:
       properties:
         id:
           type: string
-          example: "survey-123456"
+          example: 'survey-123456'
         title:
           type: string
-          example: "客户满意度调查"
+          example: '客户满意度调查'
         description:
           type: string
-          example: "了解客户对我们产品和服务的满意度"
+          example: '了解客户对我们产品和服务的满意度'
         questions:
           type: array
           items:
@@ -600,11 +600,11 @@ components:
         created_at:
           type: string
           format: date-time
-          example: "2023-04-15T10:30:00Z"
+          example: '2023-04-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
-          example: "2023-04-20T15:45:00Z"
+          example: '2023-04-20T15:45:00Z'
         published:
           type: boolean
           example: true
@@ -615,10 +615,10 @@ components:
       properties:
         title:
           type: string
-          example: "客户满意度调查"
+          example: '客户满意度调查'
         description:
           type: string
-          example: "了解客户对我们产品和服务的满意度"
+          example: '了解客户对我们产品和服务的满意度'
         questions:
           type: array
           items:
@@ -635,10 +635,10 @@ components:
       properties:
         title:
           type: string
-          example: "客户满意度调查"
+          example: '客户满意度调查'
         description:
           type: string
-          example: "了解客户对我们产品和服务的满意度"
+          example: '了解客户对我们产品和服务的满意度'
         questions:
           type: array
           items:
@@ -654,17 +654,17 @@ components:
       properties:
         id:
           type: string
-          example: "q1"
+          example: 'q1'
         type:
           type: string
           enum: [text, radio, checkbox, dropdown, rating, date, file, section]
-          example: "radio"
+          example: 'radio'
         title:
           type: string
-          example: "您对我们的产品总体满意度如何？"
+          example: '您对我们的产品总体满意度如何？'
         description:
           type: string
-          example: "请根据您的使用体验进行评价"
+          example: '请根据您的使用体验进行评价'
         required:
           type: boolean
           example: true
@@ -677,22 +677,22 @@ components:
           example: false
         placeholder:
           type: string
-          example: "请输入..."
+          example: '请输入...'
         maxRating:
           type: integer
           example: 5
         ratingType:
           type: string
           enum: [number, star, heart]
-          example: "star"
+          example: 'star'
         minDate:
           type: string
           format: date
-          example: "2023-01-01"
+          example: '2023-01-01'
         maxDate:
           type: string
           format: date
-          example: "2023-12-31"
+          example: '2023-12-31'
         maxFiles:
           type: integer
           example: 1
@@ -701,17 +701,17 @@ components:
           example: 5
         fileTypes:
           type: string
-          example: ".pdf,.jpg,.png"
+          example: '.pdf,.jpg,.png'
         validationType:
           type: string
           enum: [none, email, phone, url, number, regex]
-          example: "email"
+          example: 'email'
         validationRegex:
           type: string
-          example: "^[a-zA-Z0-9]+$"
+          example: '^[a-zA-Z0-9]+$'
         validationMessage:
           type: string
-          example: "请输入有效的电子邮箱地址"
+          example: '请输入有效的电子邮箱地址'
     QuestionCreate:
       type: object
       required:
@@ -721,13 +721,13 @@ components:
         type:
           type: string
           enum: [text, radio, checkbox, dropdown, rating, date, file, section]
-          example: "radio"
+          example: 'radio'
         title:
           type: string
-          example: "您对我们的产品总体满意度如何？"
+          example: '您对我们的产品总体满意度如何？'
         description:
           type: string
-          example: "请根据您的使用体验进行评价"
+          example: '请根据您的使用体验进行评价'
         required:
           type: boolean
           default: false
@@ -740,22 +740,22 @@ components:
           default: false
         placeholder:
           type: string
-          example: "请输入..."
+          example: '请输入...'
         maxRating:
           type: integer
           default: 5
         ratingType:
           type: string
           enum: [number, star, heart]
-          default: "number"
+          default: 'number'
         minDate:
           type: string
           format: date
-          example: "2023-01-01"
+          example: '2023-01-01'
         maxDate:
           type: string
           format: date
-          example: "2023-12-31"
+          example: '2023-12-31'
         maxFiles:
           type: integer
           default: 1
@@ -764,30 +764,30 @@ components:
           default: 5
         fileTypes:
           type: string
-          example: ".pdf,.jpg,.png"
+          example: '.pdf,.jpg,.png'
         validationType:
           type: string
           enum: [none, email, phone, url, number, regex]
-          default: "none"
+          default: 'none'
         validationRegex:
           type: string
-          example: "^[a-zA-Z0-9]+$"
+          example: '^[a-zA-Z0-9]+$'
         validationMessage:
           type: string
-          example: "请输入有效的电子邮箱地址"
+          example: '请输入有效的电子邮箱地址'
     QuestionOption:
       type: object
       properties:
         text:
           type: string
-          example: "非常满意"
+          example: '非常满意'
         value:
           type: string
-          example: "5"
+          example: '5'
         image:
           type: string
           format: uri
-          example: "https://example.com/images/very-satisfied.png"
+          example: 'https://example.com/images/very-satisfied.png'
     QuestionOptionCreate:
       type: object
       required:
@@ -795,14 +795,14 @@ components:
       properties:
         text:
           type: string
-          example: "非常满意"
+          example: '非常满意'
         value:
           type: string
-          example: "5"
+          example: '5'
         image:
           type: string
           format: uri
-          example: "https://example.com/images/very-satisfied.png"
+          example: 'https://example.com/images/very-satisfied.png'
     SurveySettings:
       type: object
       properties:
@@ -829,10 +829,10 @@ components:
               default: false
             title:
               type: string
-              example: "欢迎参与我们的调查"
+              example: '欢迎参与我们的调查'
             description:
               type: string
-              example: "感谢您抽出时间参与本次调查，您的反馈对我们非常重要。"
+              example: '感谢您抽出时间参与本次调查，您的反馈对我们非常重要。'
         thankYouScreen:
           type: object
           properties:
@@ -841,14 +841,14 @@ components:
               default: true
             title:
               type: string
-              example: "感谢您的参与！"
+              example: '感谢您的参与！'
             description:
               type: string
-              example: "您的反馈已成功提交，感谢您的宝贵意见。"
+              example: '您的反馈已成功提交，感谢您的宝贵意见。'
             redirectUrl:
               type: string
               format: uri
-              example: "https://example.com/thank-you"
+              example: 'https://example.com/thank-you'
             redirectDelay:
               type: integer
               example: 5
@@ -857,32 +857,32 @@ components:
       properties:
         primaryColor:
           type: string
-          example: "#3b82f6"
+          example: '#3b82f6'
         backgroundColor:
           type: string
-          example: "#ffffff"
+          example: '#ffffff'
         fontFamily:
           type: string
-          example: "Inter, sans-serif"
+          example: 'Inter, sans-serif'
         borderRadius:
           type: string
-          example: "0.5rem"
+          example: '0.5rem'
         questionSpacing:
           type: string
-          example: "1.5rem"
+          example: '1.5rem'
         preset:
           type: string
           enum: [default, modern, minimal, colorful]
-          default: "default"
+          default: 'default'
     Response:
       type: object
       properties:
         id:
           type: string
-          example: "response-123456"
+          example: 'response-123456'
         survey_id:
           type: string
-          example: "survey-123456"
+          example: 'survey-123456'
         answers:
           type: array
           items:
@@ -890,17 +890,17 @@ components:
         created_at:
           type: string
           format: date-time
-          example: "2023-04-16T09:23:00Z"
+          example: '2023-04-16T09:23:00Z'
         user_agent:
           type: string
-          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+          example: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         ip_address:
           type: string
-          example: "192.168.1.1"
+          example: '192.168.1.1'
         email:
           type: string
           format: email
-          example: "user@example.com"
+          example: 'user@example.com'
     ResponseCreate:
       type: object
       required:
@@ -913,13 +913,13 @@ components:
         email:
           type: string
           format: email
-          example: "user@example.com"
+          example: 'user@example.com'
     Answer:
       type: object
       properties:
         question_id:
           type: string
-          example: "q1"
+          example: 'q1'
         value:
           oneOf:
             - type: string
@@ -927,8 +927,8 @@ components:
               items:
                 type: string
             - type: number
-            - type: "null"
-          example: "5"
+            - type: 'null'
+          example: '5'
     AnswerCreate:
       type: object
       required:
@@ -937,7 +937,7 @@ components:
       properties:
         question_id:
           type: string
-          example: "q1"
+          example: 'q1'
         value:
           oneOf:
             - type: string
@@ -945,8 +945,8 @@ components:
               items:
                 type: string
             - type: number
-            - type: "null"
-          example: "5"
+            - type: 'null'
+          example: '5'
     SurveyStats:
       type: object
       properties:
@@ -959,7 +959,7 @@ components:
           example: 98.5
         average_time:
           type: string
-          example: "3:42"
+          example: '3:42'
         question_stats:
           type: array
           items:
@@ -969,13 +969,13 @@ components:
       properties:
         question_id:
           type: string
-          example: "q1"
+          example: 'q1'
         question_title:
           type: string
-          example: "您对我们的产品总体满意度如何？"
+          example: '您对我们的产品总体满意度如何？'
         question_type:
           type: string
-          example: "radio"
+          example: 'radio'
         total_answers:
           type: integer
           example: 124
@@ -987,7 +987,7 @@ components:
             - type: array
               items:
                 type: string
-              example: ["很好用", "界面简洁", "功能丰富"]
+              example: ['很好用', '界面简洁', '功能丰富']
             - type: object
               properties:
                 min:
@@ -1005,7 +1005,7 @@ components:
       properties:
         option:
           type: string
-          example: "非常满意"
+          example: '非常满意'
         count:
           type: integer
           example: 45
@@ -1018,28 +1018,29 @@ components:
       properties:
         id:
           type: string
-          example: "webhook-123456"
+          example: 'webhook-123456'
         url:
           type: string
           format: uri
-          example: "https://example.com/webhook"
+          example: 'https://example.com/webhook'
         events:
           type: array
           items:
             type: string
-            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
-          example: ["response.created"]
+            enum:
+              [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ['response.created']
         active:
           type: boolean
           example: true
         created_at:
           type: string
           format: date-time
-          example: "2023-04-15T10:30:00Z"
+          example: '2023-04-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
-          example: "2023-04-20T15:45:00Z"
+          example: '2023-04-20T15:45:00Z'
     WebhookCreate:
       type: object
       required:
@@ -1049,13 +1050,14 @@ components:
         url:
           type: string
           format: uri
-          example: "https://example.com/webhook"
+          example: 'https://example.com/webhook'
         events:
           type: array
           items:
             type: string
-            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
-          example: ["response.created"]
+            enum:
+              [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ['response.created']
         active:
           type: boolean
           default: true
@@ -1065,13 +1067,14 @@ components:
         url:
           type: string
           format: uri
-          example: "https://example.com/webhook"
+          example: 'https://example.com/webhook'
         events:
           type: array
           items:
             type: string
-            enum: [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
-          example: ["response.created", "response.deleted"]
+            enum:
+              [survey.created, survey.updated, survey.deleted, response.created, response.deleted]
+          example: ['response.created', 'response.deleted']
         active:
           type: boolean
     PaginationMeta:
@@ -1097,10 +1100,10 @@ components:
           properties:
             code:
               type: string
-              example: "validation_error"
+              example: 'validation_error'
             message:
               type: string
-              example: "请求参数验证失败"
+              example: '请求参数验证失败'
   responses:
     BadRequest:
       description: 请求参数错误
@@ -1120,10 +1123,10 @@ components:
                 properties:
                   code:
                     type: string
-                    example: "unauthorized"
+                    example: 'unauthorized'
                   message:
                     type: string
-                    example: "无效的API密钥或未提供API密钥"
+                    example: '无效的API密钥或未提供API密钥'
     NotFound:
       description: 资源不存在
       content:
@@ -1136,10 +1139,10 @@ components:
                 properties:
                   code:
                     type: string
-                    example: "not_found"
+                    example: 'not_found'
                   message:
                     type: string
-                    example: "请求的资源不存在"
+                    example: '请求的资源不存在'
     ServerError:
       description: 服务器错误
       content:
@@ -1152,7 +1155,7 @@ components:
                 properties:
                   code:
                     type: string
-                    example: "server_error"
+                    example: 'server_error'
                   message:
                     type: string
-                    example: "服务器内部错误"
+                    example: '服务器内部错误'

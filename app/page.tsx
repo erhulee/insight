@@ -1,15 +1,7 @@
-import Link from "next/link";
-import {
-  BarChart3,
-  FileText,
-  User,
-  Code,
-  Puzzle,
-  Zap,
-  ArrowRight,
-} from "lucide-react";
-import { FeatureCard } from "@/components/feature-card";
-import { Banner } from "./banner";
+import Link from 'next/link'
+import { BarChart3, FileText, User, Code, Puzzle, Zap, ArrowRight } from 'lucide-react'
+import { FeatureCard } from '@/components/feature-card'
+import { Banner } from './banner'
 
 export default function Home() {
   return (
@@ -63,10 +55,7 @@ export default function Home() {
                     强大的开放平台
                   </h2>
                   <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary absolute top-0 right-0 translate-x-1/2 -translate-y-full sm:text-xs ">
-                    <Link
-                      href="/developer"
-                      className=" flex flex-row items-center gap-2"
-                    >
+                    <Link href="/developer" className=" flex flex-row items-center gap-2">
                       探索开发者中心
                       <ArrowRight className=" w-3 h-3"></ArrowRight>
                     </Link>
@@ -174,5 +163,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  );
+  )
 }

@@ -1,16 +1,16 @@
-"use client"
-import type React from "react"
-import { useRef, useEffect } from "react"
-import type { Question } from "@/lib/types"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { GripVertical, Trash2, Copy } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useDragDrop } from "@/components/survey-editor/drag-drop-context"
-import { QuestionRender } from "@/components/survey-editor/buildin/form-runtime/question-render"
-import { useSnapshot } from "valtio"
-import { runtimeStore } from "@/app/dashboard/_valtio/runtime"
-import { Badge } from "@/components/ui/badge"
+'use client'
+import type React from 'react'
+import { useRef, useEffect } from 'react'
+import type { Question } from '@/lib/types'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { GripVertical, Trash2, Copy } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useDragDrop } from '@/components/survey-editor/drag-drop-context'
+import { QuestionRender } from '@/components/survey-editor/buildin/form-runtime/question-render'
+import { useSnapshot } from 'valtio'
+import { runtimeStore } from '@/app/dashboard/_valtio/runtime'
+import { Badge } from '@/components/ui/badge'
 
 interface QuestionItemProps {
   question: Question
@@ -45,7 +45,7 @@ export function EditQuestionItem({
     try {
       handleDragStart(e, question)
     } catch (error) {
-      console.error("Error in drag start:", error)
+      console.error('Error in drag start:', error)
     }
   }
 
@@ -53,7 +53,7 @@ export function EditQuestionItem({
     try {
       handleDragEnd(e)
     } catch (error) {
-      console.error("Error in drag end:", error)
+      console.error('Error in drag end:', error)
     }
   }
 
@@ -61,7 +61,7 @@ export function EditQuestionItem({
     try {
       handleDragOver(e, question.field)
     } catch (error) {
-      console.error("Error in drag over:", error)
+      console.error('Error in drag over:', error)
     }
   }
 
@@ -70,17 +70,17 @@ export function EditQuestionItem({
     try {
       // handleDrop(e, questions, setQuestions)
     } catch (error) {
-      console.error("Error in drop:", error)
+      console.error('Error in drop:', error)
     }
   }
-  console.log("qqqqq:", question)
+  console.log('qqqqq:', question)
   return (
     <Card
       ref={cardRef}
       className={cn(
-        "question-item group transition-all",
-        isSelected && !isPreview && "selected border-primary",
-        isPreview && "preview-item",
+        'question-item group transition-all',
+        isSelected && !isPreview && 'selected border-primary',
+        isPreview && 'preview-item',
       )}
       onClick={() => onSelect(question.field)}
       draggable={!isPreview}
@@ -96,7 +96,7 @@ export function EditQuestionItem({
               <GripVertical className="h-5 w-5 text-muted-foreground" />
             </div>
           )}
-          <span className=" text-sm font-bold" >{question.attr['title']}</span>
+          <span className=" text-sm font-bold">{question.attr['title']}</span>
           <Badge variant="secondary">{question.name}</Badge>
         </div>
         {!isPreview && (

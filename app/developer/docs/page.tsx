@@ -1,24 +1,29 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Link from "next/link"
-import { FileText, Search, ChevronRight, Copy, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
-import { OpenApiRenderer } from "@/components/developer/openapi-renderer"
-import { toast } from "sonner"
+import { useState } from 'react'
+import Link from 'next/link'
+import { FileText, Search, ChevronRight, Copy, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { OpenApiRenderer } from '@/components/developer/openapi-renderer'
+import { toast } from 'sonner'
 
 export default function ApiDocsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast("已复制", {
-      description: "代码已复制到剪贴板",
+    toast('已复制', {
+      description: '代码已复制到剪贴板',
     })
   }
 
@@ -32,7 +37,10 @@ export default function ApiDocsPage() {
             <span>问卷星</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
               我的问卷
             </Link>
             <Link href="/developer" className="text-sm font-medium text-primary">
@@ -264,7 +272,9 @@ export default function ApiDocsPage() {
                       问卷星API是一个RESTful
                       API，允许开发者以编程方式访问和管理问卷、问题和回复数据。您可以创建自定义问卷界面，集成数据到您的系统中，或构建自动化工作流。
                     </p>
-                    <p className="mb-4">API使用JSON格式进行数据交换，并使用标准HTTP方法和状态码。</p>
+                    <p className="mb-4">
+                      API使用JSON格式进行数据交换，并使用标准HTTP方法和状态码。
+                    </p>
                     <h3 className="text-lg font-medium mb-2">基础URL</h3>
                     <p className="mb-4">所有API请求都应该发送到以下基础URL：</p>
                     <div className="bg-muted p-3 rounded-md mb-4">
@@ -317,7 +327,8 @@ export default function ApiDocsPage() {
                 <Card>
                   <CardContent className="pt-6">
                     <p className="mb-4">
-                      问卷星API使用Bearer Token认证方式。您需要在请求头中添加Authorization头，值为"Bearer
+                      问卷星API使用Bearer
+                      Token认证方式。您需要在请求头中添加Authorization头，值为"Bearer
                       "加上您的API密钥。
                     </p>
                     <div className="relative mb-4">
@@ -336,7 +347,10 @@ export default function ApiDocsPage() {
                     <h3 className="text-lg font-medium mb-2">获取API密钥</h3>
                     <p className="mb-4">
                       您可以在
-                      <Link href="/developer/api-keys" className="text-primary hover:underline mx-1">
+                      <Link
+                        href="/developer/api-keys"
+                        className="text-primary hover:underline mx-1"
+                      >
                         API密钥管理
                       </Link>
                       页面创建和管理您的API密钥。
@@ -412,7 +426,9 @@ export default function ApiDocsPage() {
                 <h2 className="text-2xl font-bold mb-4">错误处理</h2>
                 <Card>
                   <CardContent className="pt-6">
-                    <p className="mb-4">当API请求失败时，您将收到一个包含错误信息的JSON响应，以及相应的HTTP状态码。</p>
+                    <p className="mb-4">
+                      当API请求失败时，您将收到一个包含错误信息的JSON响应，以及相应的HTTP状态码。
+                    </p>
                     <div className="relative mb-4">
                       <Button
                         variant="ghost"
@@ -538,7 +554,10 @@ export default function ApiDocsPage() {
                       <AccordionItem value="get-surveys">
                         <AccordionTrigger>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                            >
                               GET
                             </Badge>
                             <span>/surveys</span>
@@ -575,12 +594,16 @@ export default function ApiDocsPage() {
                                   <tr className="border-b">
                                     <td className="py-2">status</td>
                                     <td className="py-2">string</td>
-                                    <td className="py-2">筛选状态：all（默认）、draft、published</td>
+                                    <td className="py-2">
+                                      筛选状态：all（默认）、draft、published
+                                    </td>
                                   </tr>
                                   <tr className="border-b">
                                     <td className="py-2">sort</td>
                                     <td className="py-2">string</td>
-                                    <td className="py-2">排序字段：created_at、updated_at（默认）</td>
+                                    <td className="py-2">
+                                      排序字段：created_at、updated_at（默认）
+                                    </td>
                                   </tr>
                                   <tr className="border-b">
                                     <td className="py-2">order</td>
@@ -840,7 +863,10 @@ get_surveys()`}</code>
                       <AccordionItem value="post-surveys">
                         <AccordionTrigger>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                            <Badge
+                              variant="outline"
+                              className="bg-green-100 text-green-800 hover:bg-green-100"
+                            >
                               POST
                             </Badge>
                             <span>/surveys</span>
@@ -1011,17 +1037,22 @@ get_surveys()`}</code>
                       <AccordionItem value="get-survey">
                         <AccordionTrigger>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                            >
                               GET
                             </Badge>
-                            <span>/surveys/{"{id}"}</span>
+                            <span>/surveys/{'{id}'}</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-4">
                             <div>
                               <h3 className="text-lg font-medium mb-2">获取问卷详情</h3>
-                              <p className="text-muted-foreground mb-4">获取单个问卷的详细信息，包括问题和选项</p>
+                              <p className="text-muted-foreground mb-4">
+                                获取单个问卷的详细信息，包括问题和选项
+                              </p>
                             </div>
 
                             <div>

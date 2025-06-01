@@ -191,7 +191,6 @@ html body[data-scroll-locked] {
 
 /* 修复表单控件在移动设备上的问题 */
 @media (max-width: 768px) {
-
   input,
   select,
   textarea {

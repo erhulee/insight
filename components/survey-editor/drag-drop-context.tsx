@@ -1,7 +1,7 @@
-"use client"
-import type React from "react"
-import { createContext, useContext, useState, useCallback } from "react"
-import type { Question } from "@/lib/types"
+'use client'
+import type React from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
+import type { Question } from '@/lib/types'
 
 interface DragDropContextProps {
   isDragging: boolean
@@ -29,8 +29,8 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
 
     // 设置拖拽数据
     if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = "move"
-      e.dataTransfer.setData("text/plain", item.id)
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/plain', item.id)
     }
 
     // 添加拖拽时的视觉反馈
@@ -40,15 +40,15 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
         requestAnimationFrame(() => {
           try {
             if (e.currentTarget instanceof HTMLElement) {
-              e.currentTarget.classList.add("dragging")
+              e.currentTarget.classList.add('dragging')
             }
           } catch (error) {
-            console.error("Error adding dragging class:", error)
+            console.error('Error adding dragging class:', error)
           }
         })
       }
     } catch (error) {
-      console.error("Error in handleDragStart:", error)
+      console.error('Error in handleDragStart:', error)
     }
   }, [])
 
@@ -60,19 +60,19 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
     // 移除拖拽时的视觉反馈
     try {
       if (e.currentTarget instanceof HTMLElement) {
-        e.currentTarget.classList.remove("dragging")
+        e.currentTarget.classList.remove('dragging')
       }
 
       // 移除所有拖拽相关的类
-      document.querySelectorAll(".drag-over").forEach((el) => {
+      document.querySelectorAll('.drag-over').forEach((el) => {
         try {
-          el.classList.remove("drag-over")
+          el.classList.remove('drag-over')
         } catch (error) {
-          console.error("Error removing drag-over class:", error)
+          console.error('Error removing drag-over class:', error)
         }
       })
     } catch (error) {
-      console.error("Error in handleDragEnd:", error)
+      console.error('Error in handleDragEnd:', error)
     }
   }, [])
 
@@ -86,10 +86,10 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
         // 添加拖拽目标的视觉反馈
         try {
           if (e.currentTarget instanceof HTMLElement) {
-            e.currentTarget.classList.add("drag-over")
+            e.currentTarget.classList.add('drag-over')
           }
         } catch (error) {
-          console.error("Error in handleDragOver:", error)
+          console.error('Error in handleDragOver:', error)
         }
       }
     },
@@ -97,11 +97,15 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
   )
 
   const handleDrop = useCallback(
-    (e: React.DragEvent, questions: Question[], setQuestions: React.Dispatch<React.SetStateAction<Question[]>>) => {
+    (
+      e: React.DragEvent,
+      questions: Question[],
+      setQuestions: React.Dispatch<React.SetStateAction<Question[]>>,
+    ) => {
       e.preventDefault()
 
-      console.log("draggedItem:", draggedItem)
-      console.log("dragOverItemId:", dragOverItemId)
+      console.log('draggedItem:', draggedItem)
+      console.log('dragOverItemId:', dragOverItemId)
       if (draggedItem && dragOverItemId) {
         try {
           // 获取拖动项和目标项的索引
@@ -126,24 +130,24 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
               try {
                 const element = document.getElementById(removed.id)
                 if (element) {
-                  element.classList.add("drop-highlight")
+                  element.classList.add('drop-highlight')
                   setTimeout(() => {
                     try {
                       if (element && document.body.contains(element)) {
-                        element.classList.remove("drop-highlight")
+                        element.classList.remove('drop-highlight')
                       }
                     } catch (error) {
-                      console.error("Error removing drop-highlight class:", error)
+                      console.error('Error removing drop-highlight class:', error)
                     }
                   }, 1000)
                 }
               } catch (error) {
-                console.error("Error adding drop-highlight class:", error)
+                console.error('Error adding drop-highlight class:', error)
               }
             })
           }
         } catch (error) {
-          console.error("Error in handleDrop:", error)
+          console.error('Error in handleDrop:', error)
         }
       }
 
@@ -154,22 +158,22 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
 
       // 移除所有拖拽相关的类 - 使用安全的方式
       try {
-        document.querySelectorAll(".dragging").forEach((el) => {
+        document.querySelectorAll('.dragging').forEach((el) => {
           try {
-            el.classList.remove("dragging")
+            el.classList.remove('dragging')
           } catch (error) {
-            console.error("Error removing dragging class:", error)
+            console.error('Error removing dragging class:', error)
           }
         })
-        document.querySelectorAll(".drag-over").forEach((el) => {
+        document.querySelectorAll('.drag-over').forEach((el) => {
           try {
-            el.classList.remove("drag-over")
+            el.classList.remove('drag-over')
           } catch (error) {
-            console.error("Error removing drag-over class:", error)
+            console.error('Error removing drag-over class:', error)
           }
         })
       } catch (error) {
-        console.error("Error cleaning up drag classes:", error)
+        console.error('Error cleaning up drag classes:', error)
       }
     },
     [draggedItem, dragOverItemId],
@@ -195,7 +199,7 @@ export function DragDropProvider({ children }: { children: React.ReactNode }) {
 export function useDragDrop() {
   const context = useContext(DragDropContext)
   if (context === undefined) {
-    throw new Error("useDragDrop must be used within a DragDropProvider")
+    throw new Error('useDragDrop must be used within a DragDropProvider')
   }
   return context
 }

@@ -1,18 +1,25 @@
-"use client"
+'use client'
 
-import { Separator } from "@/components/ui/separator"
+import { Separator } from '@/components/ui/separator'
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { FileText, ArrowRight } from "lucide-react"
-import type { Survey, Question } from "@/lib/types"
-import { getFromLocalStorage, validateEmail, validatePhone, validateUrl } from "@/lib/utils"
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { FileText, ArrowRight } from 'lucide-react'
+import type { Survey, Question } from '@/lib/types'
+import { getFromLocalStorage, validateEmail, validatePhone, validateUrl } from '@/lib/utils'
 
-import { toast } from "sonner"
+import { toast } from 'sonner'
 
 export default function SurveyPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -32,15 +39,15 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         const loadedSurvey = getFromLocalStorage<Survey>(`survey_${params.id}`, null)
 
         if (!loadedSurvey) {
-          toast("问卷不存在", {
-            description: "您访问的问卷不存在或已被删除",
+          toast('问卷不存在', {
+            description: '您访问的问卷不存在或已被删除',
           })
           return
         }
 
         if (!loadedSurvey.published) {
-          toast("问卷未发布", {
-            description: "此问卷尚未发布，无法访问",
+          toast('问卷未发布', {
+            description: '此问卷尚未发布，无法访问',
           })
           return
         }
@@ -50,7 +57,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         // 初始化答案对象
         const initialAnswers: Record<string, any> = {}
         loadedSurvey.questions.forEach((question) => {
-          if (question.type === "checkbox") {
+          if (question.type === 'checkbox') {
             initialAnswers[question.id] = []
           } else {
             initialAnswers[question.id] = null
@@ -60,9 +67,9 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         setAnswers(initialAnswers)
         setIsLoading(false)
       } catch (error) {
-        console.error("加载问卷失败:", error)
-        toast("加载失败", {
-          description: "加载问卷时出现错误",
+        console.error('加载问卷失败:', error)
+        toast('加载失败', {
+          description: '加载问卷时出现错误',
         })
       }
     }, 1000)
@@ -131,7 +138,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
 
     survey.questions.forEach((question) => {
       // 跳过分节标题
-      if (question.type === "section") return
+      if (question.type === 'section') return
 
       const answer = answers[question.id]
 
@@ -140,57 +147,62 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         if (
           answer === null ||
           answer === undefined ||
-          answer === "" ||
+          answer === '' ||
           (Array.isArray(answer) && answer.length === 0)
         ) {
-          newErrors[question.id] = "此问题为必填项"
+          newErrors[question.id] = '此问题为必填项'
           isValid = false
           return
         }
       }
 
       // 如果没有回答，跳过其他验证
-      if (answer === null || answer === undefined || answer === "" || (Array.isArray(answer) && answer.length === 0)) {
+      if (
+        answer === null ||
+        answer === undefined ||
+        answer === '' ||
+        (Array.isArray(answer) && answer.length === 0)
+      ) {
         return
       }
 
       // 特定类型验证
       if (question.validationType) {
         switch (question.validationType) {
-          case "email":
+          case 'email':
             if (!validateEmail(answer)) {
-              newErrors[question.id] = question.validationMessage || "请输入有效的电子邮箱地址"
+              newErrors[question.id] = question.validationMessage || '请输入有效的电子邮箱地址'
               isValid = false
             }
             break
-          case "phone":
+          case 'phone':
             if (!validatePhone(answer)) {
-              newErrors[question.id] = question.validationMessage || "请输入有效的电话号码"
+              newErrors[question.id] = question.validationMessage || '请输入有效的电话号码'
               isValid = false
             }
             break
-          case "url":
+          case 'url':
             if (!validateUrl(answer)) {
-              newErrors[question.id] = question.validationMessage || "请输入有效的网址"
+              newErrors[question.id] = question.validationMessage || '请输入有效的网址'
               isValid = false
             }
             break
-          case "number":
+          case 'number':
             if (isNaN(Number(answer))) {
-              newErrors[question.id] = question.validationMessage || "请输入有效的数字"
+              newErrors[question.id] = question.validationMessage || '请输入有效的数字'
               isValid = false
             }
             break
-          case "regex":
+          case 'regex':
             if (question.validationRegex) {
               try {
                 const regex = new RegExp(question.validationRegex)
                 if (!regex.test(String(answer))) {
-                  newErrors[question.id] = question.validationMessage || "输入格式不正确"
+                  newErrors[question.id] = question.validationMessage || '输入格式不正确'
                   isValid = false
                 }
               } catch (error) {
-                console.error("Invalid regex:", error)
+                console.error('Invalid regex:', error)
               }
             }
             break
@@ -198,7 +210,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
       }
 
       // 文本长度验证
-      if (question.type === "text") {
+      if (question.type === 'text') {
         if (question.minLength && String(answer).length < question.minLength) {
           newErrors[question.id] = `最少需要 ${question.minLength} 个字符`
           isValid = false
@@ -224,7 +236,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
       if (firstErrorId) {
         const element = document.getElementById(firstErrorId)
         if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" })
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
       }
       return
@@ -246,7 +258,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
 
       // 模拟API提交
       // 在实际应用中，这里应该调用API提交问卷答案
-      console.log("提交问卷答案:", submissionData)
+      console.log('提交问卷答案:', submissionData)
 
       // 存储到localStorage（仅用于演示）
       const responsesKey = `survey_responses_${survey.id}`
@@ -257,10 +269,10 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
       // 重定向到感谢页面
       setRedirectToThanks(true)
     } catch (error) {
-      console.error("提交问卷失败:", error)
-      toast("提交失败", {
-        description: "提交问卷时出现错误，请重试",
-        variant: "destructive",
+      console.error('提交问卷失败:', error)
+      toast('提交失败', {
+        description: '提交问卷时出现错误，请重试',
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -270,31 +282,31 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
   // 渲染问题
   const renderQuestion = (question: Question) => {
     switch (question.type) {
-      case "text":
+      case 'text':
         return (
           <div className="space-y-2">
             {question.multiline ? (
               <Textarea
                 id={question.id}
-                value={answers[question.id] || ""}
+                value={answers[question.id] || ''}
                 onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                 placeholder={question.placeholder}
                 rows={5}
-                className={errors[question.id] ? "border-destructive" : ""}
+                className={errors[question.id] ? 'border-destructive' : ''}
               />
             ) : (
               <Input
                 id={question.id}
                 type="text"
-                value={answers[question.id] || ""}
+                value={answers[question.id] || ''}
                 onChange={(e) => handleAnswerChange(question.id, e.target.value)}
                 placeholder={question.placeholder}
-                className={errors[question.id] ? "border-destructive" : ""}
+                className={errors[question.id] ? 'border-destructive' : ''}
               />
             )}
           </div>
         )
-      case "radio":
+      case 'radio':
         return (
           <div className="space-y-2">
             {question.options?.map((option, index) => (
@@ -315,7 +327,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             ))}
           </div>
         )
-      case "checkbox":
+      case 'checkbox':
         return (
           <div className="space-y-2">
             {question.options?.map((option, index) => (
@@ -325,7 +337,9 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
                   id={`${question.id}-${index}`}
                   value={option.value || option.text}
                   checked={(answers[question.id] || []).includes(option.value || option.text)}
-                  onChange={(e) => handleCheckboxChange(question.id, option.value || option.text, e.target.checked)}
+                  onChange={(e) =>
+                    handleCheckboxChange(question.id, option.value || option.text, e.target.checked)
+                  }
                   className="h-4 w-4 text-primary rounded"
                 />
                 <label htmlFor={`${question.id}-${index}`} className="text-sm cursor-pointer">
@@ -335,15 +349,16 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             ))}
           </div>
         )
-      case "dropdown":
+      case 'dropdown':
         return (
           <div className="space-y-2">
             <select
               id={question.id}
-              value={answers[question.id] || ""}
+              value={answers[question.id] || ''}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md ${errors[question.id] ? "border-destructive" : "border-input"
-                }`}
+              className={`w-full px-3 py-2 border rounded-md ${
+                errors[question.id] ? 'border-destructive' : 'border-input'
+              }`}
             >
               <option value="">请选择...</option>
               {question.options?.map((option, index) => (
@@ -354,7 +369,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             </select>
           </div>
         )
-      case "rating":
+      case 'rating':
         return (
           <div className="space-y-2">
             <div className="flex space-x-2">
@@ -363,10 +378,11 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
                   key={index}
                   type="button"
                   onClick={() => handleAnswerChange(question.id, index + 1)}
-                  className={`w-10 h-10 rounded-md flex items-center justify-center border ${answers[question.id] === index + 1
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-background hover:bg-muted"
-                    }`}
+                  className={`w-10 h-10 rounded-md flex items-center justify-center border ${
+                    answers[question.id] === index + 1
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-background hover:bg-muted'
+                  }`}
                 >
                   {index + 1}
                 </button>
@@ -374,21 +390,21 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         )
-      case "date":
+      case 'date':
         return (
           <div className="space-y-2">
             <Input
               id={question.id}
               type="date"
-              value={answers[question.id] || ""}
+              value={answers[question.id] || ''}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
               min={question.minDate}
               max={question.maxDate}
-              className={errors[question.id] ? "border-destructive" : ""}
+              className={errors[question.id] ? 'border-destructive' : ''}
             />
           </div>
         )
-      case "file":
+      case 'file':
         return (
           <div className="space-y-2">
             <div className="border-2 border-dashed border-muted-foreground/20 rounded-md p-4 text-center">
@@ -415,10 +431,12 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             </div>
           </div>
         )
-      case "section":
+      case 'section':
         return null
       default:
-        return <div className="text-sm text-muted-foreground">不支持的问题类型: {question.type}</div>
+        return (
+          <div className="text-sm text-muted-foreground">不支持的问题类型: {question.type}</div>
+        )
     }
   }
 
@@ -442,7 +460,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
             <CardDescription>您访问的问卷不存在或已被删除</CardDescription>
           </CardHeader>
           <CardFooter>
-            <Button onClick={() => router.push("/")} className="w-full">
+            <Button onClick={() => router.push('/')} className="w-full">
               返回首页
             </Button>
           </CardFooter>
@@ -472,14 +490,20 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
 
         <div className="space-y-6">
           {survey.questions.map((question, index) =>
-            question.type === "section" ? (
+            question.type === 'section' ? (
               <div key={question.id} className="mt-8 mb-4">
                 <h3 className="text-xl font-medium">{question.title}</h3>
-                {question.description && <p className="text-muted-foreground mt-1">{question.description}</p>}
+                {question.description && (
+                  <p className="text-muted-foreground mt-1">{question.description}</p>
+                )}
                 <Separator className="mt-4" />
               </div>
             ) : (
-              <Card key={question.id} id={question.id} className={errors[question.id] ? "border-destructive" : ""}>
+              <Card
+                key={question.id}
+                id={question.id}
+                className={errors[question.id] ? 'border-destructive' : ''}
+              >
                 <CardHeader className="pb-2">
                   <div className="flex items-start gap-1">
                     <CardTitle className="text-base">
@@ -487,11 +511,15 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
                       {question.required && <span className="text-destructive ml-1">*</span>}
                     </CardTitle>
                   </div>
-                  {question.description && <CardDescription>{question.description}</CardDescription>}
+                  {question.description && (
+                    <CardDescription>{question.description}</CardDescription>
+                  )}
                 </CardHeader>
                 <CardContent>
                   {renderQuestion(question)}
-                  {errors[question.id] && <p className="text-destructive text-sm mt-2">{errors[question.id]}</p>}
+                  {errors[question.id] && (
+                    <p className="text-destructive text-sm mt-2">{errors[question.id]}</p>
+                  )}
                 </CardContent>
               </Card>
             ),
@@ -500,7 +528,7 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
 
         <div className="mt-8 flex justify-end">
           <Button onClick={handleSubmit} disabled={isSubmitting} className="gap-1">
-            {isSubmitting ? "提交中..." : "提交问卷"}
+            {isSubmitting ? '提交中...' : '提交问卷'}
             {!isSubmitting && <ArrowRight className="h-4 w-4" />}
           </Button>
         </div>

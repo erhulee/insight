@@ -1,13 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from 'next/server'
 
 // 验证API密钥
-async function validateApiKey(request: NextRequest) {
-
-}
+async function validateApiKey(request: NextRequest) {}
 
 // 获取问卷列表
-export async function GET(request: NextRequest) {
-}
+export async function GET(request: NextRequest) {}
 
 // 创建问卷
 export async function POST(request: NextRequest) {
@@ -26,8 +23,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: {
-            code: "validation_error",
-            message: "问卷标题是必填项",
+            code: 'validation_error',
+            message: '问卷标题是必填项',
           },
         },
         { status: 400 },
@@ -38,7 +35,7 @@ export async function POST(request: NextRequest) {
     const newSurvey = {
       id: `survey-${Date.now()}`,
       title: body.title,
-      description: body.description || "",
+      description: body.description || '',
       questions: body.questions || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -53,17 +50,15 @@ export async function POST(request: NextRequest) {
     // 返回结果
     return NextResponse.json({ data: newSurvey }, { status: 201 })
   } catch (error) {
-    console.error("Error creating survey:", error)
+    console.error('Error creating survey:', error)
     return NextResponse.json(
       {
         error: {
-          code: "server_error",
-          message: "创建问卷失败",
+          code: 'server_error',
+          message: '创建问卷失败',
         },
       },
       { status: 500 },
     )
   }
 }
-
-

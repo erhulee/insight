@@ -1,23 +1,28 @@
-"use client"
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, } from "lucide-react"
-import { InsightBrand } from "@/components/common/insight-brand"
-import { UserInfoAvatar } from "@/components/common/userInfoAvatar"
-import { trpc } from "../_trpc/client"
-import { TemplateCard } from "./_components/TemplateCard"
-import { NoData } from "./_components/NoData"
-
+'use client'
+import type React from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Search } from 'lucide-react'
+import { InsightBrand } from '@/components/common/insight-brand'
+import { UserInfoAvatar } from '@/components/common/userInfoAvatar'
+import { trpc } from '../_trpc/client'
+import { TemplateCard } from './_components/TemplateCard'
+import { NoData } from './_components/NoData'
 
 export default function TemplatesPage() {
   const templateClient = trpc.GetTemplate.useQuery()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState("all")
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [activeTab, setActiveTab] = useState('all')
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,7 +77,12 @@ export default function TemplatesPage() {
           </div>
 
           {/* 标签页 */}
-          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <Tabs
+            defaultValue={activeTab}
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="mb-6"
+          >
             <TabsList>
               <TabsTrigger value="all">全部</TabsTrigger>
               <TabsTrigger value="popular">热门</TabsTrigger>
@@ -80,11 +90,24 @@ export default function TemplatesPage() {
             </TabsList>
           </Tabs>
 
-          {templateClient.isError ? <NoData></NoData> : templateClient.isLoading ? <div>loading</div> :
+          {templateClient.isError ? (
+            <NoData></NoData>
+          ) : templateClient.isLoading ? (
+            <div>loading</div>
+          ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 grid-cols-2">
-              {templateClient.data?.map((template => (<TemplateCard questionsCnt={3} key={template.id} templateId={template.id} title={template.name} description={""} tags={[]}></TemplateCard>
-              )))}
-            </div>}
+              {templateClient.data?.map((template) => (
+                <TemplateCard
+                  questionsCnt={3}
+                  key={template.id}
+                  templateId={template.id}
+                  title={template.name}
+                  description={''}
+                  tags={[]}
+                ></TemplateCard>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>

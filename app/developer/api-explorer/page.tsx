@@ -1,18 +1,29 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { FileText, Code, Play, Copy } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "sonner"
-import { getFromLocalStorage } from "@/lib/utils"
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { FileText, Code, Play, Copy } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
+import { getFromLocalStorage } from '@/lib/utils'
 
 export default function ApiExplorerPage() {
   const [openApiSpec, setOpenApiSpec] = useState<any>(null)
@@ -20,55 +31,60 @@ export default function ApiExplorerPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState<string | null>(null)
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null)
   const [apiKeys, setApiKeys] = useState<any[]>([])
-  const [selectedApiKey, setSelectedApiKey] = useState<string>("")
+  const [selectedApiKey, setSelectedApiKey] = useState<string>('')
   const [requestParams, setRequestParams] = useState<Record<string, any>>({})
-  const [requestBody, setRequestBody] = useState<string>("")
-  const [responseData, setResponseData] = useState<string>("")
+  const [requestBody, setRequestBody] = useState<string>('')
+  const [responseData, setResponseData] = useState<string>('')
   const [isExecuting, setIsExecuting] = useState(false)
 
   // 加载OpenAPI规范
   useEffect(() => {
     const fetchOpenApiSpec = async () => {
       try {
-        const response = await fetch("/openapi.yaml")
+        const response = await fetch('/openapi.yaml')
         const text = await response.text()
 
         // 这里应该使用一个YAML解析库，但为了简化示例，我们使用一个模拟的解析结果
         const mockParsedSpec = {
           info: {
-            title: "问卷星 API",
-            version: "1.0.0",
-            description: "问卷星 API 允许开发者以编程方式访问和管理问卷、问题和回复数据。",
+            title: '问卷星 API',
+            version: '1.0.0',
+            description: '问卷星 API 允许开发者以编程方式访问和管理问卷、问题和回复数据。',
           },
           paths: {
-            "/surveys": {
+            '/surveys': {
               get: {
-                summary: "获取问卷列表",
-                description: "获取当前用户的问卷列表",
+                summary: '获取问卷列表',
+                description: '获取当前用户的问卷列表',
                 parameters: [
-                  { name: "page", in: "query", description: "页码，默认为1", schema: { type: "integer", default: 1 } },
                   {
-                    name: "limit",
-                    in: "query",
-                    description: "每页数量，默认为10，最大为100",
-                    schema: { type: "integer", default: 10 },
+                    name: 'page',
+                    in: 'query',
+                    description: '页码，默认为1',
+                    schema: { type: 'integer', default: 1 },
+                  },
+                  {
+                    name: 'limit',
+                    in: 'query',
+                    description: '每页数量，默认为10，最大为100',
+                    schema: { type: 'integer', default: 10 },
                   },
                 ],
                 responses: {
-                  "200": {
-                    description: "成功",
+                  '200': {
+                    description: '成功',
                     content: {
-                      "application/json": {
+                      'application/json': {
                         example: {
                           data: [
                             {
-                              id: "survey-123456",
-                              title: "客户满意度调查",
-                              description: "了解客户对我们产品和服务的满意度",
+                              id: 'survey-123456',
+                              title: '客户满意度调查',
+                              description: '了解客户对我们产品和服务的满意度',
                               questions_count: 8,
                               responses_count: 124,
-                              created_at: "2023-04-15T10:30:00Z",
-                              updated_at: "2023-04-20T15:45:00Z",
+                              created_at: '2023-04-15T10:30:00Z',
+                              updated_at: '2023-04-20T15:45:00Z',
                               published: true,
                             },
                           ],
@@ -85,25 +101,25 @@ export default function ApiExplorerPage() {
                 },
               },
               post: {
-                summary: "创建问卷",
-                description: "创建一个新的问卷",
+                summary: '创建问卷',
+                description: '创建一个新的问卷',
                 requestBody: {
                   required: true,
                   content: {
-                    "application/json": {
+                    'application/json': {
                       example: {
-                        title: "产品反馈调查",
-                        description: "帮助我们改进产品",
+                        title: '产品反馈调查',
+                        description: '帮助我们改进产品',
                         questions: [
                           {
-                            type: "radio",
-                            title: "您使用我们的产品多久了？",
+                            type: 'radio',
+                            title: '您使用我们的产品多久了？',
                             required: true,
                             options: [
-                              { text: "不到1个月" },
-                              { text: "1-6个月" },
-                              { text: "6-12个月" },
-                              { text: "1年以上" },
+                              { text: '不到1个月' },
+                              { text: '1-6个月' },
+                              { text: '6-12个月' },
+                              { text: '1年以上' },
                             ],
                           },
                         ],
@@ -113,57 +129,75 @@ export default function ApiExplorerPage() {
                   },
                 },
                 responses: {
-                  "201": {
-                    description: "创建成功",
+                  '201': {
+                    description: '创建成功',
                   },
                 },
               },
             },
-            "/surveys/{id}": {
+            '/surveys/{id}': {
               get: {
-                summary: "获取问卷详情",
-                description: "获取单个问卷的详细信息，包括问题和选项",
+                summary: '获取问卷详情',
+                description: '获取单个问卷的详细信息，包括问题和选项',
                 parameters: [
-                  { name: "id", in: "path", required: true, description: "问卷ID", schema: { type: "string" } },
+                  {
+                    name: 'id',
+                    in: 'path',
+                    required: true,
+                    description: '问卷ID',
+                    schema: { type: 'string' },
+                  },
                 ],
                 responses: {
-                  "200": {
-                    description: "成功",
+                  '200': {
+                    description: '成功',
                   },
                 },
               },
               put: {
-                summary: "更新问卷",
-                description: "更新问卷信息",
+                summary: '更新问卷',
+                description: '更新问卷信息',
                 parameters: [
-                  { name: "id", in: "path", required: true, description: "问卷ID", schema: { type: "string" } },
+                  {
+                    name: 'id',
+                    in: 'path',
+                    required: true,
+                    description: '问卷ID',
+                    schema: { type: 'string' },
+                  },
                 ],
                 requestBody: {
                   required: true,
                   content: {
-                    "application/json": {
+                    'application/json': {
                       example: {
-                        title: "更新后的问卷标题",
-                        description: "更新后的问卷描述",
+                        title: '更新后的问卷标题',
+                        description: '更新后的问卷描述',
                       },
                     },
                   },
                 },
                 responses: {
-                  "200": {
-                    description: "更新成功",
+                  '200': {
+                    description: '更新成功',
                   },
                 },
               },
               delete: {
-                summary: "删除问卷",
-                description: "删除一个问卷",
+                summary: '删除问卷',
+                description: '删除一个问卷',
                 parameters: [
-                  { name: "id", in: "path", required: true, description: "问卷ID", schema: { type: "string" } },
+                  {
+                    name: 'id',
+                    in: 'path',
+                    required: true,
+                    description: '问卷ID',
+                    schema: { type: 'string' },
+                  },
                 ],
                 responses: {
-                  "204": {
-                    description: "删除成功",
+                  '204': {
+                    description: '删除成功',
                   },
                 },
               },
@@ -174,9 +208,9 @@ export default function ApiExplorerPage() {
         setOpenApiSpec(mockParsedSpec)
         setIsLoading(false)
       } catch (error) {
-        console.error("加载OpenAPI规范失败:", error)
-        toast("加载失败", {
-          description: "加载API规范时出现错误",
+        console.error('加载OpenAPI规范失败:', error)
+        toast('加载失败', {
+          description: '加载API规范时出现错误',
         })
         setIsLoading(false)
       }
@@ -187,7 +221,7 @@ export default function ApiExplorerPage() {
 
   // 加载API密钥
   useEffect(() => {
-    const storedKeys = getFromLocalStorage<any[]>("api_keys", [])
+    const storedKeys = getFromLocalStorage<any[]>('api_keys', [])
     setApiKeys(storedKeys)
     if (storedKeys.length > 0) {
       setSelectedApiKey(storedKeys[0].key)
@@ -199,13 +233,19 @@ export default function ApiExplorerPage() {
     setSelectedEndpoint(endpoint)
     setSelectedMethod(method)
     setRequestParams({})
-    setRequestBody("")
-    setResponseData("")
+    setRequestBody('')
+    setResponseData('')
 
     // 如果有请求体示例，设置默认请求体
-    if (openApiSpec?.paths[endpoint]?.[method]?.requestBody?.content?.["application/json"]?.example) {
+    if (
+      openApiSpec?.paths[endpoint]?.[method]?.requestBody?.content?.['application/json']?.example
+    ) {
       setRequestBody(
-        JSON.stringify(openApiSpec.paths[endpoint][method].requestBody.content["application/json"].example, null, 2),
+        JSON.stringify(
+          openApiSpec.paths[endpoint][method].requestBody.content['application/json'].example,
+          null,
+          2,
+        ),
       )
     }
   }
@@ -221,8 +261,8 @@ export default function ApiExplorerPage() {
   // 执行API请求
   const handleExecuteRequest = () => {
     if (!selectedEndpoint || !selectedMethod || !selectedApiKey) {
-      toast("无法执行请求", {
-        description: "请选择端点、方法和API密钥",
+      toast('无法执行请求', {
+        description: '请选择端点、方法和API密钥',
       })
       return
     }
@@ -234,7 +274,9 @@ export default function ApiExplorerPage() {
 
     // 替换路径参数
     const pathParams =
-      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter((p: any) => p.in === "path") || []
+      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter(
+        (p: any) => p.in === 'path',
+      ) || []
 
     pathParams.forEach((param: any) => {
       const paramValue = requestParams[param.name] || `{${param.name}}`
@@ -243,13 +285,15 @@ export default function ApiExplorerPage() {
 
     // 添加查询参数
     const queryParams =
-      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter((p: any) => p.in === "query") || []
+      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter(
+        (p: any) => p.in === 'query',
+      ) || []
 
     if (queryParams.length > 0) {
-      url += "?"
+      url += '?'
       queryParams.forEach((param: any, index: number) => {
         if (requestParams[param.name]) {
-          url += `${index > 0 ? "&" : ""}${param.name}=${requestParams[param.name]}`
+          url += `${index > 0 ? '&' : ''}${param.name}=${requestParams[param.name]}`
         }
       })
     }
@@ -258,28 +302,28 @@ export default function ApiExplorerPage() {
     setTimeout(() => {
       let mockResponse
 
-      if (selectedMethod === "get") {
-        if (selectedEndpoint === "/surveys") {
+      if (selectedMethod === 'get') {
+        if (selectedEndpoint === '/surveys') {
           mockResponse = {
             data: [
               {
-                id: "survey-123456",
-                title: "客户满意度调查",
-                description: "了解客户对我们产品和服务的满意度",
+                id: 'survey-123456',
+                title: '客户满意度调查',
+                description: '了解客户对我们产品和服务的满意度',
                 questions_count: 8,
                 responses_count: 124,
-                created_at: "2023-04-15T10:30:00Z",
-                updated_at: "2023-04-20T15:45:00Z",
+                created_at: '2023-04-15T10:30:00Z',
+                updated_at: '2023-04-20T15:45:00Z',
                 published: true,
               },
               {
-                id: "survey-789012",
-                title: "产品反馈调查",
-                description: "收集用户对新功能的反馈",
+                id: 'survey-789012',
+                title: '产品反馈调查',
+                description: '收集用户对新功能的反馈',
                 questions_count: 5,
                 responses_count: 42,
-                created_at: "2023-05-10T09:15:00Z",
-                updated_at: "2023-05-12T14:20:00Z",
+                created_at: '2023-05-10T09:15:00Z',
+                updated_at: '2023-05-12T14:20:00Z',
                 published: true,
               },
             ],
@@ -290,31 +334,31 @@ export default function ApiExplorerPage() {
               limit: 10,
             },
           }
-        } else if (selectedEndpoint === "/surveys/{id}") {
-          const surveyId = requestParams.id || "survey-123456"
+        } else if (selectedEndpoint === '/surveys/{id}') {
+          const surveyId = requestParams.id || 'survey-123456'
           mockResponse = {
             data: {
               id: surveyId,
-              title: "客户满意度调查",
-              description: "了解客户对我们产品和服务的满意度",
+              title: '客户满意度调查',
+              description: '了解客户对我们产品和服务的满意度',
               questions: [
                 {
-                  id: "q1",
-                  type: "radio",
-                  title: "您对我们的产品总体满意度如何？",
+                  id: 'q1',
+                  type: 'radio',
+                  title: '您对我们的产品总体满意度如何？',
                   required: true,
                   options: [
-                    { text: "非常满意", value: "5" },
-                    { text: "满意", value: "4" },
-                    { text: "一般", value: "3" },
-                    { text: "不满意", value: "2" },
-                    { text: "非常不满意", value: "1" },
+                    { text: '非常满意', value: '5' },
+                    { text: '满意', value: '4' },
+                    { text: '一般', value: '3' },
+                    { text: '不满意', value: '2' },
+                    { text: '非常不满意', value: '1' },
                   ],
                 },
                 {
-                  id: "q2",
-                  type: "text",
-                  title: "您有什么建议可以帮助我们改进产品？",
+                  id: 'q2',
+                  type: 'text',
+                  title: '您有什么建议可以帮助我们改进产品？',
                   required: false,
                   multiline: true,
                 },
@@ -324,41 +368,41 @@ export default function ApiExplorerPage() {
                 showQuestionNumbers: true,
               },
               theme: {
-                primaryColor: "#3b82f6",
-                backgroundColor: "#ffffff",
+                primaryColor: '#3b82f6',
+                backgroundColor: '#ffffff',
               },
-              created_at: "2023-04-15T10:30:00Z",
-              updated_at: "2023-04-20T15:45:00Z",
+              created_at: '2023-04-15T10:30:00Z',
+              updated_at: '2023-04-20T15:45:00Z',
               published: true,
             },
           }
         }
-      } else if (selectedMethod === "post") {
-        if (selectedEndpoint === "/surveys") {
+      } else if (selectedMethod === 'post') {
+        if (selectedEndpoint === '/surveys') {
           let requestBodyObj = {}
           try {
             requestBodyObj = JSON.parse(requestBody)
           } catch (e) {
-            requestBodyObj = { error: "Invalid JSON" }
+            requestBodyObj = { error: 'Invalid JSON' }
           }
 
           mockResponse = {
             data: {
-              id: "survey-" + Math.floor(Math.random() * 1000000),
+              id: 'survey-' + Math.floor(Math.random() * 1000000),
               ...requestBodyObj,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
           }
         }
-      } else if (selectedMethod === "put") {
-        if (selectedEndpoint === "/surveys/{id}") {
-          const surveyId = requestParams.id || "survey-123456"
+      } else if (selectedMethod === 'put') {
+        if (selectedEndpoint === '/surveys/{id}') {
+          const surveyId = requestParams.id || 'survey-123456'
           let requestBodyObj = {}
           try {
             requestBodyObj = JSON.parse(requestBody)
           } catch (e) {
-            requestBodyObj = { error: "Invalid JSON" }
+            requestBodyObj = { error: 'Invalid JSON' }
           }
 
           mockResponse = {
@@ -369,7 +413,7 @@ export default function ApiExplorerPage() {
             },
           }
         }
-      } else if (selectedMethod === "delete") {
+      } else if (selectedMethod === 'delete') {
         mockResponse = null
       }
 
@@ -381,20 +425,22 @@ export default function ApiExplorerPage() {
   // 复制代码
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast("已复制", {
-      description: "代码已复制到剪贴板",
+    toast('已复制', {
+      description: '代码已复制到剪贴板',
     })
   }
 
   // 生成请求代码示例
   const generateCodeExample = (language: string) => {
-    if (!selectedEndpoint || !selectedMethod || !selectedApiKey) return ""
+    if (!selectedEndpoint || !selectedMethod || !selectedApiKey) return ''
 
     let url = `https://api.wenjuanxing.com/v1${selectedEndpoint}`
 
     // 替换路径参数
     const pathParams =
-      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter((p: any) => p.in === "path") || []
+      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter(
+        (p: any) => p.in === 'path',
+      ) || []
 
     pathParams.forEach((param: any) => {
       const paramValue = requestParams[param.name] || `{${param.name}}`
@@ -403,46 +449,50 @@ export default function ApiExplorerPage() {
 
     // 添加查询参数
     const queryParams =
-      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter((p: any) => p.in === "query") || []
+      openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.filter(
+        (p: any) => p.in === 'query',
+      ) || []
 
     if (queryParams.length > 0) {
-      url += "?"
+      url += '?'
       queryParams.forEach((param: any, index: number) => {
         if (requestParams[param.name]) {
-          url += `${index > 0 ? "&" : ""}${param.name}=${requestParams[param.name]}`
+          url += `${index > 0 ? '&' : ''}${param.name}=${requestParams[param.name]}`
         }
       })
     }
 
-    const hasBody = ["post", "put", "patch"].includes(selectedMethod) && requestBody
+    const hasBody = ['post', 'put', 'patch'].includes(selectedMethod) && requestBody
 
     switch (language) {
-      case "curl":
+      case 'curl':
         return `curl -X ${selectedMethod.toUpperCase()} "${url}" \\
 -H "Authorization: Bearer ${selectedApiKey}" \\
--H "Content-Type: application/json"${hasBody
+-H "Content-Type: application/json"${
+          hasBody
             ? ` \\
 -d '${requestBody}'`
-            : ""
-          }`
+            : ''
+        }`
 
-      case "javascript":
+      case 'javascript':
         return `const response = await fetch("${url}", {
   method: "${selectedMethod.toUpperCase()}",
   headers: {
     "Authorization": "Bearer ${selectedApiKey}",
     "Content-Type": "application/json"
-  }${hasBody
-            ? `,
+  }${
+    hasBody
+      ? `,
   body: JSON.stringify(${requestBody})`
-            : ""
-          }
+      : ''
+  }
 });
 
 const data = await response.json();
 console.log(data);`
 
-      case "python":
+      case 'python':
         return `import requests
 
 headers = {
@@ -450,16 +500,17 @@ headers = {
     "Content-Type": "application/json"
 }
 
-${hasBody
-            ? `payload = ${requestBody}
+${
+  hasBody
+    ? `payload = ${requestBody}
 
 `
-            : ""
-          }response = requests.${selectedMethod}("${url}", headers=headers${hasBody ? ", json=payload" : ""})
+    : ''
+}response = requests.${selectedMethod}("${url}", headers=headers${hasBody ? ', json=payload' : ''})
 data = response.json()
 print(data)`
 
-      case "php":
+      case 'php':
         return `<?php
 $curl = curl_init();
 
@@ -470,11 +521,12 @@ curl_setopt_array($curl, [
     CURLOPT_HTTPHEADER => [
         "Authorization: Bearer ${selectedApiKey}",
         "Content-Type: application/json"
-    ]${hasBody
-            ? `,
+    ]${
+      hasBody
+        ? `,
     CURLOPT_POSTFIELDS => '${requestBody}'`
-            : ""
-          }
+        : ''
+    }
 ]);
 
 $response = curl_exec($curl);
@@ -484,7 +536,7 @@ curl_close($curl);
 print_r($data);`
 
       default:
-        return ""
+        return ''
     }
   }
 
@@ -498,7 +550,10 @@ print_r($data);`
             <span>问卷星</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
               我的问卷
             </Link>
             <Link href="/developer" className="text-sm font-medium text-primary">
@@ -530,40 +585,49 @@ print_r($data);`
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible className="w-full">
-                    {Object.entries(openApiSpec?.paths || {}).map(([path, methods]: [string, any]) => (
-                      <AccordionItem key={path} value={path}>
-                        <AccordionTrigger className="text-sm font-medium">{path}</AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-2 pl-4">
-                            {Object.entries(methods).map(([method, details]: [string, any]) => (
-                              <Button
-                                key={`${path}-${method}`}
-                                variant={selectedEndpoint === path && selectedMethod === method ? "default" : "ghost"}
-                                size="sm"
-                                className="w-full justify-start gap-2 text-xs"
-                                onClick={() => handleSelectEndpoint(path, method)}
-                              >
-                                <span
-                                  className={`px-2 py-0.5 rounded text-xs font-medium ${method === "get"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : method === "post"
-                                      ? "bg-green-100 text-green-800"
-                                      : method === "put"
-                                        ? "bg-amber-100 text-amber-800"
-                                        : method === "delete"
-                                          ? "bg-red-100 text-red-800"
-                                          : "bg-gray-100 text-gray-800"
-                                    }`}
+                    {Object.entries(openApiSpec?.paths || {}).map(
+                      ([path, methods]: [string, any]) => (
+                        <AccordionItem key={path} value={path}>
+                          <AccordionTrigger className="text-sm font-medium">
+                            {path}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-2 pl-4">
+                              {Object.entries(methods).map(([method, details]: [string, any]) => (
+                                <Button
+                                  key={`${path}-${method}`}
+                                  variant={
+                                    selectedEndpoint === path && selectedMethod === method
+                                      ? 'default'
+                                      : 'ghost'
+                                  }
+                                  size="sm"
+                                  className="w-full justify-start gap-2 text-xs"
+                                  onClick={() => handleSelectEndpoint(path, method)}
                                 >
-                                  {method.toUpperCase()}
-                                </span>
-                                <span className="truncate">{details.summary}</span>
-                              </Button>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                      method === 'get'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : method === 'post'
+                                          ? 'bg-green-100 text-green-800'
+                                          : method === 'put'
+                                            ? 'bg-amber-100 text-amber-800'
+                                            : method === 'delete'
+                                              ? 'bg-red-100 text-red-800'
+                                              : 'bg-gray-100 text-gray-800'
+                                    }`}
+                                  >
+                                    {method.toUpperCase()}
+                                  </span>
+                                  <span className="truncate">{details.summary}</span>
+                                </Button>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ),
+                    )}
                   </Accordion>
                 </CardContent>
               </Card>
@@ -577,16 +641,17 @@ print_r($data);`
                     <CardHeader>
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded text-xs font-medium ${selectedMethod === "get"
-                            ? "bg-blue-100 text-blue-800"
-                            : selectedMethod === "post"
-                              ? "bg-green-100 text-green-800"
-                              : selectedMethod === "put"
-                                ? "bg-amber-100 text-amber-800"
-                                : selectedMethod === "delete"
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-gray-100 text-gray-800"
-                            }`}
+                          className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            selectedMethod === 'get'
+                              ? 'bg-blue-100 text-blue-800'
+                              : selectedMethod === 'post'
+                                ? 'bg-green-100 text-green-800'
+                                : selectedMethod === 'put'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : selectedMethod === 'delete'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-gray-100 text-gray-800'
+                          }`}
                         >
                           {selectedMethod.toUpperCase()}
                         </span>
@@ -625,45 +690,58 @@ print_r($data);`
                         </div>
 
                         {/* 参数输入 */}
-                        {openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters?.length > 0 && (
+                        {openApiSpec?.paths[selectedEndpoint]?.[selectedMethod]?.parameters
+                          ?.length > 0 && (
                           <div className="space-y-4">
                             <h3 className="text-sm font-medium">请求参数</h3>
                             <div className="space-y-4">
                               {/* 路径参数 */}
                               {openApiSpec.paths[selectedEndpoint][selectedMethod].parameters
-                                .filter((param: any) => param.in === "path")
+                                .filter((param: any) => param.in === 'path')
                                 .map((param: any) => (
                                   <div key={param.name} className="space-y-2">
                                     <Label htmlFor={`param-${param.name}`}>
                                       {param.name}
-                                      {param.required && <span className="text-destructive ml-1">*</span>}
+                                      {param.required && (
+                                        <span className="text-destructive ml-1">*</span>
+                                      )}
                                     </Label>
                                     <Input
                                       id={`param-${param.name}`}
                                       placeholder={param.description}
-                                      value={requestParams[param.name] || ""}
-                                      onChange={(e) => handleParamChange(param.name, e.target.value)}
+                                      value={requestParams[param.name] || ''}
+                                      onChange={(e) =>
+                                        handleParamChange(param.name, e.target.value)
+                                      }
                                     />
-                                    <p className="text-xs text-muted-foreground">{param.description}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {param.description}
+                                    </p>
                                   </div>
                                 ))}
 
                               {/* 查询参数 */}
                               {openApiSpec.paths[selectedEndpoint][selectedMethod].parameters
-                                .filter((param: any) => param.in === "query")
+                                .filter((param: any) => param.in === 'query')
                                 .map((param: any) => (
                                   <div key={param.name} className="space-y-2">
                                     <Label htmlFor={`param-${param.name}`}>
                                       {param.name}
-                                      {param.required && <span className="text-destructive ml-1">*</span>}
+                                      {param.required && (
+                                        <span className="text-destructive ml-1">*</span>
+                                      )}
                                     </Label>
                                     <Input
                                       id={`param-${param.name}`}
                                       placeholder={param.description}
-                                      value={requestParams[param.name] || ""}
-                                      onChange={(e) => handleParamChange(param.name, e.target.value)}
+                                      value={requestParams[param.name] || ''}
+                                      onChange={(e) =>
+                                        handleParamChange(param.name, e.target.value)
+                                      }
                                     />
-                                    <p className="text-xs text-muted-foreground">{param.description}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {param.description}
+                                    </p>
                                   </div>
                                 ))}
                             </div>
@@ -671,7 +749,7 @@ print_r($data);`
                         )}
 
                         {/* 请求体 */}
-                        {["post", "put", "patch"].includes(selectedMethod) && (
+                        {['post', 'put', 'patch'].includes(selectedMethod) && (
                           <div className="space-y-2">
                             <Label htmlFor="request-body">请求体 (JSON)</Label>
                             <div className="relative">
@@ -749,12 +827,12 @@ print_r($data);`
                                 variant="ghost"
                                 size="icon"
                                 className="absolute right-2 top-2 z-10"
-                                onClick={() => handleCopyCode(generateCodeExample("curl"))}
+                                onClick={() => handleCopyCode(generateCodeExample('curl'))}
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
                               <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto">
-                                <code>{generateCodeExample("curl")}</code>
+                                <code>{generateCodeExample('curl')}</code>
                               </pre>
                             </TabsContent>
                             <TabsContent value="javascript" className="relative">
@@ -762,12 +840,12 @@ print_r($data);`
                                 variant="ghost"
                                 size="icon"
                                 className="absolute right-2 top-2 z-10"
-                                onClick={() => handleCopyCode(generateCodeExample("javascript"))}
+                                onClick={() => handleCopyCode(generateCodeExample('javascript'))}
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
                               <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto">
-                                <code>{generateCodeExample("javascript")}</code>
+                                <code>{generateCodeExample('javascript')}</code>
                               </pre>
                             </TabsContent>
                             <TabsContent value="python" className="relative">
@@ -775,12 +853,12 @@ print_r($data);`
                                 variant="ghost"
                                 size="icon"
                                 className="absolute right-2 top-2 z-10"
-                                onClick={() => handleCopyCode(generateCodeExample("python"))}
+                                onClick={() => handleCopyCode(generateCodeExample('python'))}
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
                               <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto">
-                                <code>{generateCodeExample("python")}</code>
+                                <code>{generateCodeExample('python')}</code>
                               </pre>
                             </TabsContent>
                             <TabsContent value="php" className="relative">
@@ -788,12 +866,12 @@ print_r($data);`
                                 variant="ghost"
                                 size="icon"
                                 className="absolute right-2 top-2 z-10"
-                                onClick={() => handleCopyCode(generateCodeExample("php"))}
+                                onClick={() => handleCopyCode(generateCodeExample('php'))}
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
                               <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto">
-                                <code>{generateCodeExample("php")}</code>
+                                <code>{generateCodeExample('php')}</code>
                               </pre>
                             </TabsContent>
                           </Tabs>
@@ -812,7 +890,9 @@ print_r($data);`
                     <div className="text-center py-12">
                       <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">选择一个API端点</h3>
-                      <p className="text-muted-foreground mb-4">从左侧列表中选择一个API端点来查看详情并测试API</p>
+                      <p className="text-muted-foreground mb-4">
+                        从左侧列表中选择一个API端点来查看详情并测试API
+                      </p>
                     </div>
                   </CardContent>
                 </Card>

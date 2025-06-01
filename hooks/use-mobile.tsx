@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -14,11 +14,11 @@ export function useIsMobile() {
     checkIsMobile()
 
     // 监听窗口大小变化
-    window.addEventListener("resize", checkIsMobile)
+    window.addEventListener('resize', checkIsMobile)
 
     // 清理监听器
     return () => {
-      window.removeEventListener("resize", checkIsMobile)
+      window.removeEventListener('resize', checkIsMobile)
     }
   }, [])
 

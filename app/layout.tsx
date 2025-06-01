@@ -1,19 +1,19 @@
-import type React from "react"
-import type { Metadata } from "next"
-import "./globals.css"
-import Provider from "./_trpc/Provider"
-import { Toaster } from "@/components/ui/sonner"
-import '@ant-design/v5-patch-for-react-19';
+import type React from 'react'
+import type { Metadata } from 'next'
+import './globals.css'
+import Provider from './_trpc/Provider'
+import { Toaster } from '@/components/ui/sonner'
+import '@ant-design/v5-patch-for-react-19'
 import localFont from 'next/font/local'
 export const metadata: Metadata = {
-  title: "Insight - 专业的在线问卷调查平台",
-  description: "创建专业问卷，收集有价值的数据，简单易用的问卷设计工具",
+  title: 'Insight - 专业的在线问卷调查平台',
+  description: '创建专业问卷，收集有价值的数据，简单易用的问卷设计工具',
 }
-import { AntdRegistry } from '@ant-design/nextjs-registry';
+import { AntdRegistry } from '@ant-design/nextjs-registry'
 const douyinFont = localFont({
-  src: "./DouyinSansBold.ttf",
-  display: "swap",
-  variable: "--font-douyin"
+  src: './DouyinSansBold.ttf',
+  display: 'swap',
+  variable: '--font-douyin',
 })
 export default function RootLayout({
   children,
@@ -22,16 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="scroll-smooth">
-      <body className={`${douyinFont.variable}`} >
+      <body className={`${douyinFont.variable}`}>
         <AntdRegistry>
-          <Provider>
-            {children}
-          </Provider>
+          <Provider>{children}</Provider>
         </AntdRegistry>
         <Toaster />
       </body>
     </html>
   )
 }
-
-

@@ -1,75 +1,82 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Link from "next/link"
-import { FileText, Search, Copy, ExternalLink, Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
+import { useState } from 'react'
+import Link from 'next/link'
+import { FileText, Search, Copy, ExternalLink, Download } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 export default function ExamplesPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("all")
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast("已复制", {
-      description: "代码已复制到剪贴板",
+    toast('已复制', {
+      description: '代码已复制到剪贴板',
     })
   }
 
   // 示例数据
   const examples = [
     {
-      id: "create-survey",
-      title: "创建问卷",
-      description: "创建一个新的问卷，包含多种题型",
-      category: "surveys",
-      languages: ["javascript", "python", "php"],
-      difficulty: "beginner",
+      id: 'create-survey',
+      title: '创建问卷',
+      description: '创建一个新的问卷，包含多种题型',
+      category: 'surveys',
+      languages: ['javascript', 'python', 'php'],
+      difficulty: 'beginner',
     },
     {
-      id: "update-survey",
-      title: "更新问卷",
-      description: "更新现有问卷的标题、描述和问题",
-      category: "surveys",
-      languages: ["javascript", "python"],
-      difficulty: "beginner",
+      id: 'update-survey',
+      title: '更新问卷',
+      description: '更新现有问卷的标题、描述和问题',
+      category: 'surveys',
+      languages: ['javascript', 'python'],
+      difficulty: 'beginner',
     },
     {
-      id: "collect-responses",
-      title: "收集问卷回复",
-      description: "创建一个表单，提交问卷回复",
-      category: "responses",
-      languages: ["javascript", "html"],
-      difficulty: "intermediate",
+      id: 'collect-responses',
+      title: '收集问卷回复',
+      description: '创建一个表单，提交问卷回复',
+      category: 'responses',
+      languages: ['javascript', 'html'],
+      difficulty: 'intermediate',
     },
     {
-      id: "analyze-data",
-      title: "分析问卷数据",
-      description: "获取和分析问卷统计数据",
-      category: "stats",
-      languages: ["javascript", "python"],
-      difficulty: "intermediate",
+      id: 'analyze-data',
+      title: '分析问卷数据',
+      description: '获取和分析问卷统计数据',
+      category: 'stats',
+      languages: ['javascript', 'python'],
+      difficulty: 'intermediate',
     },
     {
-      id: "webhook-handler",
-      title: "Webhook处理器",
-      description: "创建一个处理问卷星Webhook的服务器",
-      category: "webhooks",
-      languages: ["javascript", "python", "php"],
-      difficulty: "advanced",
+      id: 'webhook-handler',
+      title: 'Webhook处理器',
+      description: '创建一个处理问卷星Webhook的服务器',
+      category: 'webhooks',
+      languages: ['javascript', 'python', 'php'],
+      difficulty: 'advanced',
     },
     {
-      id: "custom-ui",
-      title: "自定义问卷界面",
-      description: "使用React创建自定义问卷界面",
-      category: "ui",
-      languages: ["javascript", "react"],
-      difficulty: "advanced",
+      id: 'custom-ui',
+      title: '自定义问卷界面',
+      description: '使用React创建自定义问卷界面',
+      category: 'ui',
+      languages: ['javascript', 'react'],
+      difficulty: 'advanced',
     },
   ]
 
@@ -81,7 +88,7 @@ export default function ExamplesPage() {
       example.description.toLowerCase().includes(searchQuery.toLowerCase())
 
     // 标签过滤
-    const matchesTab = activeTab === "all" || example.category === activeTab
+    const matchesTab = activeTab === 'all' || example.category === activeTab
 
     return matchesSearch && matchesTab
   })
@@ -96,7 +103,10 @@ export default function ExamplesPage() {
             <span>问卷星</span>
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
               我的问卷
             </Link>
             <Link href="/developer" className="text-sm font-medium text-primary">
@@ -110,7 +120,9 @@ export default function ExamplesPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">代码示例</h1>
-          <p className="text-muted-foreground text-lg">浏览各种编程语言的集成示例，快速开始使用问卷星API</p>
+          <p className="text-muted-foreground text-lg">
+            浏览各种编程语言的集成示例，快速开始使用问卷星API
+          </p>
         </div>
 
         {/* 搜索和过滤 */}
@@ -147,18 +159,18 @@ export default function ExamplesPage() {
                   <Badge
                     variant="outline"
                     className={
-                      example.difficulty === "beginner"
-                        ? "bg-green-100 text-green-800 hover:bg-green-100"
-                        : example.difficulty === "intermediate"
-                          ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                          : "bg-amber-100 text-amber-800 hover:bg-amber-100"
+                      example.difficulty === 'beginner'
+                        ? 'bg-green-100 text-green-800 hover:bg-green-100'
+                        : example.difficulty === 'intermediate'
+                          ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
+                          : 'bg-amber-100 text-amber-800 hover:bg-amber-100'
                     }
                   >
-                    {example.difficulty === "beginner"
-                      ? "初级"
-                      : example.difficulty === "intermediate"
-                        ? "中级"
-                        : "高级"}
+                    {example.difficulty === 'beginner'
+                      ? '初级'
+                      : example.difficulty === 'intermediate'
+                        ? '中级'
+                        : '高级'}
                   </Badge>
                 </div>
                 <CardDescription>{example.description}</CardDescription>
@@ -167,16 +179,16 @@ export default function ExamplesPage() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   {example.languages.map((language) => (
                     <Badge key={language} variant="secondary" className="text-xs">
-                      {language === "javascript"
-                        ? "JavaScript"
-                        : language === "python"
-                          ? "Python"
-                          : language === "php"
-                            ? "PHP"
-                            : language === "react"
-                              ? "React"
-                              : language === "html"
-                                ? "HTML"
+                      {language === 'javascript'
+                        ? 'JavaScript'
+                        : language === 'python'
+                          ? 'Python'
+                          : language === 'php'
+                            ? 'PHP'
+                            : language === 'react'
+                              ? 'React'
+                              : language === 'html'
+                                ? 'HTML'
                                 : language}
                     </Badge>
                   ))}
@@ -663,7 +675,8 @@ createSurvey();`}</code>
                   这个示例演示了如何使用API创建一个新的问卷，包含单选题、多选题和文本题。您可以根据需要修改问卷标题、描述和问题。
                 </p>
                 <p className="text-muted-foreground">
-                  创建问卷后，您可以通过更新问卷的published字段来发布问卷，或者使用/surveys/{"{id}"}/publish端点。
+                  创建问卷后，您可以通过更新问卷的published字段来发布问卷，或者使用/surveys/{'{id}'}
+                  /publish端点。
                 </p>
 
                 <div className="flex gap-2">

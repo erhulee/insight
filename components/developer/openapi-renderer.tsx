@@ -1,13 +1,18 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
-import { Copy, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
+import { Copy, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 interface OpenApiRendererProps {
   specUrl: string
@@ -26,10 +31,10 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
           throw new Error(`Failed to fetch OpenAPI spec: ${response.statusText}`)
         }
 
-        const contentType = response.headers.get("content-type")
+        const contentType = response.headers.get('content-type')
         let data
 
-        if (contentType?.includes("application/json")) {
+        if (contentType?.includes('application/json')) {
           data = await response.json()
         } else {
           // Assume YAML - in a real app, you'd use a YAML parser here
@@ -37,15 +42,15 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
           // Mock parsing for demo purposes
           data = {
             info: {
-              title: "问卷星 API",
-              version: "1.0.0",
-              description: "问卷星 API 允许开发者以编程方式访问和管理问卷、问题和回复数据。",
+              title: '问卷星 API',
+              version: '1.0.0',
+              description: '问卷星 API 允许开发者以编程方式访问和管理问卷、问题和回复数据。',
             },
             paths: {
-              "/surveys": {
+              '/surveys': {
                 get: {
-                  summary: "获取问卷列表",
-                  description: "获取当前用户的问卷列表",
+                  summary: '获取问卷列表',
+                  description: '获取当前用户的问卷列表',
                 },
               },
             },
@@ -55,8 +60,8 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
         setSpec(data)
         setIsLoading(false)
       } catch (err) {
-        console.error("Error fetching OpenAPI spec:", err)
-        setError(err instanceof Error ? err.message : "Unknown error")
+        console.error('Error fetching OpenAPI spec:', err)
+        setError(err instanceof Error ? err.message : 'Unknown error')
         setIsLoading(false)
       }
     }
@@ -66,8 +71,8 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
-    toast("已复制", {
-      description: "代码已复制到剪贴板",
+    toast('已复制', {
+      description: '代码已复制到剪贴板',
     })
   }
 
@@ -132,7 +137,9 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
               {spec.servers.map((server: any, index: number) => (
                 <li key={index} className="flex flex-col">
                   <span className="font-medium">{server.url}</span>
-                  {server.description && <span className="text-sm text-muted-foreground">{server.description}</span>}
+                  {server.description && (
+                    <span className="text-sm text-muted-foreground">{server.description}</span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -159,15 +166,15 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                           <Badge
                             variant="outline"
                             className={
-                              method === "get"
-                                ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                : method === "post"
-                                  ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                  : method === "put"
-                                    ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                                    : method === "delete"
-                                      ? "bg-red-100 text-red-800 hover:bg-red-100"
-                                      : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                              method === 'get'
+                                ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
+                                : method === 'post'
+                                  ? 'bg-green-100 text-green-800 hover:bg-green-100'
+                                  : method === 'put'
+                                    ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                                    : method === 'delete'
+                                      ? 'bg-red-100 text-red-800 hover:bg-red-100'
+                                      : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
                             }
                           >
                             {method.toUpperCase()}
@@ -176,7 +183,9 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                         </div>
 
                         {details.description && (
-                          <p className="text-sm text-muted-foreground mb-4">{details.description}</p>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            {details.description}
+                          </p>
                         )}
 
                         <Tabs defaultValue="parameters">
@@ -202,11 +211,15 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                                   <tbody>
                                     {details.parameters.map((param: any, index: number) => (
                                       <tr key={index} className="border-b">
-                                        <td className="py-2 px-4 font-mono text-xs">{param.name}</td>
+                                        <td className="py-2 px-4 font-mono text-xs">
+                                          {param.name}
+                                        </td>
                                         <td className="py-2 px-4">{param.in}</td>
-                                        <td className="py-2 px-4">{param.schema?.type || "-"}</td>
-                                        <td className="py-2 px-4">{param.required ? "是" : "否"}</td>
-                                        <td className="py-2 px-4">{param.description || "-"}</td>
+                                        <td className="py-2 px-4">{param.schema?.type || '-'}</td>
+                                        <td className="py-2 px-4">
+                                          {param.required ? '是' : '否'}
+                                        </td>
+                                        <td className="py-2 px-4">{param.description || '-'}</td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -219,7 +232,9 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                             {details.requestBody && (
                               <div className="mt-4">
                                 <h4 className="text-sm font-medium mb-2">请求体</h4>
-                                {details.requestBody.required && <p className="text-xs text-destructive mb-2">必填</p>}
+                                {details.requestBody.required && (
+                                  <p className="text-xs text-destructive mb-2">必填</p>
+                                )}
                                 {details.requestBody.content &&
                                   Object.entries(details.requestBody.content).map(
                                     ([contentType, content]: [string, any]) => (
@@ -231,12 +246,18 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                                               variant="ghost"
                                               size="icon"
                                               className="absolute right-2 top-2"
-                                              onClick={() => handleCopyCode(JSON.stringify(content.example, null, 2))}
+                                              onClick={() =>
+                                                handleCopyCode(
+                                                  JSON.stringify(content.example, null, 2),
+                                                )
+                                              }
                                             >
                                               <Copy className="h-4 w-4" />
                                             </Button>
                                             <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
-                                              <code>{JSON.stringify(content.example, null, 2)}</code>
+                                              <code>
+                                                {JSON.stringify(content.example, null, 2)}
+                                              </code>
                                             </pre>
                                           </div>
                                         )}
@@ -250,49 +271,61 @@ export function OpenApiRenderer({ specUrl }: OpenApiRendererProps) {
                           <TabsContent value="responses">
                             {details.responses && Object.entries(details.responses).length > 0 ? (
                               <div className="space-y-4">
-                                {Object.entries(details.responses).map(([code, response]: [string, any]) => (
-                                  <div key={code} className="border rounded-md p-4">
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Badge
-                                        variant="outline"
-                                        className={
-                                          code.startsWith("2")
-                                            ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                            : code.startsWith("4")
-                                              ? "bg-amber-100 text-amber-800 hover:bg-amber-100"
-                                              : code.startsWith("5")
-                                                ? "bg-red-100 text-red-800 hover:bg-red-100"
-                                                : "bg-gray-100 text-gray-800 hover:bg-gray-100"
-                                        }
-                                      >
-                                        {code}
-                                      </Badge>
-                                      <h4 className="font-medium">{response.description}</h4>
-                                    </div>
+                                {Object.entries(details.responses).map(
+                                  ([code, response]: [string, any]) => (
+                                    <div key={code} className="border rounded-md p-4">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <Badge
+                                          variant="outline"
+                                          className={
+                                            code.startsWith('2')
+                                              ? 'bg-green-100 text-green-800 hover:bg-green-100'
+                                              : code.startsWith('4')
+                                                ? 'bg-amber-100 text-amber-800 hover:bg-amber-100'
+                                                : code.startsWith('5')
+                                                  ? 'bg-red-100 text-red-800 hover:bg-red-100'
+                                                  : 'bg-gray-100 text-gray-800 hover:bg-gray-100'
+                                          }
+                                        >
+                                          {code}
+                                        </Badge>
+                                        <h4 className="font-medium">{response.description}</h4>
+                                      </div>
 
-                                    {response.content &&
-                                      Object.entries(response.content).map(([contentType, content]: [string, any]) => (
-                                        <div key={contentType} className="mt-2">
-                                          <p className="text-xs font-mono mb-2">{contentType}</p>
-                                          {content.example && (
-                                            <div className="relative">
-                                              <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-2 top-2"
-                                                onClick={() => handleCopyCode(JSON.stringify(content.example, null, 2))}
-                                              >
-                                                <Copy className="h-4 w-4" />
-                                              </Button>
-                                              <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
-                                                <code>{JSON.stringify(content.example, null, 2)}</code>
-                                              </pre>
+                                      {response.content &&
+                                        Object.entries(response.content).map(
+                                          ([contentType, content]: [string, any]) => (
+                                            <div key={contentType} className="mt-2">
+                                              <p className="text-xs font-mono mb-2">
+                                                {contentType}
+                                              </p>
+                                              {content.example && (
+                                                <div className="relative">
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="absolute right-2 top-2"
+                                                    onClick={() =>
+                                                      handleCopyCode(
+                                                        JSON.stringify(content.example, null, 2),
+                                                      )
+                                                    }
+                                                  >
+                                                    <Copy className="h-4 w-4" />
+                                                  </Button>
+                                                  <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
+                                                    <code>
+                                                      {JSON.stringify(content.example, null, 2)}
+                                                    </code>
+                                                  </pre>
+                                                </div>
+                                              )}
                                             </div>
-                                          )}
-                                        </div>
-                                      ))}
-                                  </div>
-                                ))}
+                                          ),
+                                        )}
+                                    </div>
+                                  ),
+                                )}
                               </div>
                             ) : (
                               <p className="text-sm text-muted-foreground py-2">无响应信息</p>

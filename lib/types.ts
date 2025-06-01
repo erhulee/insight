@@ -1,4 +1,4 @@
-import { QuestionType } from "@/components/survey-editor/buildin/form-item"
+import { QuestionType } from '@/components/survey-editor/buildin/form-item'
 
 export interface Survey {
   id: string

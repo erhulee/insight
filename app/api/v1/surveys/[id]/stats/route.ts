@@ -1,39 +1,39 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getFromLocalStorage } from "@/lib/utils"
+import { type NextRequest, NextResponse } from 'next/server'
+import { getFromLocalStorage } from '@/lib/utils'
 
 // 验证API密钥
 async function validateApiKey(request: NextRequest) {
-  const authHeader = request.headers.get("authorization")
+  const authHeader = request.headers.get('authorization')
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       valid: false,
       error: {
-        code: "unauthorized",
-        message: "未提供API密钥",
+        code: 'unauthorized',
+        message: '未提供API密钥',
       },
     }
   }
 
-  const apiKey = authHeader.replace("Bearer ", "")
+  const apiKey = authHeader.replace('Bearer ', '')
 
   // 从存储中获取API密钥
-  const storedKeys = getFromLocalStorage("api_keys", [])
+  const storedKeys = getFromLocalStorage('api_keys', [])
   const validKey = storedKeys.find((key) => key.key === apiKey)
 
   if (!validKey) {
     return {
       valid: false,
       error: {
-        code: "unauthorized",
-        message: "无效的API密钥",
+        code: 'unauthorized',
+        message: '无效的API密钥',
       },
     }
   }
 
   // 更新最后使用时间
   validKey.lastUsed = new Date().toISOString()
-  localStorage.setItem("api_keys", JSON.stringify(storedKeys))
+  localStorage.setItem('api_keys', JSON.stringify(storedKeys))
 
   return { valid: true, userId: validKey.id }
 }
@@ -57,8 +57,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json(
         {
           error: {
-            code: "not_found",
-            message: "问卷不存在",
+            code: 'not_found',
+            message: '问卷不存在',
           },
         },
         { status: 404 },
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     // 计算统计数据
     const totalResponses = responses.length
     const completionRate = totalResponses > 0 ? 98.5 : 0 // 模拟数据
-    const averageTime = "3:42" // 模拟数据
+    const averageTime = '3:42' // 模拟数据
 
     // 计算问题统计数据
     const questionStats = survey.questions.map((question: any) => {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       questionStat.total_answers = answers.length
 
       // 根据问题类型计算统计数据
-      if (question.type === "radio" || question.type === "checkbox") {
+      if (question.type === 'radio' || question.type === 'checkbox') {
         // 选项统计
         const optionCounts: Record<string, number> = {}
 
@@ -117,17 +117,20 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             percentage: Number.parseFloat(percentage.toFixed(1)),
           }
         })
-      } else if (question.type === "rating") {
+      } else if (question.type === 'rating') {
         // 评分统计
-        const ratings = answers.map((answer: any) => Number.parseInt(answer.value)).filter((v: any) => !isNaN(v))
+        const ratings = answers
+          .map((answer: any) => Number.parseInt(answer.value))
+          .filter((v: any) => !isNaN(v))
 
         const min = ratings.length > 0 ? Math.min(...ratings) : 0
         const max = ratings.length > 0 ? Math.max(...ratings) : 0
         const sum = ratings.reduce((acc: number, val: number) => acc + val, 0)
-        const average = ratings.length > 0 ? Number.parseFloat((sum / ratings.length).toFixed(1)) : 0
+        const average =
+          ratings.length > 0 ? Number.parseFloat((sum / ratings.length).toFixed(1)) : 0
 
         questionStat.stats = { min, max, average }
-      } else if (question.type === "text") {
+      } else if (question.type === 'text') {
         // 文本回答列表
         questionStat.stats = answers.map((answer: any) => answer.value).filter(Boolean)
       }
@@ -145,12 +148,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       },
     })
   } catch (error) {
-    console.error("Error fetching survey stats:", error)
+    console.error('Error fetching survey stats:', error)
     return NextResponse.json(
       {
         error: {
-          code: "server_error",
-          message: "获取问卷统计数据失败",
+          code: 'server_error',
+          message: '获取问卷统计数据失败',
         },
       },
       { status: 500 },

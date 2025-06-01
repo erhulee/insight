@@ -1,52 +1,53 @@
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, Search, FileText } from "lucide-react"
-import { SurveyOverview } from "@/app/developer/components/survey-overview"
-import { trpc } from "@/app/_trpc/client";
-import { LayoutHeader } from "@/components/layout-header"
-import { toast } from "sonner"
+'use client'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { PlusCircle, Search, FileText } from 'lucide-react'
+import { SurveyOverview } from '@/app/developer/components/survey-overview'
+import { trpc } from '@/app/_trpc/client'
+import { LayoutHeader } from '@/components/layout-header'
+import { toast } from 'sonner'
 
 export default function DashboardPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("all")
-  const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery()
-  if (error && error.data?.code == "UNAUTHORIZED") {
-    toast("未登录或登录已过期, 3秒后为您跳转")
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
+  const { data: surveys, isLoading, refetch, isError, error } = trpc.GetSurveyList.useQuery()
+  if (error && error.data?.code == 'UNAUTHORIZED') {
+    toast('未登录或登录已过期, 3秒后为您跳转')
     return null
   }
   // 创建新问卷
   const deleteMutation = trpc.DeleteSurvey.useMutation({
-    onSuccess: () => refetch()
-  });
+    onSuccess: () => refetch(),
+  })
   const handleCreateSurvey = async () => {
-    window.location.href = "/dashboard/create"
+    window.location.href = '/dashboard/create'
   }
   const handleDeleteSurvey = async (id: string) => {
     deleteMutation.mutate({ id })
   }
 
   // 过滤问卷
-  const filteredSurveys = surveys?.filter((survey) => {
-    // 根据搜索查询过滤
-    const matchesSearch = survey.name.toLowerCase().includes(searchQuery.toLowerCase())
-    // 根据标签过滤
-    if (activeTab === "all") return matchesSearch
-    if (activeTab === "published") return matchesSearch && survey.published
-    if (activeTab === "drafts") return matchesSearch && !survey.published
-    return matchesSearch
-  }) ?? []
+  const filteredSurveys =
+    surveys?.filter((survey) => {
+      // 根据搜索查询过滤
+      const matchesSearch = survey.name.toLowerCase().includes(searchQuery.toLowerCase())
+      // 根据标签过滤
+      if (activeTab === 'all') return matchesSearch
+      if (activeTab === 'published') return matchesSearch && survey.published
+      if (activeTab === 'drafts') return matchesSearch && !survey.published
+      return matchesSearch
+    }) ?? []
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-gray-50">
       {/* 顶部导航栏 */}
       <div className=" px-4">
         <LayoutHeader></LayoutHeader>
       </div>
       {/* 主要内容区域 */}
-      <main className="container 2xl:px-4 2xl:py-6 py-4 mx-auto bg-gray-50">
+      <main className="container 2xl:px-4 2xl:py-6 py-4 mx-auto ">
         <div className="flex flex-col gap-6">
           {/* 标题和创建按钮 */}
           <div className="flex items-center justify-between">
@@ -70,7 +71,12 @@ export default function DashboardPage() {
               />
             </div>
 
-            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
+            <Tabs
+              defaultValue="all"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full sm:w-auto"
+            >
               <TabsList>
                 <TabsTrigger value="all">全部</TabsTrigger>
                 <TabsTrigger value="published">已发布</TabsTrigger>
@@ -101,7 +107,11 @@ export default function DashboardPage() {
             ) : filteredSurveys.length > 0 ? (
               // 问卷列表
               filteredSurveys.map((survey) => (
-                <SurveyOverview key={survey.id} survey={survey as any} handleDelete={handleDeleteSurvey}></SurveyOverview>
+                <SurveyOverview
+                  key={survey.id}
+                  survey={survey as any}
+                  handleDelete={handleDeleteSurvey}
+                ></SurveyOverview>
               ))
             ) : (
               // 空状态
@@ -111,7 +121,7 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="text-lg font-medium mb-2">没有找到问卷</h3>
                 <p className="text-muted-foreground mb-4">
-                  {searchQuery ? "尝试使用不同的搜索词或清除过滤器" : "创建您的第一个问卷开始使用"}
+                  {searchQuery ? '尝试使用不同的搜索词或清除过滤器' : '创建您的第一个问卷开始使用'}
                 </p>
                 <Button onClick={handleCreateSurvey} className="gap-1">
                   <PlusCircle className="h-4 w-4" />

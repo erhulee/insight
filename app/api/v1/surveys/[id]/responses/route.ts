@@ -1,39 +1,39 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getFromLocalStorage } from "@/lib/utils"
+import { type NextRequest, NextResponse } from 'next/server'
+import { getFromLocalStorage } from '@/lib/utils'
 
 // 验证API密钥
 async function validateApiKey(request: NextRequest) {
-  const authHeader = request.headers.get("authorization")
+  const authHeader = request.headers.get('authorization')
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       valid: false,
       error: {
-        code: "unauthorized",
-        message: "未提供API密钥",
+        code: 'unauthorized',
+        message: '未提供API密钥',
       },
     }
   }
 
-  const apiKey = authHeader.replace("Bearer ", "")
+  const apiKey = authHeader.replace('Bearer ', '')
 
   // 从存储中获取API密钥
-  const storedKeys = getFromLocalStorage("api_keys", [])
+  const storedKeys = getFromLocalStorage('api_keys', [])
   const validKey = storedKeys.find((key) => key.key === apiKey)
 
   if (!validKey) {
     return {
       valid: false,
       error: {
-        code: "unauthorized",
-        message: "无效的API密钥",
+        code: 'unauthorized',
+        message: '无效的API密钥',
       },
     }
   }
 
   // 更新最后使用时间
   validKey.lastUsed = new Date().toISOString()
-  localStorage.setItem("api_keys", JSON.stringify(storedKeys))
+  localStorage.setItem('api_keys', JSON.stringify(storedKeys))
 
   return { valid: true, userId: validKey.id }
 }
@@ -57,8 +57,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json(
         {
           error: {
-            code: "not_found",
-            message: "问卷不存在",
+            code: 'not_found',
+            message: '问卷不存在',
           },
         },
         { status: 404 },
@@ -67,10 +67,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     // 获取查询参数
     const searchParams = request.nextUrl.searchParams
-    const page = Number.parseInt(searchParams.get("page") || "1")
-    const limit = Number.parseInt(searchParams.get("limit") || "10")
-    const sort = searchParams.get("sort") || "created_at"
-    const order = searchParams.get("order") || "desc"
+    const page = Number.parseInt(searchParams.get('page') || '1')
+    const limit = Number.parseInt(searchParams.get('limit') || '10')
+    const sort = searchParams.get('sort') || 'created_at'
+    const order = searchParams.get('order') || 'desc'
 
     // 从存储中获取问卷回复
     const responsesKey = `survey_responses_${id}`
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       const aValue = a[sort as keyof typeof a]
       const bValue = b[sort as keyof typeof b]
 
-      if (order === "asc") {
+      if (order === 'asc') {
         return aValue > bValue ? 1 : -1
       } else {
         return aValue < bValue ? 1 : -1
@@ -105,12 +105,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       },
     })
   } catch (error) {
-    console.error("Error fetching responses:", error)
+    console.error('Error fetching responses:', error)
     return NextResponse.json(
       {
         error: {
-          code: "server_error",
-          message: "获取问卷回复失败",
+          code: 'server_error',
+          message: '获取问卷回复失败',
         },
       },
       { status: 500 },
@@ -137,8 +137,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json(
         {
           error: {
-            code: "not_found",
-            message: "问卷不存在",
+            code: 'not_found',
+            message: '问卷不存在',
           },
         },
         { status: 404 },
@@ -152,8 +152,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json(
         {
           error: {
-            code: "validation_error",
-            message: "问卷未发布，无法提交回复",
+            code: 'validation_error',
+            message: '问卷未发布，无法提交回复',
           },
         },
         { status: 400 },
@@ -168,8 +168,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json(
         {
           error: {
-            code: "validation_error",
-            message: "回复必须包含answers字段，且为数组",
+            code: 'validation_error',
+            message: '回复必须包含answers字段，且为数组',
           },
         },
         { status: 400 },
@@ -182,8 +182,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       survey_id: id,
       answers: body.answers,
       created_at: new Date().toISOString(),
-      user_agent: request.headers.get("user-agent") || "",
-      ip_address: request.headers.get("x-forwarded-for") || request.ip || "",
+      user_agent: request.headers.get('user-agent') || '',
+      ip_address: request.headers.get('x-forwarded-for') || request.ip || '',
       email: body.email || null,
     }
 
@@ -197,12 +197,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     // 返回结果
     return NextResponse.json({ data: newResponse }, { status: 201 })
   } catch (error) {
-    console.error("Error submitting response:", error)
+    console.error('Error submitting response:', error)
     return NextResponse.json(
       {
         error: {
-          code: "server_error",
-          message: "提交问卷回复失败",
+          code: 'server_error',
+          message: '提交问卷回复失败',
         },
       },
       { status: 500 },
