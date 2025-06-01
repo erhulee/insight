@@ -1,9 +1,15 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { BarChart3, FileText, User, Code, Puzzle, Zap } from "lucide-react"
-import { FeatureCard } from "@/components/feature-card"
-import { LayoutHeader } from "@/components/layout-header"
-import { Banner } from "./banner"
+import Link from "next/link";
+import {
+  BarChart3,
+  FileText,
+  User,
+  Code,
+  Puzzle,
+  Zap,
+  ArrowRight,
+} from "lucide-react";
+import { FeatureCard } from "@/components/feature-card";
+import { Banner } from "./banner";
 
 export default function Home() {
   return (
@@ -14,17 +20,37 @@ export default function Home() {
           <div className="container  mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2 relative">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">一站式问卷解决方案</h2>
-                <div className="inline-block rounded-lg bg-green-100 text-green-900 px-3 py-1 text-sm absolute top-0 right-0 translate-x-1/2 -translate-y-full">核心功能</div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-3xl xl:text-4xl">
+                  一站式问卷解决方案
+                </h2>
+                <div
+                  className="inline-block rounded-lg bg-green-100 text-green-900 px-3 py-1 text-sm absolute top-0 right-0 translate-x-1/2 -translate-y-full 
+               sm:text-xs xl:text-sm 
+                "
+                >
+                  核心功能
+                </div>
                 <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
                   我们提供从问卷设计、发布、数据收集到分析的全流程支持
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
-              <FeatureCard title="可视化编辑" description="拖拽式编辑器，支持多种题型，轻松创建专业问卷" icon={<FileText className="h-4 w-4" />}></FeatureCard>
-              <FeatureCard title="问卷管理" description="集中管理所有问卷，控制发布状态，设置访问权限" icon={<User className="h-4 w-4" />}></FeatureCard>
-              <FeatureCard title="数据分析" description="实时数据统计，多维度分析，图表可视化展示结果" icon={<BarChart3 className="h-4 w-4" />}></FeatureCard>
+            <div className="mx-auto grid max-w-5xl gap-6 py-12 md:grid-cols-2 lg:grid-cols-3 grid-cols-3">
+              <FeatureCard
+                title="可视化编辑"
+                description="拖拽式编辑器，支持多种题型，轻松创建专业问卷"
+                icon={<FileText className="h-4 w-4" />}
+              ></FeatureCard>
+              <FeatureCard
+                title="问卷管理"
+                description="集中管理所有问卷，控制发布状态，设置访问权限"
+                icon={<User className="h-4 w-4" />}
+              ></FeatureCard>
+              <FeatureCard
+                title="数据分析"
+                description="实时数据统计，多维度分析，图表可视化展示结果"
+                icon={<BarChart3 className="h-4 w-4" />}
+              ></FeatureCard>
             </div>
           </div>
         </section>
@@ -32,20 +58,41 @@ export default function Home() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2 relative flex flex-row w-full justify-center">
-                <div className=" relative" > <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">强大的开放平台</h2>
-                  <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary absolute top-0 right-0 translate-x-1/2 -translate-y-full ">开发者工具</div>
+                <div className=" relative">
+                  <h2 className="text-5xl font-bold tracking-tighter md:text-3xl xl:text-4xl ">
+                    强大的开放平台
+                  </h2>
+                  <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary absolute top-0 right-0 translate-x-1/2 -translate-y-full sm:text-xs ">
+                    <Link
+                      href="/developer"
+                      className=" flex flex-row items-center gap-2"
+                    >
+                      探索开发者中心
+                      <ArrowRight className=" w-3 h-3"></ArrowRight>
+                    </Link>
+                  </div>
                   <p className="max-w-[900px] mt-4 text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                     将问卷功能集成到您的应用程序中，或构建自定义解决方案
-                  </p></div>
-                <Button variant="link" className=" absolute right-0">
-                  <Link href="/developer">{`探索开发者中心 >`} </Link>
-                </Button>
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
-              <FeatureCard title="RESTful API" description="全面的API，支持问卷创建、管理和数据收集" icon={<Code className="h-4 w-4" />}></FeatureCard>
-              <FeatureCard title="自渲染工具" description="使用OpenAPI规范自动生成问卷界面" icon={<Puzzle className="h-4 w-4" />}></FeatureCard>
-              <FeatureCard title="Webhooks" description="实时事件通知，支持自动化工作流" icon={<Zap className="h-4 w-4" />}></FeatureCard>
+            <div className="mx-auto grid max-w-5xl gap-6 py-12 grid-cols-3">
+              <FeatureCard
+                title="RESTful API"
+                description="全面的API，支持问卷创建、管理和数据收集"
+                icon={<Code className="h-4 w-4" />}
+              ></FeatureCard>
+              <FeatureCard
+                title="自渲染工具"
+                description="使用OpenAPI规范自动生成问卷界面"
+                icon={<Puzzle className="h-4 w-4" />}
+              ></FeatureCard>
+              <FeatureCard
+                title="Webhooks"
+                description="实时事件通知，支持自动化工作流"
+                icon={<Zap className="h-4 w-4" />}
+              ></FeatureCard>
             </div>
           </div>
         </section>
@@ -127,5 +174,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
