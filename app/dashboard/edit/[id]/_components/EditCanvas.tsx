@@ -1,9 +1,7 @@
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { Question } from '@/lib/types'
 import { scrollToElement } from '@/lib/utils'
 import { preset, QuestionType } from '@/components/survey-editor/buildin/form-item'
 import { cloneDeep } from 'lodash-es'
@@ -15,53 +13,52 @@ import {
   runtimeStore,
   selectQuestion,
 } from '@/app/dashboard/_valtio/runtime'
-type Props = {}
+import { QuestionSchemaType } from '@/lib/dsl'
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
   id: item.type,
   name: item.title,
   icon: <item.icon className="h-4 w-4"></item.icon>,
 }))
-export function Canvas(props: Props) {
+export function Canvas() {
   const runtimeState = useSnapshot(runtimeStore)
-  const questions = runtimeState.currentQuestion
-  const handleSelectQuestion = (question: Question) => {
+  const questions = runtimeState.questions
+  const handleSelectQuestion = (question: QuestionSchemaType) => {
     selectQuestion(question)
   }
   // 复制问题
   const handleDuplicateQuestion = (id: string) => {
-    const questionToDuplicate = questions.find((q) => q.field === id)!
+    const questionToDuplicate = questions.find((q) => q.id === id)!
     if (!questionToDuplicate) return
 
-    const duplicatedQuestion: Question = {
+    const duplicatedQuestion: QuestionSchemaType = {
       ...JSON.parse(JSON.stringify(questionToDuplicate)),
       id: uuidv4(),
     }
 
-    const index = questions.findIndex((q) => q.field === id)
+    const index = questions.findIndex((q) => q.id === id)
     const updatedQuestions = [...questions]
     updatedQuestions.splice(index + 1, 0, duplicatedQuestion)
     // 滚动到复制的问题
     setTimeout(() => {
-      scrollToElement(duplicatedQuestion.field, 100)
+      scrollToElement(duplicatedQuestion.id, 100)
     }, 100)
   }
   const handleDeleteQuestion = (id: string) => {
     deleteQuestion(id)
   }
-  const handleDescriptionChange = () => {}
 
   const handleAddQuestion = (type: QuestionType) => {
     const questionPreset = cloneDeep(preset.find((item) => item.type == type))
-    const newQuestion: Question = {
-      field: uuidv4(),
+    const newQuestion: QuestionSchemaType = {
+      id: uuidv4(),
       ...questionPreset,
     } as any
     addQuestion(newQuestion)
     // setSelectedQuestionId(newQuestion.id)
     // 滚动到新添加的问题
     setTimeout(() => {
-      scrollToElement(newQuestion.field, 100)
+      scrollToElement(newQuestion.id, 100)
     }, 100)
   }
   // 渲染预览内容
@@ -91,7 +88,7 @@ export function Canvas(props: Props) {
           ) : (
             questions.map((question) => (
               <EditQuestionItem
-                key={question.field}
+                key={question.id}
                 question={question}
                 isPreview={false}
                 onSelect={() => {

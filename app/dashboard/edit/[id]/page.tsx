@@ -2,13 +2,10 @@
 import type React from 'react'
 import { useState, use, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Question } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate } from 'lucide-react'
 import { DragDropProvider } from '@/components/survey-editor/drag-drop-context'
 import { toast } from 'sonner'
-import { QuestionType } from '@/components/survey-editor/buildin/form-item'
 import { publish, unpublish } from './service'
 import { RenameInput } from './_components/RenameInput'
 import { trpc } from '@/app/_trpc/client'
@@ -26,7 +23,6 @@ import {
 import { ShareConfig } from './_components/shareConfig'
 import { EditHeader } from './_components/EditHeader'
 import { WidgetPanel } from './_components/WidgetPanel'
-import { QuestionConfig } from './_components/QuestionConfig'
 import { cloneDeep } from 'lodash-es'
 import { SurveyPagiNation } from './_components/SurveyPagiNation'
 import { useSnapshot } from 'valtio'
@@ -38,6 +34,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { EditQuestionConfig } from './_components/EditQuestionConfig'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function EditSurveyPage(props: {
   params: Promise<{
@@ -155,14 +153,7 @@ export default function EditSurveyPage(props: {
       }
     }
   }
-  // 获取选中的问题
-  const selectedQuestion = runtimeState.currentQuestion.find((q) => q.field === selectedQuestionId)
-  console.log(
-    'selectedQuestion:',
-    selectedQuestion,
-    selectedQuestionId,
-    runtimeState.currentQuestion,
-  )
+
   if (isError || survey == null) {
     return <div>程序异常</div>
   } else {
@@ -229,42 +220,12 @@ export default function EditSurveyPage(props: {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
-                {activeTab === 'json' && (
-                  <JsonEditor questions={runtimeState.questions}></JsonEditor>
-                )}
-                {activeTab === 'design' && (
-                  <Canvas selectedQuestionId={selectedQuestionId} survey={survey}></Canvas>
-                )}
+                {activeTab === 'json' && <JsonEditor></JsonEditor>}
+                {activeTab === 'design' && <Canvas></Canvas>}
               </div>
             )}
-
             {/* 右侧面板 - 问题设置 */}
-            <div className="w-80 border-l bg-muted/30 overflow-hidden hidden md:block">
-              <div className="border-b p-4">
-                <h3 className="font-medium">问题配置</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {selectedQuestion
-                    ? `编辑 "${selectedQuestion.type === QuestionType.Text ? '分节' : '问题'}" 的属性和选项`
-                    : '请从左侧选择一个问题进行编辑'}
-                </p>
-              </div>
-              <ScrollArea>
-                <div className="p-4">
-                  {selectedQuestion ? (
-                    <QuestionConfig
-                      onUpdate={(attr) => {
-                        handleUpdateQuestion('update-attr', attr)
-                      }}
-                    />
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>选择一个问题来配置其属性</p>
-                      <p className="text-xs mt-2">或从左侧添加一个新问题</p>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
+            <EditQuestionConfig></EditQuestionConfig>
           </div>
         </DragDropProvider>
         {/* 发布配置 */}

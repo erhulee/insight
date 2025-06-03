@@ -6,7 +6,6 @@ import { RangeSetter } from './rangeSetter'
 export function ConfigSetter(props: { configSetter: FormItemConfigSetter }) {
   const { configSetter } = props
   const { type } = configSetter
-  console.log('configSetter:', configSetter)
   switch (type) {
     case FormItemConfigSetterType.Input:
       return <Input className=" w-full" placeholder={configSetter.placeholder}></Input>

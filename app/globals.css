@@ -222,3 +222,7 @@ html body[data-scroll-locked] {
   color: rgba(44, 44, 44, 0.85) !important;
   font-weight: 500 !important;
 }
+
+.ant-input-number .ant-input-number-in-form-item {
+  width: 100% !important;
+}

@@ -1,5 +1,4 @@
-import { FormItemConfigSetter } from './IFormItemConfig'
-import { QuestionType } from './QuestionType'
+import { QuestionSchema } from '@/lib/dsl/index'
 
 export interface IFormItemAttr {
   /**
@@ -14,8 +13,9 @@ export interface IFormItemAttr {
   description: string
 }
 
-export interface IFormItemMeta {
+export interface IFormItemMeta<T = typeof QuestionSchema> {
   icon: React.PropsWithChildren<React.FC<{ className: string }>>
+
   /**
    * 题型名称
    */
@@ -23,18 +23,8 @@ export interface IFormItemMeta {
   /**
    * 题型key
    */
-  type: QuestionType
-  /**
-   * 	题型属性信息
-   */
-  attrs: Array<IFormItemAttr>
-  /**
-   * 对应题型属性的配置表单渲染配置
-   */
-  config: Array<FormItemConfigSetter>
+  type: string
+  schema: T
 }
 
-export interface IFormToolKit {
-  icon: React.PropsWithChildren<React.FC<{ className: string }>>
-  meta: IFormItemMeta
-}
+export const DEFAULT_ID = 'servery_default-id'

@@ -1,51 +1,41 @@
-import { Question } from '@/lib/types'
-import { QuestionType } from '../form-item'
-import { Checkbox, Input, Radio } from 'antd'
+import {
+  MultipleQuestionSchemaType,
+  QuestionSchemaType,
+  SingleQuestionSchema,
+  SingleQuestionSchemaType,
+} from '@/lib/dsl'
+import { Checkbox, Input } from 'antd'
+import { MultipleQuestion } from './multiple'
+import { SingleQuestion } from '../form-item/single/render'
 
-export function QuestionRender(props: { question: Question }) {
+export function QuestionRender(props: { question: QuestionSchemaType }) {
   const { question } = props
   switch (question.type) {
-    case QuestionType.Text:
-      return <Input placeholder={question.attr['placeholder'] || ''}></Input>
-    case QuestionType.TextArea:
-      return <Input.TextArea placeholder={question.attr['placeholder'] || ''}></Input.TextArea>
-    case QuestionType.Radio:
+    case 'input':
+      return <Input placeholder={question.props['placeholder'] || ''}></Input>
+    case 'textarea':
       return (
-        <Radio.Group
-          disabled
-          options={question.attr['options'].map((i: string) => ({
-            label: i,
-            value: i,
-          }))}
-        ></Radio.Group>
+        <Input.TextArea
+          showCount
+          maxLength={question.props['maxlength']}
+          placeholder={question.props['placeholder'] || ''}
+        ></Input.TextArea>
       )
-    case QuestionType.Checkbox:
-      return (
-        <Checkbox.Group
-          disabled
-          options={question.attr['options'].map((i: string) => ({
-            label: i,
-            value: i,
-          }))}
-        ></Checkbox.Group>
-      )
-    // case "checkbox":
-    //     return (
-    //         <div className="space-y-2">
-    //             {question.required && <span className="text-destructive text-sm">*</span>}
-    //             {question.description && <p className="text-xs text-muted-foreground">{question.description}</p>}
-    //             <div className="space-y-1">
-    //                 {question.options?.map((option, index) => (
-    //                     <div key={index} className="flex items-center space-x-2">
-    //                         <input type="checkbox" id={`option-${question.id}-${index}`} disabled={isPreview} />
-    //                         <label htmlFor={`option-${question.id}-${index}`} className="text-sm">
-    //                             {option.text}
-    //                         </label>
-    //                     </div>
-    //                 ))}
-    //             </div>
-    //         </div>
-    //     )
+    case 'multiple':
+      return <MultipleQuestion dsl={question as MultipleQuestionSchemaType}></MultipleQuestion>
+    case 'single':
+      return <SingleQuestion dsl={question as SingleQuestionSchemaType}></SingleQuestion>
+    // case QuestionType.Radio:
+    //   return (
+    //     <Radio.Group
+    //       disabled
+    //       options={question.attr['options'].map((i: string) => ({
+    //         label: i,
+    //         value: i,
+    //       }))}
+    //     ></Radio.Group>
+    //   )
+
     // case "dropdown":
     //     return (
     //         <div className="space-y-2">

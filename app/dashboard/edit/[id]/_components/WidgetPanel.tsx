@@ -1,11 +1,11 @@
 'use client'
 import { addQuestion, runtimeStore } from '@/app/dashboard/_valtio/runtime'
-import { preset, QuestionType } from '@/components/survey-editor/buildin/form-item'
+import { preset } from '@/components/survey-editor/buildin/form-item'
 import { Button } from '@/components/ui/button'
-import { Question } from '@/lib/types'
 import { Settings } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
+import { QuestionSchemaType } from '@/lib/dsl'
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
   id: item.type,
@@ -14,23 +14,15 @@ const questionTypes = preset.map((item) => ({
 }))
 export function WidgetPanel() {
   const currentPageIndex = useSnapshot(runtimeStore).currentPage
-  const handleAddQuestion = (questionType: QuestionType) => {
+  const handleAddQuestion = (questionType: string) => {
     const meta = preset.find((item) => item.type === questionType)!
     const id = uuidv4()
-    const newQuestion: Question = {
-      field: id,
+    const newQuestion: QuestionSchemaType = meta.schema.parse({
       id: id,
-      type: questionType,
-      name: meta.title,
-      attr: meta.attrs.reduce((pre, cur) => {
-        return {
-          ...pre,
-          [cur.name]: cur.defaultValue,
-          field: id,
-        }
-      }, {}),
-      ownerPage: currentPageIndex,
-    }
+      type: questionType as QuestionSchemaType['type'],
+      title: meta.title,
+      props: {},
+    })
     addQuestion(newQuestion)
   }
   return (

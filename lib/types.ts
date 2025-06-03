@@ -1,25 +1,16 @@
-import { QuestionType } from '@/components/survey-editor/buildin/form-item'
+import { QuestionSchemaType } from './dsl'
 
 export interface Survey {
   id: string
   title: string
   description?: string
-  questions: Question[]
+  questions: Array<QuestionSchemaType>
   createdAt: string
   updatedAt: string
   published: boolean
   settings?: SurveySettings
   theme?: SurveyTheme
   pageCount: number
-}
-
-export interface Question {
-  field: string
-  id: string
-  name: string
-  type: QuestionType
-  attr: Record<string, any>
-  ownerPage: number
 }
 
 export interface QuestionOption {

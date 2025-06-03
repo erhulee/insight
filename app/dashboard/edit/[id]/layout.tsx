@@ -1,5 +1,4 @@
 'use client'
-import { trpc } from '@/app/_trpc/client'
 import type React from 'react'
 import { use } from 'react'
 

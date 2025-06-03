@@ -1,10 +1,11 @@
-import { Question } from '@/lib/types'
+import { QuestionSchemaType } from '@/lib/dsl'
+import { cloneDeep } from 'lodash-es'
 import { proxy } from 'valtio'
-
+type Question = QuestionSchemaType
 export type RuntimeState = {
   surveyId: string
   questions: Question[]
-  selectedQuestionID: Question['field'] | null
+  selectedQuestionID: Question['id'] | null
   currentPage: number
   currentQuestion: Question[]
   pageCount: number
@@ -19,11 +20,12 @@ export const runtimeStore = proxy<RuntimeState>({
 })
 
 function updateCurrentQuestion() {
-  runtimeStore.currentQuestion = runtimeStore.questions.filter(
-    (q) => q.ownerPage == runtimeStore.currentPage,
-  )
+  runtimeStore.currentQuestion = runtimeStore.questions
+  // .filter(
+  //   (q) => q.ownerPage == runtimeStore.currentPage,
+  // )
   if (
-    runtimeStore.currentQuestion.findIndex((q) => q.field === runtimeStore.selectedQuestionID) == -1
+    runtimeStore.currentQuestion.findIndex((q) => q.id === runtimeStore.selectedQuestionID) == -1
   ) {
     runtimeStore.selectedQuestionID = null
   }
@@ -36,17 +38,17 @@ export const initRuntimeStore = (params: RuntimeState) => {
   runtimeStore.currentQuestion = params.currentQuestion
 }
 
-export const selectQuestion = (question: Question) => {
-  runtimeStore.selectedQuestionID = question.field
+export const selectQuestion = (question: QuestionSchemaType) => {
+  runtimeStore.selectedQuestionID = question.id
   updateCurrentQuestion()
 }
-export const addQuestion = (question: Question) => {
+export const addQuestion = (question: QuestionSchemaType) => {
   runtimeStore.questions.push(question)
   updateCurrentQuestion()
 }
 
-export const deleteQuestion = (field: Question['field']) => {
-  runtimeStore.questions = runtimeStore.questions.filter((q) => q.field !== field)
+export const deleteQuestion = (id: QuestionSchemaType['id']) => {
+  runtimeStore.questions = runtimeStore.questions.filter((q) => q.id !== id)
   updateCurrentQuestion()
 }
 
@@ -76,7 +78,36 @@ export const deletePage = (pageIndex: number) => {
   updateCurrentQuestion()
 }
 
-export const updateRuntimeQuestion = (question: Question[]) => {
+export const updateRuntimeQuestion = (question: QuestionSchemaType[]) => {
   runtimeStore.questions = question
   updateCurrentQuestion()
+}
+
+export const RuntimeDSLAction = {
+  updateQuestion: (
+    action: 'props' | 'form-basic',
+    params: {
+      props?: Record<string, any>
+      attr?: Partial<{
+        title: string
+        description: string
+        required: boolean
+      }>
+    },
+  ) => {
+    const idx = runtimeStore.questions.findIndex((q) => q.id === runtimeStore.selectedQuestionID)
+    const oldQuestion = cloneDeep(runtimeStore.questions[idx])
+    if (action == 'props') {
+      const oldQuestionProps = oldQuestion?.props || {}
+      Object.assign(oldQuestionProps, params.props)
+      oldQuestion.props = oldQuestionProps
+    } else if (action == 'form-basic') {
+      Object.assign(oldQuestion, params.attr)
+    }
+    runtimeStore.questions = [
+      ...runtimeStore.questions.slice(0, idx),
+      oldQuestion,
+      ...runtimeStore.questions.slice(idx + 1),
+    ]
+  },
 }

@@ -1,6 +1,6 @@
 import { meta as TextInputMeta } from './text-input/textInput'
-import { meta as TextAreaMeta } from './text-area/textArea'
-import { meta as RadioMeta } from './radio/radio'
-import { meta as CheckboxMeta } from './checkbox/checkbox'
+import { meta as TextareaMeta } from './text-area/textArea'
+import { meta as MultipleMeta } from './checkbox/checkbox'
+import { meta as SingleMeta } from './single/schema'
 export { QuestionType } from './core/QuestionType'
-export const preset = [TextInputMeta, TextAreaMeta, CheckboxMeta, RadioMeta]
+export const preset = [TextInputMeta, TextareaMeta, MultipleMeta, SingleMeta]
