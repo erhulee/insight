@@ -12,8 +12,12 @@ import {
   deleteQuestion,
   runtimeStore,
   selectQuestion,
+  updateRuntimeQuestion,
 } from '@/app/dashboard/_valtio/runtime'
 import { QuestionSchemaType } from '@/lib/dsl'
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
+
+import type { Question, QuestionLogic } from '@/app/dashboard/_valtio/runtime'
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
   id: item.type,
@@ -47,7 +51,6 @@ export function Canvas() {
   const handleDeleteQuestion = (id: string) => {
     deleteQuestion(id)
   }
-
   const handleAddQuestion = (type: QuestionType) => {
     const questionPreset = cloneDeep(preset.find((item) => item.type == type))
     const newQuestion: QuestionSchemaType = {
@@ -61,45 +64,56 @@ export function Canvas() {
       scrollToElement(newQuestion.id, 100)
     }, 100)
   }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const fromQuestionId = event.active.id;
+    const targetQuestionId = event.over?.id;
+    if (targetQuestionId == null) return
+    const fromQuestionIndex = questions.findIndex((q) => q.id === fromQuestionId);
+    const targetQuestionIndex = questions.findIndex((q) => q.id === targetQuestionId);
+    if (fromQuestionIndex !== -1 && targetQuestionIndex !== -1) {
+      const updatedQuestions = [...questions];
+      const [movedQuestion] = updatedQuestions.splice(fromQuestionIndex, 1);
+      updatedQuestions.splice(targetQuestionIndex, 0, movedQuestion);
+      runtimeStore.questions = updatedQuestions
+    }
+  }
+
   // 渲染预览内容
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto p-4">
-        {/* 问卷描述 */}
-        {/* <div className="mb-6">
-                <Textarea
-                    value={survey.description}
-                    onChange={handleDescriptionChange}
-                    placeholder="问卷描述（可选）"
-                    className="resize-none"
-                    rows={2}
-                />
-            </div> */}
-
         {/* 问题列表 */}
-        <div className="space-y-4">
-          {questions.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed rounded-lg">
-              <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
-              <Button onClick={() => handleAddQuestion(QuestionType.Text)}>
-                <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
-              </Button>
-            </div>
-          ) : (
-            questions.map((question) => (
-              <EditQuestionItem
-                key={question.id}
-                question={question}
-                isPreview={false}
-                onSelect={() => {
-                  handleSelectQuestion(question)
-                }}
-                onDelete={handleDeleteQuestion}
-                onDuplicate={handleDuplicateQuestion}
-              />
-            ))
-          )}
-        </div>
+        <DndContext
+          onDragEnd={handleDragEnd}
+          onDragStart={() => {
+            console.log('drag start')
+          }}>
+          <div className="space-y-4">
+            {questions.length === 0 ? (
+              <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
+                <Button onClick={() => handleAddQuestion(QuestionType.Text)}>
+                  <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
+                </Button>
+              </div>
+            ) : (
+              questions.map((question, index) => (
+                <EditQuestionItem
+                  key={question.id}
+                  question={question}
+                  isPreview={false}
+                  onSelect={() => handleSelectQuestion(question)}
+                  onDelete={handleDeleteQuestion}
+                  onDuplicate={handleDuplicateQuestion}
+                  index={index}
+                />
+              ))
+            )
+            }
+          </div>
+
+        </DndContext>
 
         {/* 添加问题按钮 - 移动设备上显示 */}
         <div className="mt-6 lg:hidden">

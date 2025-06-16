@@ -23,6 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="scroll-smooth">
+      {/* <head>
+        <script
+          crossOrigin="anonymous"
+          src="//unpkg.com/react-scan/dist/auto.global.js"
+        />
+      </head> */}
       <body className={`${douyinFont.variable}`}>
         <AntdRegistry>
           <ConfigProvider

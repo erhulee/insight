@@ -16,5 +16,7 @@ export default function RootLayout(
   // }, {
   //     initialData: {} as any
   // })
-  return <div>{props.children}</div>
+  return <div>
+
+    {props.children}</div>
 }

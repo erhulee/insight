@@ -1,7 +1,35 @@
 import { QuestionSchemaType } from '@/lib/dsl'
 import { cloneDeep } from 'lodash-es'
 import { proxy } from 'valtio'
-type Question = QuestionSchemaType
+
+export type QuestionLogic = {
+  condition: {
+    questionId: string
+    answer?: {
+      equal?: string | string[]
+      notEqual?: string | string[]
+      contains?: string
+      empty?: boolean
+    }
+  }
+  action: {
+    type: 'hide' | 'show' | 'jumpTo'
+    targetQuestionId?: string
+  }
+}
+
+export type Question = {
+  id: string
+  type: QuestionSchemaType['type']
+  title: string
+  description?: string
+  required?: boolean
+  props: Record<string, any>
+  pageSize: number
+  ownerPage: number
+  logic?: QuestionLogic[]
+}
+
 export type RuntimeState = {
   surveyId: string
   questions: Question[]
@@ -10,6 +38,7 @@ export type RuntimeState = {
   currentQuestion: Question[]
   pageCount: number
 }
+
 export const runtimeStore = proxy<RuntimeState>({
   surveyId: '',
   questions: [] as Question[],
