@@ -50,9 +50,6 @@ export const runtimeStore = proxy<RuntimeState>({
 
 function updateCurrentQuestion() {
   runtimeStore.currentQuestion = runtimeStore.questions
-  // .filter(
-  //   (q) => q.ownerPage == runtimeStore.currentPage,
-  // )
   if (
     runtimeStore.currentQuestion.findIndex((q) => q.id === runtimeStore.selectedQuestionID) == -1
   ) {

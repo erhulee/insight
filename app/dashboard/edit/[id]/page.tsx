@@ -7,9 +7,9 @@ import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate } from 'lucide
 import { DragDropProvider } from '@/components/survey-editor/drag-drop-context'
 import { toast } from 'sonner'
 import { publish, unpublish } from './service'
-import { RenameInput } from './_components/RenameInput'
+import { RenameInput } from '../_components/RenameInput'
 import { trpc } from '@/app/_trpc/client'
-import { Canvas } from './_components/EditCanvas'
+import { Canvas } from '../_components/EditCanvas'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import {
   Sheet,
@@ -20,21 +20,21 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { ShareConfig } from './_components/shareConfig'
-import { EditHeader } from './_components/EditHeader'
-import { WidgetPanel } from './_components/WidgetPanel'
+import { ShareConfig } from '../_components/shareConfig'
+import { EditHeader } from '../_components/EditHeader'
+import { WidgetPanel } from '../_components/WidgetPanel'
 import { cloneDeep } from 'lodash-es'
-import { SurveyPagiNation } from './_components/SurveyPagiNation'
+import { SurveyPagiNation } from '../_components/SurveyPagiNation'
 import { useSnapshot } from 'valtio'
 import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from '../../_valtio/runtime'
-import { JsonEditor } from './_components/JsonEditor'
+import { JsonEditor } from '../_components/JsonEditor'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EditQuestionConfig } from './_components/EditQuestionConfig'
+import { EditQuestionConfig } from '../_components/EditQuestionConfig'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function EditSurveyPage(props: {

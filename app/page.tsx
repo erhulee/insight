@@ -51,7 +51,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2 relative flex flex-row w-full justify-center">
                 <div className=" relative">
-                  <h2 className="text-5xl font-bold tracking-tighter md:text-3xl xl:text-4xl ">
+                  <h2 className="text-3xl font-bold tracking-tighter sm:text-3xl xl:text-4xl">
                     强大的开放平台
                   </h2>
                   <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary absolute top-0 right-0 translate-x-1/2 -translate-y-full sm:text-xs ">

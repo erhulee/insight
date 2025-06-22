@@ -6,78 +6,58 @@ import { scrollToElement } from '@/lib/utils'
 import { preset, QuestionType } from '@/components/survey-editor/buildin/form-item'
 import { cloneDeep } from 'lodash-es'
 import { EditQuestionItem } from './EditQuestionItem'
-import { useSnapshot } from 'valtio'
 import {
-  addQuestion,
-  deleteQuestion,
-  runtimeStore,
-  selectQuestion,
-  updateRuntimeQuestion,
+  Question,
 } from '@/app/dashboard/_valtio/runtime'
 import { QuestionSchemaType } from '@/lib/dsl'
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, PointerSensor, useSensor } from '@dnd-kit/core'
+import { useAction } from '../_hooks/useAction'
 
-import type { Question, QuestionLogic } from '@/app/dashboard/_valtio/runtime'
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
   id: item.type,
   name: item.title,
-  icon: <item.icon className="h-4 w-4"></item.icon>,
+  icon: <item.icon className="h-4 w-4" />,
 }))
-export function Canvas() {
-  const runtimeState = useSnapshot(runtimeStore)
-  const questions = runtimeState.questions
-  const handleSelectQuestion = (question: QuestionSchemaType) => {
+
+/**
+ * Main canvas component for editing survey questions
+ */
+export const Canvas: React.FC = () => {
+  const { questions, selectQuestion, addQuestion, handleDragEnd, deleteQuestion, isQuestionSelected } = useAction()
+
+  const handleSelectQuestion = (question: Question) => {
     selectQuestion(question)
   }
-  // 复制问题
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 5
+    }
+  })
+
+  /**
+   * Duplicates a question and inserts it after the original
+   */
   const handleDuplicateQuestion = (id: string) => {
-    const questionToDuplicate = questions.find((q) => q.id === id)!
+    const questionToDuplicate = questions.find((q) => q.id === id)
     if (!questionToDuplicate) return
 
-    const duplicatedQuestion: QuestionSchemaType = {
-      ...JSON.parse(JSON.stringify(questionToDuplicate)),
+    const duplicatedQuestion: Question = {
+      ...cloneDeep(questionToDuplicate),
       id: uuidv4(),
     }
 
     const index = questions.findIndex((q) => q.id === id)
     const updatedQuestions = [...questions]
     updatedQuestions.splice(index + 1, 0, duplicatedQuestion)
+
     // 滚动到复制的问题
     setTimeout(() => {
       scrollToElement(duplicatedQuestion.id, 100)
     }, 100)
   }
-  const handleDeleteQuestion = (id: string) => {
-    deleteQuestion(id)
-  }
-  const handleAddQuestion = (type: QuestionType) => {
-    const questionPreset = cloneDeep(preset.find((item) => item.type == type))
-    const newQuestion: QuestionSchemaType = {
-      id: uuidv4(),
-      ...questionPreset,
-    } as any
-    addQuestion(newQuestion)
-    // setSelectedQuestionId(newQuestion.id)
-    // 滚动到新添加的问题
-    setTimeout(() => {
-      scrollToElement(newQuestion.id, 100)
-    }, 100)
-  }
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const fromQuestionId = event.active.id;
-    const targetQuestionId = event.over?.id;
-    if (targetQuestionId == null) return
-    const fromQuestionIndex = questions.findIndex((q) => q.id === fromQuestionId);
-    const targetQuestionIndex = questions.findIndex((q) => q.id === targetQuestionId);
-    if (fromQuestionIndex !== -1 && targetQuestionIndex !== -1) {
-      const updatedQuestions = [...questions];
-      const [movedQuestion] = updatedQuestions.splice(fromQuestionIndex, 1);
-      updatedQuestions.splice(targetQuestionIndex, 0, movedQuestion);
-      runtimeStore.questions = updatedQuestions
-    }
-  }
 
   // 渲染预览内容
   return (
@@ -85,15 +65,14 @@ export function Canvas() {
       <div className="flex-1 overflow-y-auto p-4">
         {/* 问题列表 */}
         <DndContext
+          sensors={[pointerSensor]}
           onDragEnd={handleDragEnd}
-          onDragStart={() => {
-            console.log('drag start')
-          }}>
+        >
           <div className="space-y-4">
             {questions.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed rounded-lg">
                 <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
-                <Button onClick={() => handleAddQuestion(QuestionType.Text)}>
+                <Button onClick={() => addQuestion(QuestionType.Text)}>
                   <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
                 </Button>
               </div>
@@ -103,16 +82,15 @@ export function Canvas() {
                   key={question.id}
                   question={question}
                   isPreview={false}
+                  isSelected={isQuestionSelected(question.id)}
                   onSelect={() => handleSelectQuestion(question)}
-                  onDelete={handleDeleteQuestion}
+                  onDelete={deleteQuestion}
                   onDuplicate={handleDuplicateQuestion}
                   index={index}
                 />
               ))
-            )
-            }
+            )}
           </div>
-
         </DndContext>
 
         {/* 添加问题按钮 - 移动设备上显示 */}
@@ -129,7 +107,7 @@ export function Canvas() {
                     key={type.id}
                     variant="outline"
                     size="sm"
-                    onClick={() => handleAddQuestion(type.id)}
+                    onClick={() => addQuestion(type.id as QuestionType)}
                     className="justify-start gap-1 h-auto py-2"
                   >
                     {type.icon}

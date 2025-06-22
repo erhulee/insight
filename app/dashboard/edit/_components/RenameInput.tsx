@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input'
-import { rename } from '../service'
+import { rename } from '../[id]/service'
 import { RefObject, useState } from 'react'
 import { useEffect, useRef } from 'react'
 import { useHover } from 'react-use'

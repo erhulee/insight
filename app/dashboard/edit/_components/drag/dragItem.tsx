@@ -8,7 +8,6 @@ function DragItem(props: { children: React.ReactNode, id: string }) {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     } : undefined;
 
-
     return (
         <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
             {props.children}
