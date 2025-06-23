@@ -43,6 +43,8 @@ const EditorQuestionContent: React.FC<EditorQuestionContentProps> = ({
     onDelete(question.id)
   }
 
+  console.log("q:", question)
+
   return (
     <Card
       className={cn('question-item group ')}
@@ -58,6 +60,7 @@ const EditorQuestionContent: React.FC<EditorQuestionContentProps> = ({
           >
             <GripVertical className="h-5 w-5 text-muted-foreground" />
           </div>
+          {question.required && <span className=" text-red-500 " >*</span>}
           <span className="text-sm font-bold">{question.title}</span>
         </div>
         <div className="question-actions flex items-center gap-1">

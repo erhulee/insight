@@ -24,7 +24,7 @@ export function TemplateForm() {
       description: form.description,
     })
     if (survey) {
-      window.location.href = `/dashboard/edit/${survey.id}/edit`
+      window.location.href = `/dashboard/edit/${survey.id}`
     } else {
       toast.error('创建失败')
     }

@@ -1,4 +1,4 @@
-import { Form, Input, InputNumber, Select } from 'antd'
+import { Form, Input, InputNumber, Select, Switch } from 'antd'
 export function InputConfig() {
   return (
     <div>
@@ -24,6 +24,9 @@ export function InputConfig() {
             },
           ]}
         ></Select>
+      </Form.Item>
+      <Form.Item name={['props', 'showCount']} label="展示字数">
+        <Switch ></Switch>
       </Form.Item>
       <Form.Item name={['props', 'maxlength']} label="最多填写">
         <InputNumber

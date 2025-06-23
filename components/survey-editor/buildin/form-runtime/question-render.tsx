@@ -12,7 +12,11 @@ export function QuestionRender(props: { question: QuestionSchemaType }) {
   const { question } = props
   switch (question.type) {
     case 'input':
-      return <Input placeholder={question.props['placeholder'] || ''}></Input>
+      return <Input
+        placeholder={question.props['placeholder'] || ''}
+        maxLength={question.props.maxlength}
+        showCount={question.props.showCount}
+      ></Input>
     case 'textarea':
       return (
         <Input.TextArea

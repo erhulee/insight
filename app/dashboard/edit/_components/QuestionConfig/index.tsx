@@ -39,6 +39,7 @@ export function QuestionConfig() {
             form={formClient}
             layout="vertical"
             onValuesChange={(_, value) => {
+              console.log("value change:", value)
               RuntimeDSLAction.updateQuestion('form-basic', {
                 attr: value,
               })
