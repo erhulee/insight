@@ -12,6 +12,7 @@ const QuestionType = z.enum([
   // 时间选择器
   'date',
   'number',
+  'description',
 ])
 
 const LogicRule = z.array(

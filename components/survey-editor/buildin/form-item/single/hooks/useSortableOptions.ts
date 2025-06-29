@@ -12,10 +12,10 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { RuntimeDSLAction } from '@/app/dashboard/_valtio/runtime'
-import { SingleQuestionSchemaType } from '@/lib/dsl'
 import { cloneDeep } from "lodash-es"
 import { SortableOption, Option } from '../types'
 import { generateUniqueId, generateFallbackId } from '../utils/idGenerator'
+import { SingleQuestionSchemaType } from '../schema'
 
 /**
  * useSortableOptions Hook 的返回值接口

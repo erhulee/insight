@@ -45,53 +45,7 @@ export const TextareaQuestionSchema = QuestionSchema.extend({
 })
 export type TextareaQuestionSchemaType = z.infer<typeof TextareaQuestionSchema>
 
-export const MultipleQuestionSchema = QuestionSchema.extend({
-  type: z.enum(['multiple']),
-  props: z
-    .object({
-      options: z
-        .array(
-          z.object({
-            label: z.string(),
-            value: z.string(),
-          }),
-        )
-        .optional()
-        .default([
-          {
-            label: '选项1',
-            value: 'value1',
-          },
-        ]),
-    })
-    .optional(),
-})
-export type MultipleQuestionSchemaType = z.infer<typeof MultipleQuestionSchema>
 
-export const SingleQuestionSchema = QuestionSchema.extend({
-  type: z.enum(['single']),
-  props: z
-    .object({
-      options: z
-        .array(
-          z.object({
-            label: z.string(),
-            value: z.string(),
-            id: z.string(),
-          }),
-        )
-        .optional()
-        .default([
-          {
-            label: '选项1',
-            value: 'value1',
-            id: 'option1',
-          },
-        ]),
-    })
-    .optional(),
-})
-export type SingleQuestionSchemaType = z.infer<typeof SingleQuestionSchema>
 
 
 export * from "./date-picker"

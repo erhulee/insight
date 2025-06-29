@@ -6,7 +6,7 @@ import { z } from "zod";
 export const DescriptionSchema = QuestionSchema.extend({
     type: z.enum(["description"]),
     props: z.object({
-        content: z.string().optional(),
+        content: z.string().optional().default("请输入描述"),
     })
 })
 export const DescriptionMeta: IFormItemMeta<typeof DescriptionSchema> = {

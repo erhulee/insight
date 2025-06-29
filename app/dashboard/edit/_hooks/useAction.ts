@@ -37,7 +37,6 @@ export const useAction = () => {
   const handleAddQuestion = useCallback((type: QuestionType) => {
     const meta = preset.find((item) => item.type === type)
     if (!meta) return
-
     const id = uuidv4()
     const newQuestion: QuestionSchemaType = meta.schema.parse({
       id: id,
@@ -45,13 +44,7 @@ export const useAction = () => {
       title: meta.title,
       props: {},
     })
-
     addQuestion(newQuestion)
-    
-    // Scroll to the newly added question
-    // setTimeout(() => {
-    //   scrollToElement(newQuestion.id, 100)
-    // }, 100)
   }, [])
 
   /**
@@ -76,7 +69,7 @@ export const useAction = () => {
     const index = questions.findIndex((q) => q.id === id)
     const updatedQuestions = [...questions]
     updatedQuestions.splice(index + 1, 0, duplicatedQuestion)
-    
+
     // Scroll to the duplicated question
     setTimeout(() => {
       scrollToElement(duplicatedQuestion.id, 100)
@@ -106,12 +99,12 @@ export const useAction = () => {
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const fromQuestionId = event.active.id
     const targetQuestionId = event.over?.id
-    
+
     if (targetQuestionId == null) return
-    
+
     const fromQuestionIndex = questions.findIndex((q) => q.id === fromQuestionId)
     const targetQuestionIndex = questions.findIndex((q) => q.id === targetQuestionId)
-    
+
     if (fromQuestionIndex !== -1 && targetQuestionIndex !== -1) {
       const updatedQuestions = cloneDeep([...questions])
       const [movedQuestion] = updatedQuestions.splice(fromQuestionIndex, 1)
@@ -164,21 +157,21 @@ export const useAction = () => {
     questions,
     selectedQuestionId,
     selectedQuestion: getSelectedQuestion(),
-    
+
     // CRUD Operations
     addQuestion: handleAddQuestion,
     deleteQuestion: handleDeleteQuestion,
     duplicateQuestion: handleDuplicateQuestion,
     selectQuestion: handleSelectQuestion,
     clearSelection,
-    
+
     // Update Operations
     updateQuestionProps: handleUpdateQuestionProps,
     batchUpdateQuestions,
-    
+
     // Drag and Drop
     handleDragEnd,
-    
+
     // Utility Functions
     getQuestionById,
     isQuestionSelected,
