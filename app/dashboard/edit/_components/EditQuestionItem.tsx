@@ -62,8 +62,6 @@ const EditorQuestionContent: React.FC<EditorQuestionContentProps> = ({
     onDelete(question.id)
   }
 
-  console.log("q:", question)
-
   return (
     <Card
       className={cn('question-item group ')}
@@ -138,7 +136,6 @@ const EditorQuestionContent: React.FC<EditorQuestionContentProps> = ({
             </div>
           )}
         </div>
-
         <QuestionRender question={question} />
       </CardContent>
     </Card>
@@ -153,7 +150,6 @@ export const EditQuestionItem: React.FC<QuestionItemProps> = ({
   isSelected,
   ...props
 }) => {
-  console.log("is Selectrd:?", isSelected)
   return (
     <DroppableItem id={question.id}>
       <div

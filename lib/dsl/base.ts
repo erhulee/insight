@@ -9,6 +9,7 @@ const QuestionType = z.enum([
   'single',
   'multiple',
   'rating',
+  // 时间选择器
   'date',
   'number',
 ])

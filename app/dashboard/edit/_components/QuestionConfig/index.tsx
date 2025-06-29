@@ -7,6 +7,7 @@ import { useSnapshot } from 'valtio'
 import { RuntimeDSLAction, runtimeStore } from '@/app/dashboard/_valtio/runtime'
 import { BasicConfig } from './basic'
 import { InputConfig } from './input'
+import { DateConfig } from './date'
 
 export function QuestionConfig() {
   const runtimeState = useSnapshot(runtimeStore)
@@ -46,9 +47,15 @@ export function QuestionConfig() {
             }}
           >
             <BasicConfig></BasicConfig>
-            {(selectedQuestion?.type == 'input' || selectedQuestion?.type == 'textarea') && (
-              <InputConfig></InputConfig>
-            )}
+            {(() => {
+              switch (selectedQuestion?.type) {
+                case "input":
+                case "textarea":
+                  return <InputConfig></InputConfig>
+                case "date":
+                  return <DateConfig></DateConfig>
+              }
+            })()}
           </Form>
         </TabsContent>
 

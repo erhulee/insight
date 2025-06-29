@@ -5,7 +5,6 @@ export function AntdRender(props: { questions: Array<InputQuestion> }) {
   return (
     <Form>
       {questions.map((question, index) => {
-        console.log(question)
         const { name, id, required } = question
         switch (question.type) {
           case 'text':

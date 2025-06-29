@@ -1,4 +1,5 @@
 import {
+  DatePickerQuestionSchemaType,
   MultipleQuestionSchemaType,
   QuestionSchemaType,
   SingleQuestionSchemaType,
@@ -6,9 +7,12 @@ import {
 import { Input } from 'antd'
 import { MultipleQuestion } from './multiple'
 import { SingleQuestion } from '../form-item/single/render'
+import { DatePicker } from '../form-item/date-picker'
 
 export function QuestionRender(props: { question: QuestionSchemaType }) {
   const { question } = props
+  console.log("Q:", question)
+
   switch (question.type) {
     case 'input':
       return <Input
@@ -28,6 +32,8 @@ export function QuestionRender(props: { question: QuestionSchemaType }) {
       return <MultipleQuestion dsl={question as MultipleQuestionSchemaType}></MultipleQuestion>
     case 'single':
       return <SingleQuestion dsl={question as SingleQuestionSchemaType} ></SingleQuestion>
+    case "date":
+      return <DatePicker dsl={question as DatePickerQuestionSchemaType}></DatePicker>
     // case QuestionType.Radio:
     //   return (
     //     <Radio.Group
