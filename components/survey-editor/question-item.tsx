@@ -1,7 +1,6 @@
 'use client'
 import type React from 'react'
 import { useRef, useEffect } from 'react'
-import type { Question } from '@/lib/types'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { GripVertical, Trash2, Copy } from 'lucide-react'
@@ -9,6 +8,7 @@ import { useDragDrop } from './drag-drop-context'
 import { cn } from '@/lib/utils'
 import { Badge } from '../ui/badge'
 import { QuestionRender } from './buildin/form-runtime/question-render'
+import { Question } from '@/lib/api-types'
 
 interface QuestionItemProps {
   question: Question

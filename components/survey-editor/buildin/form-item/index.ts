@@ -3,6 +3,7 @@ import { meta as TextareaMeta } from './text-area/textArea'
 import { meta as MultipleMeta } from './checkbox/checkbox'
 import { meta as SingleMeta } from './single/schema'
 import { meta as DatePickerMeta } from './date-picker/schema'
+import { DescriptionMeta } from './description'
 
 export { QuestionType } from './core/QuestionType'
 
@@ -11,5 +12,6 @@ export const preset = [
     TextareaMeta,
     MultipleMeta,
     SingleMeta,
-    DatePickerMeta
+    DatePickerMeta,
+    DescriptionMeta,
 ]
