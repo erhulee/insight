@@ -24,7 +24,7 @@ export function WidgetPanel() {
     addQuestion(newQuestion)
   }
   return (
-    <div className="w-64 border-r bg-muted/30 overflow-y-auto hidden lg:block">
+    <div className="w-64 border-r bg-muted/30 overflow-y-auto hidden lg:block fixed top-[64px] left-0 h-screen">
       <div className="p-4 border-b">
         <h3 className="text-sm font-medium mb-2">基础模块</h3>
         <div className="grid grid-cols-2 gap-2">

@@ -158,7 +158,7 @@ export default function EditSurveyPage(props: {
     return <div>程序异常</div>
   } else {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col w-full">
         {/* 顶部导航栏 */}
         <EditHeader
           handleShareSurvey={handleShareSurvey}
@@ -168,62 +168,65 @@ export default function EditSurveyPage(props: {
         ></EditHeader>
         {/* 主要内容区域 - 三栏布局 */}
         <DragDropProvider>
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden w-screen">
             {/* 左侧面板 - 问题类型 */}
             <WidgetPanel></WidgetPanel>
             {/* 中间面板 - 问题列表/预览 */}
-            {isLoading ? (
-              <div>loading...</div>
-            ) : (
-              <div className="flex-1 overflow-hidden">
-                <div className=" py-2 px-4 flex justify-between">
-                  <div className=" flex flex-row items-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <AlignJustify className=" w-4 h-4"></AlignJustify>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom">
-                        <DropdownMenuItem
-                          className=" text-sm"
-                          onClick={() => {
-                            createTemplate()
-                          }}
-                        >
-                          <BookTemplate></BookTemplate>
-                          <span className=" text-sm">保存为模版</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <RenameInput
-                      id={survey.id}
-                      title={survey.name}
-                      onUpdate={renameSurvey}
-                    ></RenameInput>
+            <div className=' ml-[255px] mr-[320px] w-full'>
+              {isLoading ? (
+                <div>loading...</div>
+              ) : (
+                <div className="flex-1 overflow-hidden">
+                  <div className=" py-2 px-4 flex justify-between">
+                    <div className=" flex flex-row items-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <AlignJustify className=" w-4 h-4"></AlignJustify>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="bottom">
+                          <DropdownMenuItem
+                            className=" text-sm"
+                            onClick={() => {
+                              createTemplate()
+                            }}
+                          >
+                            <BookTemplate></BookTemplate>
+                            <span className=" text-sm">保存为模版</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <RenameInput
+                        id={survey.id}
+                        title={survey.name}
+                        onUpdate={renameSurvey}
+                      ></RenameInput>
+                    </div>
+                    <SurveyPagiNation></SurveyPagiNation>
+                    <ToggleGroup
+                      type="single"
+                      size="sm"
+                      value={activeTab}
+                      onValueChange={(v) => {
+                        setActiveTab(v as any)
+                      }}
+                    >
+                      <ToggleGroupItem value="json">
+                        <Braces></Braces>
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="design">
+                        <Brush></Brush>
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="preview">
+                        <Eye></Eye>
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                   </div>
-                  <SurveyPagiNation></SurveyPagiNation>
-                  <ToggleGroup
-                    type="single"
-                    size="sm"
-                    value={activeTab}
-                    onValueChange={(v) => {
-                      setActiveTab(v as any)
-                    }}
-                  >
-                    <ToggleGroupItem value="json">
-                      <Braces></Braces>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="design">
-                      <Brush></Brush>
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="preview">
-                      <Eye></Eye>
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+                  {activeTab === 'json' && <JsonEditor></JsonEditor>}
+                  {activeTab === 'design' && <Canvas></Canvas>}
                 </div>
-                {activeTab === 'json' && <JsonEditor></JsonEditor>}
-                {activeTab === 'design' && <Canvas></Canvas>}
-              </div>
-            )}
+              )}
+            </div>
+
             {/* 右侧面板 - 问题设置 */}
             <EditQuestionConfig></EditQuestionConfig>
           </div>
