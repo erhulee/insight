@@ -25,17 +25,18 @@ interface UseSortableOptionsReturn {
   handleDragEnd: (event: DragEndEvent) => void
   addOption: () => void
   updateOption: (index: number, label: string) => void
+  deleteOption: (id: string) => void
   activeItem: SortableOption | null
 }
 
 export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOptionsReturn {
   const { props } = dsl
   const { options } = props!
-  
+
   // State for drag overlay
   const [activeId, setActiveId] = useState<string | null>(null)
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -67,7 +68,7 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
       value: generateUniqueId(),
       id: generateUniqueId(),
     }
-    
+
     RuntimeDSLAction.updateQuestion('props', {
       props: {
         ...props,
@@ -79,6 +80,16 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
   const updateOption = useCallback((index: number, label: string) => {
     const newOptions = cloneDeep(options)
     newOptions[index].label = label
+    RuntimeDSLAction.updateQuestion('props', {
+      props: {
+        ...props,
+        options: newOptions
+      },
+    })
+  }, [props, options])
+
+  const deleteOption = useCallback((id: string) => {
+    const newOptions = options.filter(item => item.id !== id)
     RuntimeDSLAction.updateQuestion('props', {
       props: {
         ...props,
@@ -103,7 +114,7 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
       clearTimeout(animationTimeoutRef.current)
       animationTimeoutRef.current = null
     }
-    
+
     setActiveId(event.active.id as string)
     // 还需要选中 selectedQuestionID
     RuntimeDSLAction.selectQuestion(dsl.id)
@@ -120,7 +131,7 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
     if (active.id !== over.id) {
       const oldIndex = sortableItems.findIndex(item => item.id === active.id)
       const newIndex = sortableItems.findIndex(item => item.id === over.id)
-      
+
       if (oldIndex !== -1 && newIndex !== -1) {
         reorderOptions(oldIndex, newIndex)
       }
@@ -141,6 +152,7 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
     handleDragEnd,
     addOption,
     updateOption,
+    deleteOption,
     activeItem,
   }
 } 

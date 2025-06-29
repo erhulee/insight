@@ -1,20 +1,21 @@
 export interface Option {
-  label: string
-  value: string
-  id?: string
+    label: string
+    value: string
+    id?: string
 }
 
 export interface SortableOption extends Option {
-  id: string
+    id: string
 }
 
 export interface SingleQuestionItemProps {
-  label: string
-  index: number
-  onLabelChange: (label: string) => void
-  id: string
+    label: string
+    index: number
+    id: string
+    onLabelChange: (label: string) => void
+    onDelete: (id: string) => void
 }
 
 export interface SingleQuestionProps {
-  dsl: any // SingleQuestionSchemaType
+    dsl: any // SingleQuestionSchemaType
 } 

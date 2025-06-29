@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Radio } from 'antd'
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, XIcon } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import {
   DndContext,
@@ -20,7 +20,8 @@ import { useCardSelection } from './hooks/useCardSelection'
 import { SingleQuestionItemProps, SingleQuestionProps } from './types'
 
 // Sortable item component
-function SortableQuestionItem({ label, index, onLabelChange, id }: SingleQuestionItemProps) {
+function SortableQuestionItem(props: SingleQuestionItemProps) {
+  const { label, id, onDelete, onLabelChange } = props
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const {
@@ -61,6 +62,9 @@ function SortableQuestionItem({ label, index, onLabelChange, id }: SingleQuestio
         onClick={(e) => e.stopPropagation()}
         onFocus={(e) => e.target.select()}
       />
+      <Button variant="secondary" size="sm" onClick={() => onDelete(id)}>
+        <XIcon width={18} height={18}></XIcon>
+      </Button>
     </div>
   )
 }
@@ -102,6 +106,7 @@ export function SingleQuestion({ dsl }: SingleQuestionProps) {
     handleDragEnd,
     addOption,
     updateOption,
+    deleteOption,
     activeItem,
   } = useSortableOptions(dsl)
 
@@ -147,6 +152,7 @@ export function SingleQuestion({ dsl }: SingleQuestionProps) {
                   label={opt.label}
                   index={index}
                   onLabelChange={(label) => updateOption(index, label)}
+                  onDelete={(id) => deleteOption(id)}
                 />
               ))}
             </div>

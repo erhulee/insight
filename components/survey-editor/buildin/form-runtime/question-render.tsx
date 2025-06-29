@@ -7,8 +7,8 @@ import { Input } from 'antd'
 import { MultipleQuestion } from './multiple'
 import { SingleQuestion } from '../form-item/single/render'
 
-export function QuestionRender(props: { question: QuestionSchemaType, updateQuestion: (question: QuestionSchemaType) => void }) {
-  const { question, updateQuestion } = props
+export function QuestionRender(props: { question: QuestionSchemaType }) {
+  const { question } = props
   switch (question.type) {
     case 'input':
       return <Input
