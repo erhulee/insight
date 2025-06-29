@@ -77,6 +77,7 @@ export const SingleQuestionSchema = QuestionSchema.extend({
           z.object({
             label: z.string(),
             value: z.string(),
+            id: z.string(),
           }),
         )
         .optional()
@@ -84,6 +85,7 @@ export const SingleQuestionSchema = QuestionSchema.extend({
           {
             label: '选项1',
             value: 'value1',
+            id: 'option1',
           },
         ]),
     })

@@ -110,6 +110,10 @@ export const updateRuntimeQuestion = (question: QuestionSchemaType[]) => {
 }
 
 export const RuntimeDSLAction = {
+  selectQuestion: (questionId: string) => {
+    runtimeStore.selectedQuestionID = questionId
+    updateCurrentQuestion()
+  },
   updateQuestion: (
     action: 'props' | 'form-basic',
     params: {

@@ -1,15 +1,14 @@
 import {
   MultipleQuestionSchemaType,
   QuestionSchemaType,
-  SingleQuestionSchema,
   SingleQuestionSchemaType,
 } from '@/lib/dsl'
-import { Checkbox, Input } from 'antd'
+import { Input } from 'antd'
 import { MultipleQuestion } from './multiple'
 import { SingleQuestion } from '../form-item/single/render'
 
-export function QuestionRender(props: { question: QuestionSchemaType }) {
-  const { question } = props
+export function QuestionRender(props: { question: QuestionSchemaType, updateQuestion: (question: QuestionSchemaType) => void }) {
+  const { question, updateQuestion } = props
   switch (question.type) {
     case 'input':
       return <Input
@@ -28,7 +27,7 @@ export function QuestionRender(props: { question: QuestionSchemaType }) {
     case 'multiple':
       return <MultipleQuestion dsl={question as MultipleQuestionSchemaType}></MultipleQuestion>
     case 'single':
-      return <SingleQuestion dsl={question as SingleQuestionSchemaType}></SingleQuestion>
+      return <SingleQuestion dsl={question as SingleQuestionSchemaType} ></SingleQuestion>
     // case QuestionType.Radio:
     //   return (
     //     <Radio.Group
