@@ -1,11 +1,16 @@
-// Main component
+/**
+ * 单选题组件模块
+ * 提供单选题的渲染、拖拽排序、选项管理等功能
+ */
+
+// 主组件导出
 export { SingleQuestion } from './render'
 
-// Hooks
+// 自定义 Hook 导出
 export { useSortableOptions } from './hooks/useSortableOptions'
 export { useCardSelection } from './hooks/useCardSelection'
 
-// Types
+// 类型定义导出
 export type {
   Option,
   SortableOption,
@@ -13,7 +18,7 @@ export type {
   SingleQuestionProps,
 } from './types'
 
-// Utils
+// 工具函数导出
 export {
   generateUniqueId,
   generateUniqueIdWithPrefix,
