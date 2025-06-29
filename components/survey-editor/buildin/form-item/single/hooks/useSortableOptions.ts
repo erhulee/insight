@@ -28,7 +28,6 @@ interface UseSortableOptionsReturn {
   activeItem: SortableOption | null
 }
 
-
 export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOptionsReturn {
   const { props } = dsl
   const { options } = props!
@@ -37,11 +36,10 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
   const [activeId, setActiveId] = useState<string | null>(null)
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
-  // Configure sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 5, // 减少激活距离
       },
     }),
     useSensor(KeyboardSensor, {
@@ -62,8 +60,8 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
   }, [])
 
   const addOption = useCallback(() => {
-     // 还需要选中 selectedQuestionID
-     RuntimeDSLAction.selectQuestion(dsl.id)
+    // 还需要选中 selectedQuestionID
+    RuntimeDSLAction.selectQuestion(dsl.id)
     const newOption = {
       label: '新选项',
       value: generateUniqueId(),
@@ -128,11 +126,8 @@ export function useSortableOptions(dsl: SingleQuestionSchemaType): UseSortableOp
       }
     }
 
-    // 使用更长的延迟，让 overlay 有时间移动到新位置
-    animationTimeoutRef.current = setTimeout(() => {
-      setActiveId(null)
-      animationTimeoutRef.current = null
-    }, 250)
+    // 立即清除 activeId，避免闪烁动画
+    setActiveId(null)
   }, [sortableItems, reorderOptions])
 
   // Get the active item for overlay

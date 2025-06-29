@@ -38,15 +38,15 @@ function SortableQuestionItem({ label, index, onLabelChange, id }: SingleQuestio
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+    transition: isDragging ? 'none' : transition, // 拖拽时禁用过渡动画
+    opacity: isDragging ? 0.3 : 1, // 降低拖拽时的透明度
   }
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-slate-100 p-2 rounded-md flex items-center gap-2 cursor-move transition-all duration-200 ${isDragging ? 'shadow-lg scale-105' : 'hover:bg-slate-200'
+      className={`bg-slate-100 p-2 rounded-md flex items-center gap-2 cursor-move ${isDragging ? 'shadow-lg scale-105 z-10' : 'hover:bg-slate-200 transition-colors duration-150'
         }`}
       {...attributes}
       {...listeners}
