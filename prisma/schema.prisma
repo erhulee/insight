@@ -18,6 +18,14 @@ model User {
   account  String @unique
   username String
   password String
+  
+  // 关联关系
+  surveys        Survey[]
+  templates      RenderTemplate[]
+  apiKeys        ApiKey[]
+  renderConfigs  RenderConfig[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Survey {
@@ -31,6 +39,10 @@ model Survey {
   deletedAt   DateTime?
   published   Boolean   @default(false)
   pageCount   Int       @default(1)
+  
+  // 关联关系
+  owner       User      @relation(fields: [ownerId], references: [id])
+  responses   Questionnaires[]
 }
 
 model Questionnaires {
@@ -38,6 +50,9 @@ model Questionnaires {
   surveyId  String
   Question  Json
   createdAt DateTime @default(now())
+  
+  // 关联关系
+  survey    Survey   @relation(fields: [surveyId], references: [id])
 }
 
 model SurverTemplate {
@@ -48,4 +63,87 @@ model SurverTemplate {
   questions Json
   createdAt DateTime @default(now())
   createdBy String
+}
+
+// 新增：渲染模板表
+model RenderTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  content     Json     // 模板内容 (React组件配置)
+  config      Json     // 渲染配置
+  tags        String   @default("")
+  category    String   @default("default")
+  version     String   @default("1.0.0")
+  isPublic    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  
+  // 关联关系
+  creator     User     @relation(fields: [createdBy], references: [id])
+  configs     RenderConfig[]
+  apiKeys     ApiKey[]
+}
+
+// 新增：渲染配置表
+model RenderConfig {
+  id           String   @id @default(uuid())
+  name         String
+  templateId   String
+  config       Json     // 渲染配置 (主题、布局、样式等)
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdBy    String
+  
+  // 关联关系
+  template     RenderTemplate @relation(fields: [templateId], references: [id])
+  creator      User           @relation(fields: [createdBy], references: [id])
+}
+
+// 新增：API密钥表
+model ApiKey {
+  id          String   @id @default(uuid())
+  name        String
+  key         String   @unique
+  templateId  String?
+  userId      String
+  permissions Json     // 权限配置
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  lastUsedAt  DateTime?
+  
+  // 关联关系
+  user        User     @relation(fields: [userId], references: [id])
+  template    RenderTemplate? @relation(fields: [templateId], references: [id])
+}
+
+// 新增：渲染日志表
+model RenderLog {
+  id          String   @id @default(uuid())
+  templateId  String
+  apiKeyId    String?
+  userId      String?
+  requestData Json     // 请求数据
+  responseData Json?   // 响应数据
+  renderTime  Int      // 渲染耗时(ms)
+  status      String   // 状态: success, error, timeout
+  errorMessage String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+}
+
+// 新增：数据收集表
+model DataCollection {
+  id          String   @id @default(uuid())
+  templateId  String
+  sessionId   String   // 会话ID
+  data        Json     // 收集的数据
+  metadata    Json?    // 元数据 (IP、UserAgent等)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

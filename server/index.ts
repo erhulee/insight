@@ -247,7 +247,7 @@ export const appRouter = router({
             },
           },
         })
-      } catch {}
+      } catch { }
 
       // 计算按小时的回复个数趋势数据
       const hourlyTrend = questionnaires.reduce(
@@ -313,7 +313,7 @@ export const appRouter = router({
               surveyId: item.id,
             },
           })
-        } catch {}
+        } catch { }
         return {
           ...item,
           questions: _questions(item.questions ?? []),

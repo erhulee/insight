@@ -27,6 +27,8 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  // Docker部署配置
+  output: 'standalone',
 }
 
 if (userConfig) {
