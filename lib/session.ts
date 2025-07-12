@@ -1,44 +1,33 @@
 import 'server-only'
-import { JWTPayload, SignJWT, jwtVerify } from 'jose'
-import { cookies } from 'next/headers'
+import { JWTPayload } from 'jose'
+import jwt from 'jsonwebtoken'
+import redis from './redis'
 
-const secretKey = process.env.SESSION_SECRET
-const encodedKey = new TextEncoder().encode(secretKey)
+const JWT_SECRET = process.env.SESSION_SECRET || 'default_secret'
+const EXPIRES_IN = '7d' // 7天
 
-export async function encrypt(payload: JWTPayload) {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(encodedKey)
+// 生成JWT并存入Redis
+export async function createSession(userId: string) {
+  const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_IN })
+  // 以userId为key存token，便于单点登录和登出
+  await redis.set(`jwt:${userId}`, token, 'EX', 7 * 24 * 60 * 60)
+  return token
 }
 
-export async function decrypt(session: string | undefined = '') {
+// 校验JWT并查Redis
+export async function decrypt(token: string | undefined = ''): Promise<JWTPayload | null> {
+  if (!token) return null
   try {
-    const { payload } = await jwtVerify(session, encodedKey, {
-      algorithms: ['HS256'],
-    })
+    const payload = jwt.verify(token, JWT_SECRET) as JWTPayload & { userId: string }
+    const redisToken = await redis.get(`jwt:${payload.userId}`)
+    if (redisToken !== token) return null
     return payload
   } catch (error) {
-    console.log('Failed to verify session')
+    return null
   }
 }
 
-export async function createSession(userId: string) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  const session = await encrypt({ userId, expiresAt })
-  const cookieStore = await cookies()
-
-  cookieStore.set('session', session, {
-    httpOnly: true,
-    secure: false,
-    expires: expiresAt,
-    sameSite: 'lax',
-    path: '/',
-  })
-}
-
-export async function deleteSession() {
-  const cookieStore = await cookies()
-  cookieStore.delete('session')
+// 删除Redis中的JWT
+export async function deleteSession(userId: string) {
+  await redis.del(`jwt:${userId}`)
 }

@@ -17,11 +17,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Mail, Lock, ArrowRight } from 'lucide-react'
 import { InsightBrand } from '@/components/common/insight-brand'
 import { trpc } from '../_trpc/client'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useLocalStorage } from 'react-use'
 import { toast } from 'sonner'
+import { setAuthToken } from '@/lib/auth'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [localValue, updateLocalValue, remove] = useLocalStorage<{
     account: string
     password: string
@@ -71,7 +73,10 @@ export default function LoginPage() {
         password: formData.password,
       })
 
-      if (res) {
+      if (res && res.token) {
+        // 存储 JWT token 到 localStorage
+        setAuthToken(res.token)
+
         // 处理记住密码
         if (formData.rememberMe) {
           updateLocalValue({
@@ -86,12 +91,13 @@ export default function LoginPage() {
 
         // 延迟跳转，让用户看到成功提示
         setTimeout(() => {
-          redirect('/dashboard')
+          router.push('/dashboard')
         }, 1000)
       }
     } catch (error) {
       // 登录失败时不清除已保存的密码
       console.error('Login failed:', error)
+      toast.error('登录失败，请检查账号和密码')
     }
   }
   return (
@@ -198,8 +204,8 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                还没有账号?{' '}
-                <Link href="/register" className="text-primary hover:underline">
+                <span className="text-muted-foreground">还没有账户？</span>
+                <Link href="/register" className="text-primary hover:underline ml-1">
                   立即注册
                 </Link>
               </div>

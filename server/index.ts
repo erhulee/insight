@@ -1,25 +1,11 @@
-import { procedure, router } from './trpc'
-import { cookies } from 'next/headers'
-import { createSession, decrypt } from '@/lib/session'
+import { procedure, router, protectedProcedure, createContext } from './trpc'
+import { createSession, deleteSession } from '@/lib/session'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 
 const prisma = new PrismaClient()
-const getUid = async () => {
-  try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('session')?.value
-    const payload: any = await decrypt(token)
-    const userId: string = payload['userId']
-    return userId
-  } catch (e) {
-    throw new TRPCError({
-      message: '未登录',
-      code: 'UNAUTHORIZED',
-    })
-  }
-}
+
 export const appRouter = router({
   Login: procedure
     .input(
@@ -42,26 +28,73 @@ export const appRouter = router({
           code: 'UNAUTHORIZED',
         })
       } else {
-        await createSession(User.id)
-        return User
+        // 生成JWT并存入Redis，返回token给前端
+        const token = await createSession(User.id)
+        return { user: User, token }
       }
     }),
-  GetUserInfo: procedure.query(async () => {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('session')?.value
-    const payload: any = await decrypt(token)
-    if (!payload) {
-      return null
-    } else {
-      const userId: string = payload['userId']
-      return await prisma.user.findUnique({
+
+  CreateUser: procedure
+    .input(
+      z.object({
+        account: z.string(),
+        password: z.string(),
+        username: z.string(),
+      }),
+    )
+    .mutation(async (opt) => {
+      const { account, password, username } = opt.input
+
+      // 检查账号是否已存在
+      const existingUser = await prisma.user.findUnique({
         where: {
-          id: userId,
+          account: account,
         },
       })
-    }
+
+      if (existingUser) {
+        throw new TRPCError({
+          message: '账号已存在',
+          code: 'CONFLICT',
+        })
+      }
+
+      try {
+        const user = await prisma.user.create({
+          data: {
+            account: account,
+            password: password,
+            username: username,
+          },
+        })
+
+        // 注册成功后自动生成 token
+        const token = await createSession(user.id)
+        return { user, token }
+      } catch (e) {
+        throw new TRPCError({
+          message: '注册失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  Logout: protectedProcedure.mutation(async (opt) => {
+    const userId = opt.ctx.userId!
+    await deleteSession(userId)
+    return { success: true }
   }),
-  UpdateUserInfo: procedure
+
+  GetUserInfo: protectedProcedure.query(async (opt) => {
+    const userId = opt.ctx.userId!
+    return await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    })
+  }),
+
+  UpdateUserInfo: protectedProcedure
     .input(
       z.object({
         name: z.string().optional(),
@@ -70,12 +103,12 @@ export const appRouter = router({
       }),
     )
     .mutation(async (opt) => {
-      const uid = await getUid()
+      const userId = opt.ctx.userId!
       const { name, password, current_password } = opt.input
       if (name) {
         const user = await prisma.user.update({
           where: {
-            id: uid,
+            id: userId,
           },
           data: {
             username: name,
@@ -86,7 +119,7 @@ export const appRouter = router({
       if (password && current_password) {
         const user = await prisma.user.update({
           where: {
-            id: uid,
+            id: userId,
             password: current_password,
           },
           data: {
@@ -97,6 +130,7 @@ export const appRouter = router({
       }
       return true
     }),
+
   SubmitSurvey: procedure
     .input(
       z.object({
@@ -122,7 +156,8 @@ export const appRouter = router({
         })
       }
     }),
-  SaveSurvey: procedure
+
+  SaveSurvey: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -149,7 +184,8 @@ export const appRouter = router({
         })
       }
     }),
-  UpdateSurvey: procedure
+
+  UpdateSurvey: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -158,12 +194,12 @@ export const appRouter = router({
     )
     .mutation(async (opt) => {
       const { id, title } = opt.input
-      const uid = await getUid()
+      const userId = opt.ctx.userId!
       try {
         const response = await prisma.survey.update({
           where: {
             id: id,
-            ownerId: uid,
+            ownerId: userId,
           },
           data: {
             name: title,
@@ -178,7 +214,8 @@ export const appRouter = router({
         })
       }
     }),
-  GetSurvey: procedure
+
+  GetSurvey: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -186,7 +223,7 @@ export const appRouter = router({
     )
     .query(async (opt) => {
       try {
-        const userId = await getUid()
+        const userId = opt.ctx.userId!
         const survey = await prisma.survey.findUnique({
           where: {
             ownerId: userId,
@@ -200,289 +237,375 @@ export const appRouter = router({
           return null
         }
       } catch (e) {
-        console.log(e)
-        return null
+        throw new TRPCError({
+          message: '获取问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
       }
     }),
-  GetSurveyResult: procedure
+
+  GetSurveyList: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        page: z.number().optional(),
+        limit: z.number().optional(),
       }),
     )
     .query(async (opt) => {
-      const cookieStore = await cookies()
-      const token = cookieStore.get('session')?.value
-      const payload: any = await decrypt(token)
-      if (payload == null) {
-        throw new TRPCError({
-          message: '未登录',
-          code: 'UNAUTHORIZED',
-        })
-      }
-      const userId: string = payload['userId']
-      const survey = await prisma.survey.findFirst({
-        where: {
-          ownerId: userId,
-          id: opt.input.id,
-        },
-      })
-      if (survey == null) {
-        throw new TRPCError({
-          message: '问卷不存在',
-          code: 'NOT_FOUND',
-        })
-      }
-      //@ts-ignore
-      survey.questions = JSON.parse(survey.questions ?? '[]') // TODO: 类型不匹配，需要修复，暂时先这样用着，后面再改
-      let questionnaires: Questionnaires[] = []
       try {
-        questionnaires = await prisma.questionnaires.findMany({
-          where: {
-            surveyId: opt.input.id,
-            // 近30天
-            createdAt: {
-              gte: new Date(new Date().setDate(new Date().getDate() - 7)),
-              lte: new Date(),
-            },
-          },
-        })
-      } catch { }
+        const userId = opt.ctx.userId!
+        const page = opt.input.page || 1
+        const limit = opt.input.limit || 10
+        const skip = (page - 1) * limit
 
-      // 计算按小时的回复个数趋势数据
-      const hourlyTrend = questionnaires.reduce(
-        (acc, curr) => {
-          const date = new Date(curr.createdAt)
-          const hour = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:00`
-          acc[hour] = (acc[hour] || 0) + 1
-          return acc
-        },
-        {} as Record<string, number>,
-      )
-
-      // 填充缺失的小时段
-      const startDate = new Date(new Date().setDate(new Date().getDate() - 30))
-      const endDate = new Date()
-      for (let d = startDate; d <= endDate; d.setHours(d.getHours() + 1)) {
-        const hour = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:00`
-        if (!hourlyTrend[hour]) {
-          hourlyTrend[hour] = 0
-        }
-      }
-      const trendList = Object.entries(hourlyTrend)
-        .map(([date, count]) => ({
-          date,
-          count,
-        }))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      return {
-        survey,
-        questionnaires,
-        trendList,
-      }
-    }),
-  GetSurveyList: procedure.query(async () => {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('session')?.value
-    const payload: any = await decrypt(token)
-    if (payload == null) {
-      throw new TRPCError({
-        message: '未登录',
-        code: 'UNAUTHORIZED',
-      })
-    }
-    const userId: string = payload['userId']
-    const surveyList = await prisma.survey.findMany({
-      where: {
-        ownerId: userId,
-      },
-    })
-    const _questions = (question: string | any) => {
-      if (typeof question === 'string') {
-        return JSON.parse(question)
-      } else {
-        return question
-      }
-    }
-    const transformList = await Promise.all(
-      surveyList.map(async (item) => {
-        let questionnairesInfo: Array<Questionnaires> = []
-        try {
-          questionnairesInfo = await prisma.questionnaires.findMany({
+        const [surveys, total] = await Promise.all([
+          prisma.survey.findMany({
             where: {
-              surveyId: item.id,
+              ownerId: userId,
+              deletedAt: null,
             },
-          })
-        } catch { }
+            skip,
+            take: limit,
+            orderBy: {
+              createdAt: 'desc',
+            },
+          }),
+          prisma.survey.count({
+            where: {
+              ownerId: userId,
+              deletedAt: null,
+            },
+          }),
+        ])
+
         return {
-          ...item,
-          questions: _questions(item.questions ?? []),
-          questionnairesCnt: questionnairesInfo.length,
+          surveys,
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
         }
-      }),
-    )
-    return transformList
-  }),
-  CreateSurveyByTemplate: procedure
-    .input(
-      z.object({
-        templateId: z.string(),
-      }),
-    )
-    .mutation(async (opt) => {
-      const { templateId } = opt.input
-      const uid = await getUid()
-      const template = await prisma.surverTemplate.findUnique({
-        where: {
-          id: templateId,
-        },
-      })
-      if (template == null) {
+      } catch (e) {
         throw new TRPCError({
-          message: '模板不存在',
-          code: 'NOT_FOUND',
-        })
-      }
-      const survey = await prisma.survey.create({
-        data: {
-          ownerId: uid,
-          name: template.name,
-          description: '',
-          //@ts-ignore
-          questions: template.questions,
-          pageCount: 1,
-        },
-      })
-      if (survey == null) {
-        throw new TRPCError({
-          message: '创建失败',
+          message: '获取问卷列表失败',
           code: 'INTERNAL_SERVER_ERROR',
         })
-      } else {
-        return survey
       }
     }),
-  CreateSurvey: procedure
+
+  CreateSurvey: protectedProcedure
     .input(
       z.object({
-        name: z.string().optional(),
+        name: z.string(),
         description: z.string().optional(),
       }),
     )
     .mutation(async (opt) => {
-      const { name = '未命名', description = '' } = opt.input
-      const cookieStore = await cookies()
-      const token = cookieStore.get('session')?.value
-      const payload: any = await decrypt(token)
-      const userId: string = payload['userId']
-
       try {
+        const userId = opt.ctx.userId!
         const survey = await prisma.survey.create({
           data: {
             ownerId: userId,
-            name: name,
-            description: description,
-            questions: JSON.stringify([]),
+            name: opt.input.name,
+            description: opt.input.description || '',
+            questions: [],
+            published: false,
             pageCount: 1,
           },
         })
         return survey
       } catch (e) {
-        console.log('err:', e)
         throw new TRPCError({
-          message: '创建失败',
+          message: '创建问卷失败',
           code: 'INTERNAL_SERVER_ERROR',
         })
       }
     }),
-  InsertSurveyNewPage: procedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
-    .mutation(async (opt) => {
-      const { id } = opt.input
-      const cookieStore = await cookies()
-      const token = cookieStore.get('session')?.value
-      const payload: any = await decrypt(token)
-      const userId: string = payload['userId']
-      const survey = await prisma.survey.update({
-        where: {
-          ownerId: userId,
-          id: id,
-        },
-        data: {
-          pageCount: {
-            increment: 1,
-          },
-        },
-      })
-      return survey
-    }),
-  DeleteSurvey: procedure
-    .input(
-      z.object({
-        id: z.string(),
-      }),
-    )
-    .mutation(async (opt) => {
-      const { id } = opt.input
-      const cookieStore = await cookies()
-      const token = cookieStore.get('session')?.value
-      const payload: any = await decrypt(token)
-      const userId: string = payload['userId']
-      const ok = await prisma.survey.delete({
-        where: {
-          ownerId: userId,
-          id: id,
-        },
-      })
-      return Boolean(ok)
-    }),
-  GetTemplate: procedure.query(async () => {
-    const templates = await prisma.surverTemplate.findMany({})
 
-    return templates.map((item) => {
-      console.log(item.questions, typeof item.questions)
-      return {
-        id: item.id,
-        name: item.name,
-        tags: item.tags.split(','),
-        questionsCnt: 3,
+  DeleteSurvey: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const userId = opt.ctx.userId!
+        const survey = await prisma.survey.update({
+          where: {
+            id: opt.input.id,
+            ownerId: userId,
+          },
+          data: {
+            deletedAt: new Date(),
+          },
+        })
+        return survey
+      } catch (e) {
+        throw new TRPCError({
+          message: '删除问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
       }
-    })
-  }),
-  CreateTemplateSurvey: procedure
+    }),
+
+  PublishSurvey: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        published: z.boolean(),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const userId = opt.ctx.userId!
+        const survey = await prisma.survey.update({
+          where: {
+            id: opt.input.id,
+            ownerId: userId,
+          },
+          data: {
+            published: opt.input.published,
+          },
+        })
+        return survey
+      } catch (e) {
+        throw new TRPCError({
+          message: '发布问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  GetSurveyResponses: protectedProcedure
+    .input(
+      z.object({
+        surveyId: z.string(),
+        page: z.number().optional(),
+        limit: z.number().optional(),
+      }),
+    )
+    .query(async (opt) => {
+      try {
+        const userId = opt.ctx.userId!
+        const page = opt.input.page || 1
+        const limit = opt.input.limit || 10
+        const skip = (page - 1) * limit
+
+        // 验证问卷所有权
+        const survey = await prisma.survey.findUnique({
+          where: {
+            id: opt.input.surveyId,
+            ownerId: userId,
+          },
+        })
+
+        if (!survey) {
+          throw new TRPCError({
+            message: '问卷不存在或无权限访问',
+            code: 'NOT_FOUND',
+          })
+        }
+
+        const [responses, total] = await Promise.all([
+          prisma.questionnaires.findMany({
+            where: {
+              surveyId: opt.input.surveyId,
+            },
+            skip,
+            take: limit,
+            orderBy: {
+              createdAt: 'desc',
+            },
+          }),
+          prisma.questionnaires.count({
+            where: {
+              surveyId: opt.input.surveyId,
+            },
+          }),
+        ])
+
+        return {
+          responses,
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit),
+        }
+      } catch (e) {
+        if (e instanceof TRPCError) throw e
+        throw new TRPCError({
+          message: '获取问卷回复失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  GetSurveyTemplates: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().optional(),
+        limit: z.number().optional(),
+        category: z.string().optional(),
+        tags: z.string().optional(),
+      }),
+    )
+    .query(async (opt) => {
+      try {
+        const page = opt.input.page || 1
+        const limit = opt.input.limit || 10
+        const skip = (page - 1) * limit
+
+        const where: any = { isActive: true }
+        if (opt.input.category) {
+          where.category = opt.input.category
+        }
+        if (opt.input.tags) {
+          where.tags = { contains: opt.input.tags }
+        }
+
+        const [templates, total] = await Promise.all([
+          prisma.renderTemplate.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              tags: true,
+              category: true,
+              version: true,
+              isPublic: true,
+              createdAt: true,
+              updatedAt: true,
+              creator: {
+                select: {
+                  id: true,
+                  username: true
+                }
+              }
+            }
+          }),
+          prisma.renderTemplate.count({ where })
+        ])
+
+        return {
+          templates,
+          total,
+          page,
+          limit,
+          pages: Math.ceil(total / limit)
+        }
+      } catch (e) {
+        throw new TRPCError({
+          message: '获取模板列表失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  CreateApiKey: protectedProcedure
     .input(
       z.object({
         name: z.string(),
-        questions: z.any(),
-        tags: z.array(z.string()).optional(),
+        templateId: z.string().optional(),
+        permissions: z.record(z.any()).optional(),
+        expiresAt: z.date().optional(),
       }),
     )
     .mutation(async (opt) => {
-      const { name, questions, tags = [] } = opt.input
-      const uid = await getUid()
       try {
-        const template = await prisma.surverTemplate.create({
+        const userId = opt.ctx.userId!
+        const crypto = require('crypto')
+        const key = crypto.randomBytes(32).toString('hex')
+
+        const apiKey = await prisma.apiKey.create({
           data: {
-            name: name,
-            questions: JSON.stringify(questions),
-            tags: tags.join(','),
-            createdBy: uid,
+            name: opt.input.name,
+            key,
+            templateId: opt.input.templateId,
+            userId,
+            permissions: JSON.stringify(opt.input.permissions || {}),
+            expiresAt: opt.input.expiresAt,
           },
         })
-        return template.id
+
+        return { ...apiKey, key } // 只在创建时返回完整key
       } catch (e) {
-        console.log('error:', e)
         throw new TRPCError({
-          message: '创建失败',
+          message: '创建API密钥失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  GetApiKeys: protectedProcedure.query(async (opt) => {
+    try {
+      const userId = opt.ctx.userId!
+      const apiKeys = await prisma.apiKey.findMany({
+        where: {
+          userId,
+          isActive: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          name: true,
+          key: false, // 不返回完整key
+          templateId: true,
+          permissions: true,
+          isActive: true,
+          expiresAt: true,
+          createdAt: true,
+          lastUsedAt: true,
+          template: {
+            select: {
+              id: true,
+              name: true,
+            }
+          }
+        }
+      })
+
+      return apiKeys
+    } catch (e) {
+      throw new TRPCError({
+        message: '获取API密钥列表失败',
+        code: 'INTERNAL_SERVER_ERROR',
+      })
+    }
+  }),
+
+  DeleteApiKey: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const userId = opt.ctx.userId!
+        const apiKey = await prisma.apiKey.update({
+          where: {
+            id: opt.input.id,
+            userId,
+          },
+          data: {
+            isActive: false,
+          },
+        })
+        return apiKey
+      } catch (e) {
+        throw new TRPCError({
+          message: '删除API密钥失败',
           code: 'INTERNAL_SERVER_ERROR',
         })
       }
     }),
 })
 
-// export type definition of API
 export type AppRouter = typeof appRouter
