@@ -11,17 +11,25 @@ export function InputConfig() {
               value: 'any',
             },
             {
-              label: '普通文本',
-              value: 'plain',
+              label: '数字',
+              value: 'digit',
             },
             {
-              label: 'Markdown',
-              value: 'markdown',
+              label: '日期',
+              value: 'date',
             },
             {
-              label: 'HTML',
-              value: 'html',
+              label: '电子邮件',
+              value: 'email',
             },
+            {
+              label: '手机号（中国大陆）',
+              value: 'phone',
+            },
+            {
+              label: "身份证（中国大陆）",
+              value: 'idCard',
+            }
           ]}
         ></Select>
       </Form.Item>

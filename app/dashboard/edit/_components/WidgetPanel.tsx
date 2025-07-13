@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { QuestionSchemaType } from '@/lib/dsl'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
   id: item.type,
@@ -12,6 +14,8 @@ const questionTypes = preset.map((item) => ({
   icon: <item.icon className="h-4 w-4"></item.icon>,
 }))
 export function WidgetPanel() {
+  const path = usePathname()
+  console.log("path:", path)
   const handleAddQuestion = (questionType: string) => {
     const meta = preset.find((item) => item.type === questionType)!
     const id = uuidv4()
@@ -46,15 +50,16 @@ export function WidgetPanel() {
       <div className="p-4">
         <h3 className="text-sm font-medium mb-2">问卷设置</h3>
         <div className="space-y-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full justify-start gap-1"
-            onClick={() => { }}
-          >
-            <Settings className="h-4 w-4" />
-            基本设置
-          </Button>
+          <Link href={`${path}?tab=page`}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start gap-1"
+            >
+              <Settings className="h-4 w-4" />
+              基本设置
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

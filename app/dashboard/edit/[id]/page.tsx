@@ -35,17 +35,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EditQuestionConfig } from '../_components/EditQuestionConfig'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { SuveryPageConfig } from '../_components/SuveryPageConfig'
 
 export default function EditSurveyPage(props: {
   params: Promise<{
     id: string
+  }>,
+  searchParams: Promise<{
+    tab?: "page" | "component"
   }>
 }) {
   const router = useRouter()
   const runtimeState = useSnapshot(runtimeStore)
   const selectedQuestionId = runtimeState.selectedQuestionID
   const params = use(props.params)
+  const searchParams = use(props.searchParams)
+  console.log("searchParams:", searchParams)
   const {
     data: survey,
     isError,
@@ -228,7 +233,7 @@ export default function EditSurveyPage(props: {
             </div>
 
             {/* 右侧面板 - 问题设置 */}
-            <EditQuestionConfig></EditQuestionConfig>
+            {searchParams.tab == "page" ? <SuveryPageConfig></SuveryPageConfig> : <EditQuestionConfig></EditQuestionConfig>}
           </div>
         </DragDropProvider>
         {/* 发布配置 */}
