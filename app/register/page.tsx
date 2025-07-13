@@ -23,8 +23,8 @@ import {
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { create } from '../login/service'
 import { InsightBrand } from '@/components/common/insight-brand'
+import { trpc } from '../_trpc/client'
 const formSchema = z
   .object({
     username: z.string().min(2).max(50),
@@ -46,9 +46,15 @@ export default function RegisterPage() {
       username: '',
     },
   })
+  const registerMutation = trpc.Register.useMutation()
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { account, password, username } = values
-    await create(account, password, username)
+    registerMutation.mutate({
+      account,
+      password,
+      username,
+    })
+    // await create(account, password, username)
   }
   return (
     <div className="min-h-screen flex flex-col">

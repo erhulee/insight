@@ -2,29 +2,20 @@
 
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { createServerTRPCClient } from '@/lib/trpc-server'
 
 // 登录函数 - 使用 tRPC 客户端
 export async function login(account: string, password: string) {
   try {
-    const response = await fetch('/api/trpc/Login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        json: {
-          account,
-          password,
-        },
-      }),
+    const client = createServerTRPCClient()
+
+    // 使用 tRPC 客户端调用登录
+    const result = await client.Login.mutate({
+      account,
+      password,
     })
 
-    if (!response.ok) {
-      throw new Error('登录失败')
-    }
-
-    const result = await response.json()
-    const { user, token } = result.result.data
+    const { user, token } = result
 
     // 将 token 存储到 cookie 中（兼容 SSR）
     const cookieStore = await cookies()
@@ -39,35 +30,6 @@ export async function login(account: string, password: string) {
     redirect('/dashboard')
   } catch (error) {
     console.error('登录失败:', error)
-    throw error
-  }
-}
-
-// 注册函数
-export async function create(account: string, password: string, username: string) {
-  try {
-    const response = await fetch('/api/trpc/CreateUser', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        json: {
-          account,
-          password,
-          username,
-        },
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error('注册失败')
-    }
-
-    // 注册成功后自动登录
-    await login(account, password)
-  } catch (error) {
-    console.error('注册失败:', error)
     throw error
   }
 }

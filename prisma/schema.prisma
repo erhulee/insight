@@ -3,11 +3,6 @@ generator client {
   output   = "../node_modules/.prisma/client"
 }
 
-// datasource db {
-//   provider  = "postgresql"
-//   url       = env("DATABASE_URL")
-//   directUrl = env("DIRECT_URL")
-// }
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")

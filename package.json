@@ -54,6 +54,7 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "antd": "^5.24.8",
     "autoprefixer": "^10.4.20",
+    "chalk": "^5.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",

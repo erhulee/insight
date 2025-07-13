@@ -1,4 +1,3 @@
-import 'server-only'
 import { JWTPayload } from 'jose'
 import jwt from 'jsonwebtoken'
 import redis from './redis'
@@ -16,15 +15,17 @@ export async function createSession(userId: string) {
 
 // 校验JWT并查Redis
 export async function decrypt(token: string | undefined = ''): Promise<JWTPayload | null> {
-  if (!token) return null
-  try {
-    const payload = jwt.verify(token, JWT_SECRET) as JWTPayload & { userId: string }
-    const redisToken = await redis.get(`jwt:${payload.userId}`)
-    if (redisToken !== token) return null
-    return payload
-  } catch (error) {
-    return null
-  }
+  // if (!token) return null
+  // try {
+  //   const payload = jwt.verify(token, JWT_SECRET) as JWTPayload & { userId: string }
+  //   const redisToken = await redis.get(`jwt:${payload.userId}`)
+  //   if (redisToken !== token) return null
+  //   return payload
+  // } catch (error) {
+  //   console.log("decrypt error:", error)
+  //   return null
+  // }
+  return null
 }
 
 // 删除Redis中的JWT

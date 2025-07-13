@@ -1,46 +1,53 @@
-'use client'
-//TODO: 改成 SSR
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+// 移除 'use client' 指令，改为服务端渲染
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PlusCircle, Search, FileText } from 'lucide-react'
 import { SurveyOverview } from '@/app/developer/components/survey-overview'
-import { trpc } from '@/app/_trpc/client'
 import { LayoutHeader } from '@/components/layout-header'
-import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { PrismaClient } from '@prisma/client'
+import { cookies } from 'next/headers'
+import { decrypt } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
-export default function DashboardPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
-  const { data: surveys, isLoading, refetch, error } = trpc.GetSurveyList.useQuery()
-  if (error && error.data?.code == 'UNAUTHORIZED') {
-    toast('未登录或登录已过期, 3秒后为您跳转')
+const prisma = new PrismaClient()
+
+// 获取用户ID的函数
+async function getUserId() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session')?.value
+
+  if (!token) {
     return null
   }
-  // 创建新问卷
-  const deleteMutation = trpc.DeleteSurvey.useMutation({
-    onSuccess: () => refetch(),
-  })
-  const handleCreateSurvey = async () => {
-    window.location.href = '/dashboard/create'
+
+  try {
+    const payload = await decrypt(token)
+    return payload?.userId as string
+  } catch (error) {
+    return null
   }
-  const handleDeleteSurvey = async (id: string) => {
-    deleteMutation.mutate({ id })
+}
+
+export default async function DashboardPage() {
+  const userId = await getUserId()
+
+  if (!userId) {
+    redirect('/login')
   }
 
-  // 过滤问卷
-  const filteredSurveys =
-    surveys?.filter((survey) => {
-      // 根据搜索查询过滤
-      const matchesSearch = survey.name.toLowerCase().includes(searchQuery.toLowerCase())
-      // 根据标签过滤
-      if (activeTab === 'all') return matchesSearch
-      if (activeTab === 'published') return matchesSearch && survey.published
-      if (activeTab === 'drafts') return matchesSearch && !survey.published
-      return matchesSearch
-    }) ?? []
+  // 服务端获取问卷数据
+  const surveys = await prisma.survey.findMany({
+    where: {
+      ownerId: userId,
+      deletedAt: null,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
   return (
     <div className="min-h-screen bg-background bg-gray-50">
       {/* 顶部导航栏 */}
@@ -53,9 +60,11 @@ export default function DashboardPage() {
           {/* 标题和创建按钮 */}
           <div className="flex items-center justify-between">
             <h1 className="2xl:text-2xl font-bold text-xl">我的问卷</h1>
-            <Button onClick={handleCreateSurvey} className="gap-1">
-              <PlusCircle className="h-4 w-4" />
-              创建问卷
+            <Button asChild className="gap-1">
+              <a href="/dashboard/create">
+                <PlusCircle className="h-4 w-4" />
+                创建问卷
+              </a>
             </Button>
           </div>
 
@@ -67,17 +76,10 @@ export default function DashboardPage() {
                 type="search"
                 placeholder="搜索问卷..."
                 className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            <Tabs
-              defaultValue="all"
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full sm:w-auto"
-            >
+            <Tabs defaultValue="all" className="w-full sm:w-auto">
               <TabsList>
                 <TabsTrigger value="all">全部</TabsTrigger>
                 <TabsTrigger value="published">已发布</TabsTrigger>
@@ -88,30 +90,19 @@ export default function DashboardPage() {
 
           {/* 问卷列表 */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
-            {isLoading ? (
-              // 加载状态
-              Array.from({ length: 6 }).map((_, index) => (
-                <Card key={index} className="animate-pulse">
-                  <CardHeader>
-                    <div className="h-6 w-3/4 bg-muted rounded"></div>
-                    <div className="h-4 w-1/2 bg-muted rounded"></div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-4 w-full bg-muted rounded mb-2"></div>
-                    <div className="h-4 w-3/4 bg-muted rounded"></div>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="h-4 w-1/3 bg-muted rounded"></div>
-                  </CardFooter>
-                </Card>
-              ))
-            ) : filteredSurveys.length > 0 ? (
+            {surveys.length > 0 ? (
               // 问卷列表
-              filteredSurveys.map((survey) => (
+              surveys.map((survey) => (
                 <SurveyOverview
                   key={survey.id}
                   survey={survey as any}
-                  handleDelete={handleDeleteSurvey}
+                  handleDelete={async (id: string) => {
+                    'use server'
+                    await prisma.survey.update({
+                      where: { id },
+                      data: { deletedAt: new Date() }
+                    })
+                  }}
                 ></SurveyOverview>
               ))
             ) : (
@@ -122,11 +113,13 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="text-lg font-medium mb-2">没有找到问卷</h3>
                 <p className="text-muted-foreground mb-4">
-                  {searchQuery ? '尝试使用不同的搜索词或清除过滤器' : '创建您的第一个问卷开始使用'}
+                  创建您的第一个问卷开始使用
                 </p>
-                <Button onClick={handleCreateSurvey} className="gap-1">
-                  <PlusCircle className="h-4 w-4" />
-                  创建问卷
+                <Button asChild className="gap-1">
+                  <a href="/dashboard/create">
+                    <PlusCircle className="h-4 w-4" />
+                    创建问卷
+                  </a>
                 </Button>
               </div>
             )}

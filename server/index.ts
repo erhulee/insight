@@ -7,13 +7,38 @@ import { TRPCError } from '@trpc/server'
 const prisma = new PrismaClient()
 
 export const appRouter = router({
+  Register: procedure.input(z.object({
+    account: z.string(),
+    password: z.string(),
+    username: z.string(),
+  })).mutation(async (opt) => {
+    const { account, password, username } = opt.input
+    const u = await prisma.user.findFirst({
+      where: {
+        account: account
+      }
+    })
+    if (u) {
+      throw new TRPCError({
+        message: '账号已存在',
+        code: 'CONFLICT',
+      })
+    }
+    const user = await prisma.user.create({
+      data: {
+        account: account,
+        password: password,
+        username: username,
+      },
+    })
+    return user
+  }),
   Login: procedure
     .input(
       z.object({
         account: z.string(),
         password: z.string(),
-      }),
-    )
+      }))
     .mutation(async (opt) => {
       const { account, password } = opt.input
       const User = await prisma.user.findUnique({
@@ -33,7 +58,6 @@ export const appRouter = router({
         return { user: User, token }
       }
     }),
-
   CreateUser: procedure
     .input(
       z.object({
@@ -72,6 +96,7 @@ export const appRouter = router({
         const token = await createSession(user.id)
         return { user, token }
       } catch (e) {
+        console.log("e:", e)
         throw new TRPCError({
           message: '注册失败',
           code: 'INTERNAL_SERVER_ERROR',
@@ -93,6 +118,45 @@ export const appRouter = router({
       },
     })
   }),
+
+  // 验证 token 并返回用户信息
+  ValidateToken: procedure
+    .input(
+      z.object({
+        token: z.string(),
+      }),
+    )
+    .query(async (opt) => {
+      const { token } = opt.input
+
+      try {
+        // 使用现有的 session 验证逻辑
+        const { decrypt } = await import('@/lib/session')
+        const payload = await decrypt(token)
+
+        if (!payload) {
+          return null
+        }
+
+        // 从 payload 中提取 userId
+        const userId = payload.userId as string
+        if (!userId) {
+          return null
+        }
+
+        // 获取用户信息
+        const user = await prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
+        })
+
+        return user
+      } catch (error) {
+        console.error('Token validation error:', error)
+        return null
+      }
+    }),
 
   UpdateUserInfo: protectedProcedure
     .input(

@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  # Redis缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: survey-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - survey-network
+    command: redis-server --appendonly yes
+
   # MySQL数据库
   mysql:
     image: mysql:8.0
@@ -31,15 +44,18 @@ services:
     environment:
       - NODE_ENV=production
       - DATABASE_URL=mysql://survey_user:survey_password@mysql:3306/survey_platform
+      - REDIS_URL=redis://redis:6379
       - NEXTAUTH_SECRET=your-secret-key-here
       - NEXTAUTH_URL=http://localhost:3000
     depends_on:
       - mysql
+      - redis
     networks:
       - survey-network
 
 volumes:
   mysql_data:
+  redis_data:
 
 networks:
   survey-network:

@@ -1,218 +1,102 @@
 'use client'
-import type React from 'react'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Mail, Lock, ArrowRight } from 'lucide-react'
-import { InsightBrand } from '@/components/common/insight-brand'
-import { trpc } from '../_trpc/client'
-import { useRouter } from 'next/navigation'
-import { useLocalStorage } from 'react-use'
-import { toast } from 'sonner'
-import { setAuthToken } from '@/lib/auth'
+
+import { useState } from 'react'
+import { trpc } from '@/app/_trpc/client'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [localValue, updateLocalValue, remove] = useLocalStorage<{
-    account: string
-    password: string
-  }>('rememberMe')
-  console.log("localValue:", localValue)
+  const [account, setAccount] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLogin, setIsLogin] = useState(true)
 
-  useEffect(() => {
-    if (localValue?.account && localValue?.password) {
-      setFormData({
-        email: localValue.account,
-        password: localValue.password,
-        rememberMe: true,
-      })
-      // 显示自动填充提示
-      toast.success('已自动填充保存的登录信息')
-    }
-  }, [localValue])
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false,
-  })
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      rememberMe: checked,
-    }))
+  // 使用 tRPC 客户端
+  const loginMutation = trpc.Login.useMutation()
+  const createUserMutation = trpc.CreateUser.useMutation()
 
-    // 如果取消勾选，清除已保存的密码
-    if (!checked && localValue) {
-      remove()
-      toast.info('已清除保存的登录信息')
-    }
-  }
-  const submitMutation = trpc.Login.useMutation()
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
     try {
-      const res = await submitMutation.mutateAsync({
-        account: formData.email,
-        password: formData.password,
-      })
+      if (isLogin) {
+        // 登录
+        const result = await loginMutation.mutateAsync({
+          account,
+          password,
+        })
 
-      if (res && res.token) {
-        // 存储 JWT token 到 localStorage
-        setAuthToken(res.token)
+        console.log('登录成功:', result)
+        // 这里可以重定向到仪表板
+        window.location.href = '/dashboard'
+      } else {
+        // 注册
+        const result = await createUserMutation.mutateAsync({
+          account,
+          password,
+          username: account, // 使用账号作为用户名
+        })
 
-        // 处理记住密码
-        if (formData.rememberMe) {
-          updateLocalValue({
-            account: formData.email,
-            password: formData.password,
-          })
-          toast.success('登录成功！已保存登录信息')
-        } else {
-          remove()
-          toast.success('登录成功！')
-        }
-
-        // 延迟跳转，让用户看到成功提示
-        setTimeout(() => {
-          router.push('/dashboard')
-        }, 1000)
+        console.log('注册成功:', result)
+        // 注册成功后自动登录
+        window.location.href = '/dashboard'
       }
     } catch (error) {
-      // 登录失败时不清除已保存的密码
-      console.error('Login failed:', error)
-      toast.error('登录失败，请检查账号和密码')
+      console.error('操作失败:', error)
+      alert('操作失败，请重试')
     }
   }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="container flex h-16 items-center px-4">
-          <InsightBrand></InsightBrand>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            {isLogin ? '登录账户' : '注册账户'}
+          </h2>
         </div>
-      </header>
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <Card>
-            <CardHeader className="space-y-1">
-              <CardTitle className="2xl:text-2xl text-base font-bold">登录</CardTitle>
-              <CardDescription>输入您的账号和密码以访问您的账户</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">账号</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      name="email"
-                      className="pl-10"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">密码</Label>
-                    <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                      忘记密码?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      className="pl-10"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="remember-me"
-                      checked={formData.rememberMe}
-                      onCheckedChange={handleCheckboxChange}
-                    />
-                    <Label htmlFor="remember-me" className="text-sm">
-                      记住我
-                    </Label>
-                  </div>
-                  {localValue && (
-                    <div
-                      onClick={() => {
-                        remove()
-                        setFormData(prev => ({ ...prev, rememberMe: false }))
-                        toast.info('已清除保存的登录信息')
-                      }}
-                      className="text-xs text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      清除保存的密码
-                    </div>
-                  )}
-                </div>
-                {formData.rememberMe && (
-                  <div className="text-xs text-muted-foreground bg-muted/50 p-2 rounded-md">
-                    💡 提示：密码将保存在本地浏览器中，仅在当前设备上可用
-                  </div>
-                )}
-              </div>
-              <Button
-                className="w-full mt-4"
-                onClick={() => {
-                  handleSubmit()
-                }}
-                disabled={submitMutation.isPending}
-              >
-                <span className="flex items-center gap-1">
-                  {submitMutation.isPending ? (
-                    <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      登录中...
-                    </>
-                  ) : (
-                    <>
-                      登录
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </span>
-              </Button>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <div className="text-center text-sm">
-                <span className="text-muted-foreground">还没有账户？</span>
-                <Link href="/register" className="text-primary hover:underline ml-1">
-                  立即注册
-                </Link>
-              </div>
-            </CardFooter>
-          </Card>
-        </div>
-      </main>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <input
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="账号"
+                value={account}
+                onChange={(e) => setAccount(e.target.value)}
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="密码"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={loginMutation.isPending || createUserMutation.isPending}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              {loginMutation.isPending || createUserMutation.isPending ? '处理中...' : (isLogin ? '登录' : '注册')}
+            </button>
+          </div>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-indigo-600 hover:text-indigo-500"
+            >
+              {isLogin ? '没有账户？点击注册' : '已有账户？点击登录'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
