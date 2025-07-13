@@ -276,7 +276,6 @@ export const appRouter = router({
           return null
         }
       } catch (e) {
-        console.log("GetSurvey error:", e)
         throw new TRPCError({
           message: '获取问卷失败',
           code: 'INTERNAL_SERVER_ERROR',

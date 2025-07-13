@@ -1,12 +1,12 @@
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PlusCircle, Search, FileText } from 'lucide-react'
-import { SurveyOverview } from '@/app/developer/components/survey-overview'
 import { LayoutHeader } from '@/components/layout-header'
 import { Button } from '@/components/ui/button'
 import { PrismaClient } from '@prisma/client'
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
+import { SurveyCard } from '@/components/survey/survey-card'
 
 const prisma = new PrismaClient()
 
@@ -75,17 +75,10 @@ export default async function DashboardPage() {
             {surveys.length > 0 ? (
               // 问卷列表
               surveys.map((survey) => (
-                <SurveyOverview
+                <SurveyCard
                   key={survey.id}
                   survey={survey as any}
-                  handleDelete={async (id: string) => {
-                    // 'use server'
-                    // await prisma.survey.update({
-                    //   where: { id },
-                    //   data: { deletedAt: new Date() }
-                    // })
-                  }}
-                ></SurveyOverview>
+                ></SurveyCard>
               ))
             ) : (
               // 空状态
