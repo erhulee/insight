@@ -1,5 +1,3 @@
-// 移除 'use client' 指令，改为服务端渲染
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PlusCircle, Search, FileText } from 'lucide-react'
@@ -7,36 +5,19 @@ import { SurveyOverview } from '@/app/developer/components/survey-overview'
 import { LayoutHeader } from '@/components/layout-header'
 import { Button } from '@/components/ui/button'
 import { PrismaClient } from '@prisma/client'
-import { cookies } from 'next/headers'
-import { decrypt } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { auth } from '@/auth'
 
 const prisma = new PrismaClient()
 
-// 获取用户ID的函数
-async function getUserId() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('session')?.value
-
-  if (!token) {
-    return null
-  }
-
-  try {
-    const payload = await decrypt(token)
-    return payload?.userId as string
-  } catch (error) {
-    return null
-  }
-}
 
 export default async function DashboardPage() {
-  const userId = await getUserId()
+  const session = await auth()
+  const userId = session?.user?.id
 
   if (!userId) {
     redirect('/login')
   }
-
   // 服务端获取问卷数据
   const surveys = await prisma.survey.findMany({
     where: {
@@ -47,6 +28,7 @@ export default async function DashboardPage() {
       createdAt: 'desc',
     },
   })
+  console.log("surveys", surveys)
 
   return (
     <div className="min-h-screen bg-background bg-gray-50">
@@ -97,11 +79,11 @@ export default async function DashboardPage() {
                   key={survey.id}
                   survey={survey as any}
                   handleDelete={async (id: string) => {
-                    'use server'
-                    await prisma.survey.update({
-                      where: { id },
-                      data: { deletedAt: new Date() }
-                    })
+                    // 'use server'
+                    // await prisma.survey.update({
+                    //   where: { id },
+                    //   data: { deletedAt: new Date() }
+                    // })
                   }}
                 ></SurveyOverview>
               ))

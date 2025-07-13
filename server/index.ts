@@ -31,33 +31,9 @@ export const appRouter = router({
         username: username,
       },
     })
+
     return user
   }),
-  Login: procedure
-    .input(
-      z.object({
-        account: z.string(),
-        password: z.string(),
-      }))
-    .mutation(async (opt) => {
-      const { account, password } = opt.input
-      const User = await prisma.user.findUnique({
-        where: {
-          account: account,
-          password: password,
-        },
-      })
-      if (User == null) {
-        throw new TRPCError({
-          message: '用户名或密码错误',
-          code: 'UNAUTHORIZED',
-        })
-      } else {
-        // 生成JWT并存入Redis，返回token给前端
-        const token = await createSession(User.id)
-        return { user: User, token }
-      }
-    }),
   CreateUser: procedure
     .input(
       z.object({
@@ -96,7 +72,6 @@ export const appRouter = router({
         const token = await createSession(user.id)
         return { user, token }
       } catch (e) {
-        console.log("e:", e)
         throw new TRPCError({
           message: '注册失败',
           code: 'INTERNAL_SERVER_ERROR',
@@ -295,12 +270,13 @@ export const appRouter = router({
           },
         })
         if (survey) {
-          survey.questions = JSON.parse(survey.questions ?? '[]') as any[] // TODO: 类型不匹配，需要修复，暂时先这样用着，后面再改
+          survey.questions = Array.isArray(survey.questions) ? survey.questions : JSON.parse(survey.questions ?? '[]') as any[] // TODO: 类型不匹配，需要修复，暂时先这样用着，后面再改
           return survey
         } else {
           return null
         }
       } catch (e) {
+        console.log("GetSurvey error:", e)
         throw new TRPCError({
           message: '获取问卷失败',
           code: 'INTERNAL_SERVER_ERROR',

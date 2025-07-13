@@ -1,4 +1,4 @@
-import { AudioLines } from 'lucide-react'
+'use client'
 import Link from 'next/link'
 
 export function InsightBrand() {

@@ -1,7 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/session'
-
+import { auth } from '@/auth'
 // 定义 context 类型
 export interface Context {
     userId?: string
@@ -53,8 +53,10 @@ export const procedure = t.procedure
 export const createCallerFactory = t.createCallerFactory
 
 // 鉴权中间件
-export const authMiddleware = t.middleware(({ ctx, next }) => {
-    if (!ctx.userId) {
+export const authMiddleware = t.middleware(async ({ ctx, next }) => {
+    const session = await auth();
+    const userId = session?.user?.id
+    if (!userId) {
         throw new TRPCError({
             code: 'UNAUTHORIZED',
             message: '未登录',
@@ -63,7 +65,7 @@ export const authMiddleware = t.middleware(({ ctx, next }) => {
     return next({
         ctx: {
             ...ctx,
-            userId: ctx.userId,
+            userId,
         },
     })
 })

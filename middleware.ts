@@ -5,8 +5,7 @@ import {
   isPathProtected,
   formatLogMessage,
 } from './lib/middleware-config'
-import { validateTokenAPI, type UserPayload } from './lib/auth-api'
-
+import jwt from 'jsonwebtoken';
 // 获取配置
 const middlewareConfig = getMiddlewareConfig()
 
@@ -17,6 +16,7 @@ const middlewareConfig = getMiddlewareConfig()
  */
 function extractToken(request: NextRequest): string | null {
   // 优先从 cookie 获取 token（兼容 SSR）
+  debugger
   let token = request.cookies.get(middlewareConfig.sessionCookieName)?.value
 
   // 如果没有 cookie token，尝试从 header 获取
@@ -24,6 +24,8 @@ function extractToken(request: NextRequest): string | null {
     const authHeader = request.headers.get('authorization') ||
       request.headers.get('Authorization') ||
       request.headers.get(middlewareConfig.authHeaders.token)
+
+    console.log("request.headers:", request.headers.keys())
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.replace('Bearer ', '')
@@ -71,70 +73,67 @@ function logMiddleware(level: string, message: string, data?: any): void {
  * Next.js 中间件函数
  * 处理认证和用户信息注入
  */
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+// export async function middleware(request: NextRequest) {
+//   const { pathname } = request.nextUrl
 
-  // 记录请求处理
-  logMiddleware('info', `Processing request`, {
-    method: request.method,
-    pathname,
-    url: request.url
-  })
+//   // 记录请求处理
+//   logMiddleware('info', `Processing request`, {
+//     method: request.method,
+//     pathname,
+//     url: request.url
+//   })
 
-  // 检查是否排除路径
-  if (isPathExcluded(pathname, middlewareConfig.excludedPaths)) {
-    logMiddleware('debug', `Path excluded`, { pathname })
-    return NextResponse.next()
-  }
+//   // 检查是否排除路径
+//   if (isPathExcluded(pathname, middlewareConfig.excludedPaths)) {
+//     logMiddleware('debug', `Path excluded`, { pathname })
+//     return NextResponse.next()
+//   }
 
-  // 提取认证令牌
-  const token = extractToken(request)
+//   // 提取认证令牌
+//   const token = extractToken(request)
 
-  // 如果没有 token，检查是否需要重定向
-  if (!token) {
-    logMiddleware('info', `No token found`, { pathname })
+//   // 如果没有 token，检查是否需要重定向
+//   if (!token) {
+//     logMiddleware('info', `No token found`, { pathname })
 
-    // 如果是保护路径且配置了重定向，则重定向到登录页
-    if (isPathProtected(pathname, middlewareConfig.protectedPaths) && middlewareConfig.redirectToLogin) {
-      const loginUrl = new URL(middlewareConfig.loginPath, request.url)
-      logMiddleware('info', `Redirecting to login`, {
-        from: pathname,
-        to: middlewareConfig.loginPath
-      })
-      return NextResponse.redirect(loginUrl)
-    }
+//     // 如果是保护路径且配置了重定向，则重定向到登录页
+//     if (isPathProtected(pathname, middlewareConfig.protectedPaths) && middlewareConfig.redirectToLogin) {
+//       const loginUrl = new URL(middlewareConfig.loginPath, request.url)
+//       logMiddleware('info', `Redirecting to login`, {
+//         from: pathname,
+//         to: middlewareConfig.loginPath
+//       })
+//       return NextResponse.redirect(loginUrl)
+//     }
 
-    return NextResponse.next()
-  }
+//     return NextResponse.next()
+//   }
 
-  // 通过API验证令牌
-  const baseUrl = request.nextUrl.origin || 'http://localhost:3000'
-  const userPayload = await validateTokenAPI(token, baseUrl)
+//   console.log("process.env.JWT_SECRE:", process.env.JWT_SECRET)
+//   // 通过API验证令牌
+//   const userPayload = jwt.verify(token, process.env.JWT_SECRET!)
+//   console.log("userPayload:", userPayload)
 
-  if (userPayload) {
-    logMiddleware('info', `User authenticated`, {
-      userId: userPayload.userId,
-      pathname
-    })
-    return createAuthenticatedRequest(request, userPayload.userId)
-  }
+//   if (userPayload) {
+//     return createAuthenticatedRequest(request, userPayload.userId)
+//   }
 
-  // 令牌无效时的处理
-  logMiddleware('warn', `Invalid token`, { pathname })
+//   // 令牌无效时的处理
+//   logMiddleware('warn', `Invalid token`, { pathname })
 
-  // 如果是保护路径且配置了重定向，则重定向到登录页
-  if (isPathProtected(pathname, middlewareConfig.protectedPaths) && middlewareConfig.redirectToLogin) {
-    const loginUrl = new URL(middlewareConfig.loginPath, request.url)
-    logMiddleware('info', `Redirecting to login due to invalid token`, {
-      from: pathname,
-      to: middlewareConfig.loginPath
-    })
-    return NextResponse.redirect(loginUrl)
-  }
+//   // 如果是保护路径且配置了重定向，则重定向到登录页
+//   if (isPathProtected(pathname, middlewareConfig.protectedPaths) && middlewareConfig.redirectToLogin) {
+//     const loginUrl = new URL(middlewareConfig.loginPath, request.url)
+//     logMiddleware('info', `Redirecting to login due to invalid token`, {
+//       from: pathname,
+//       to: middlewareConfig.loginPath
+//     })
+//     return NextResponse.redirect(loginUrl)
+//   }
 
-  // 继续请求，让具体页面处理鉴权
-  return NextResponse.next()
-}
+//   // 继续请求，让具体页面处理鉴权
+//   return NextResponse.next()
+// }
 
 // 中间件配置
 export const config = {
@@ -154,3 +153,5 @@ export const config = {
     '/((?!api|static|favicon.ico|_next|_vercel|robots.txt|sitemap.xml|health|ping).*)',
   ],
 }
+
+export { auth as middleware } from "@/auth"
