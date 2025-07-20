@@ -4,10 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { PlusCircle, LayoutTemplateIcon as Template, ArrowLeft } from 'lucide-react'
+import { PlusCircle, LayoutTemplateIcon as Template, ArrowLeft, Sparkles } from 'lucide-react'
 import { InsightBrand } from '@/components/common/insight-brand'
 import { TemplateList } from './_components/TemplateList'
 import { TemplateForm } from './_components/TemplateForm'
+import { AISurveyGenerator } from './_components/AISurveyGenerator'
+import AISurveyGeneratorStream from './_components/AISurveyGeneratorStream'
 
 export default function CreateSurveyPage() {
   const [activeTab, setActiveTab] = useState('blank')
@@ -37,10 +39,18 @@ export default function CreateSurveyPage() {
           onValueChange={setActiveTab}
           className="max-w-4xl mx-auto"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="blank" className="gap-2">
               <PlusCircle className="h-4 w-4" />
               空白问卷
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              AI 生成
+            </TabsTrigger>
+            <TabsTrigger value="ai-stream" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              AI 流式生成
             </TabsTrigger>
             <TabsTrigger value="template" className="gap-2">
               <Template className="h-4 w-4" />
@@ -51,6 +61,14 @@ export default function CreateSurveyPage() {
           {/* 空白问卷选项 */}
           <TabsContent value="blank" className="mt-6">
             <TemplateForm></TemplateForm>
+          </TabsContent>
+          {/* AI生成选项 */}
+          <TabsContent value="ai" className="mt-6">
+            <AISurveyGenerator></AISurveyGenerator>
+          </TabsContent>
+          {/* AI流式生成选项 */}
+          <TabsContent value="ai-stream" className="mt-6">
+            <AISurveyGeneratorStream></AISurveyGeneratorStream>
           </TabsContent>
           {/* 模板选项 */}
           <TabsContent value="template" className="mt-6">

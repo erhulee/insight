@@ -3,6 +3,8 @@ import { createSession, deleteSession } from '@/lib/session'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { generateSurveyFromPrompt, buildSurveyPrompt } from './ai-service'
+import { observable } from '@trpc/server/observable'
 
 const prisma = new PrismaClient()
 
@@ -337,6 +339,7 @@ export const appRouter = router({
       z.object({
         name: z.string(),
         description: z.string().optional(),
+        questions: z.any().optional(),
       }),
     )
     .mutation(async (opt) => {
@@ -347,7 +350,7 @@ export const appRouter = router({
             ownerId: userId,
             name: opt.input.name,
             description: opt.input.description || '',
-            questions: [],
+            questions: opt.input.questions || [],
             published: false,
             pageCount: 1,
           },
@@ -358,6 +361,130 @@ export const appRouter = router({
           message: '创建问卷失败',
           code: 'INTERNAL_SERVER_ERROR',
         })
+      }
+    }),
+
+  GenerateAISurvey: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string(),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const { prompt } = opt.input
+
+        // 调用Ollama生成问卷
+        const generatedSurvey = await generateSurveyFromPrompt(prompt)
+
+        return generatedSurvey
+      } catch (e) {
+        console.error('AI生成问卷失败:', e)
+        throw new TRPCError({
+          message: 'AI生成问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  GenerateAISurveyStream: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string(),
+      }),
+    )
+    .subscription(async (opt) => {
+      const { prompt } = opt.input
+
+      return observable<string>((emit) => {
+        const generateStream = async () => {
+          try {
+            const { ollamaClient } = await import('./ollama-client')
+            const aiPrompt = buildSurveyPrompt(prompt)
+
+            // 使用流式生成
+            await ollamaClient.generateStream(aiPrompt, 'qwen2.5:1.5b', (chunk: string) => {
+              emit.next(chunk)
+            })
+
+            emit.complete()
+          } catch (error) {
+            console.error('Stream generation failed:', error)
+            emit.error(new TRPCError({
+              message: '流式生成失败',
+              code: 'INTERNAL_SERVER_ERROR',
+            }))
+          }
+        }
+
+        generateStream()
+      })
+    }),
+
+  TestOllamaConnection: protectedProcedure
+    .input(
+      z.object({
+        baseUrl: z.string(),
+        model: z.string(),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const { baseUrl, model } = opt.input
+
+        // 创建临时客户端测试连接
+        const { OllamaClient } = await import('./ollama-client')
+        const testClient = new OllamaClient({ baseUrl, model })
+
+        // 测试连接
+        const isAvailable = await testClient.isAvailable()
+        if (!isAvailable) {
+          return { success: false, error: '无法连接到Ollama服务' }
+        }
+
+        // 测试模型是否可用
+        try {
+          await testClient.generate('测试', model)
+          return { success: true }
+        } catch (error) {
+          return { success: false, error: '模型不可用或生成失败' }
+        }
+      } catch (e) {
+        console.error('测试Ollama连接失败:', e)
+        return { success: false, error: '连接测试失败' }
+      }
+    }),
+
+  GetOllamaStatus: protectedProcedure
+    .query(async () => {
+      try {
+        const { ollamaClient } = await import('./ollama-client')
+
+        const isAvailable = await ollamaClient.isAvailable()
+        if (!isAvailable) {
+          return {
+            available: false,
+            models: [],
+            currentModel: ''
+          }
+        }
+
+        const models = await ollamaClient.listModels()
+        const { getOllamaConfig } = await import('@/lib/ollama-config')
+        const config = getOllamaConfig()
+
+        return {
+          available: true,
+          models,
+          currentModel: config.model
+        }
+      } catch (e) {
+        console.error('获取Ollama状态失败:', e)
+        return {
+          available: false,
+          models: [],
+          currentModel: ''
+        }
       }
     }),
 
