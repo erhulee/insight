@@ -4,6 +4,7 @@ import { meta as SingleMeta } from './single/schema'
 import { meta as DatePickerMeta } from './date-picker/schema'
 import { DescriptionMeta } from './description'
 import { MultipleMeta } from './multiple'
+import { meta as RatingMeta } from './rating'
 export { QuestionType } from './core/QuestionType'
 
 export const preset = [
@@ -13,4 +14,5 @@ export const preset = [
     SingleMeta,
     DatePickerMeta,
     DescriptionMeta,
+    RatingMeta,
 ]

@@ -356,9 +356,8 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
               id={question.id}
               value={answers[question.id] || ''}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md ${
-                errors[question.id] ? 'border-destructive' : 'border-input'
-              }`}
+              className={`w-full px-3 py-2 border rounded-md ${errors[question.id] ? 'border-destructive' : 'border-input'
+                }`}
             >
               <option value="">请选择...</option>
               {question.options?.map((option, index) => (
@@ -371,23 +370,62 @@ export default function SurveyPage({ params }: { params: { id: string } }) {
         )
       case 'rating':
         return (
-          <div className="space-y-2">
-            <div className="flex space-x-2">
-              {Array.from({ length: question.maxRating || 5 }).map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleAnswerChange(question.id, index + 1)}
-                  className={`w-10 h-10 rounded-md flex items-center justify-center border ${
-                    answers[question.id] === index + 1
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-background hover:bg-muted'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+          <div className="space-y-4">
+            {/* 评分说明 */}
+            {question.props?.description && (
+              <p className="text-sm text-muted-foreground">{question.props.description}</p>
+            )}
+
+            {/* 评分标签 */}
+            {question.props?.minLabel && question.props?.maxLabel && (
+              <div className="flex items-center justify-between">
+                <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
+                  {question.props.minLabel}
+                </span>
+                <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
+                  {question.props.maxLabel}
+                </span>
+              </div>
+            )}
+
+            {/* 星级评分 */}
+            <div className="flex items-center space-x-2">
+              {Array.from({ length: question.maxRating || 5 }).map((_, index) => {
+                const rating = index + 1
+                const isSelected = answers[question.id] === rating
+
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleAnswerChange(question.id, rating)}
+                    className={`p-1 transition-all hover:scale-110 ${isSelected ? 'text-yellow-500' : 'text-gray-300'
+                      }`}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill={isSelected ? 'currentColor' : 'none'}
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      />
+                    </svg>
+                  </button>
+                )
+              })}
             </div>
+
+            {/* 当前评分显示 */}
+            {answers[question.id] && (
+              <div className="text-sm text-muted-foreground">
+                当前评分: {answers[question.id]} / {question.maxRating || 5}
+              </div>
+            )}
           </div>
         )
       case 'date':
