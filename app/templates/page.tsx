@@ -1,7 +1,6 @@
 'use client'
 import type React from 'react'
 import { useState } from 'react'
-import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -12,14 +11,18 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Search } from 'lucide-react'
-import { InsightBrand } from '@/components/common/insight-brand'
-import { UserInfoAvatar } from '@/components/common/userInfoAvatar'
 import { trpc } from '../_trpc/client'
 import { TemplateCard } from './_components/TemplateCard'
 import { NoData } from './_components/NoData'
+import { LayoutHeader } from '@/components/layout-header'
 
 export default function TemplatesPage() {
-  const templateClient = trpc.GetTemplate.useQuery()
+  const templateClient = trpc.GetSurveyTemplates.useQuery({
+    page: 1,
+    limit: 10,
+    category: 'all',
+    tags: 'all',
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [activeTab, setActiveTab] = useState('all')
@@ -27,27 +30,13 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* 顶部导航栏 */}
-      <header className="border-b">
-        <div className=" flex h-16 items-center justify-between px-4">
-          <InsightBrand></InsightBrand>
-          <nav className="flex items-center 2xl:gap-14 xl:gap-12 gap-8 2xl:text-base font-medium text-sm">
-            <Link href="/dashboard" className="text-muted-foreground">
-              我的问卷
-            </Link>
-            <Link href="/templates" className="">
-              模板中心
-            </Link>
-            <Link href="/developer" className="text-muted-foreground">
-              开发者中心
-            </Link>
-          </nav>
-          <UserInfoAvatar></UserInfoAvatar>
-        </div>
-      </header>
+      <div className=" px-4">
+        <LayoutHeader activeTab="templates" hideBorder></LayoutHeader>
+      </div>
 
       {/* 主要内容区域 */}
       <main className="container mx-auto lg:px-4 lg:py-8 py-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col gap-6">
           {/* 标题 */}
           <div className="text-center mb-8 flex flex-col justify-start items-start">
             <h1 className="lg:text-3xl font-bold mb-2 text-xl ">问卷模板库</h1>
@@ -96,7 +85,7 @@ export default function TemplatesPage() {
             <div>loading</div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 grid-cols-2">
-              {templateClient.data?.map((template) => (
+              {templateClient.data?.templates.map((template: any) => (
                 <TemplateCard
                   questionsCnt={3}
                   key={template.id}

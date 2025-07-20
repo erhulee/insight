@@ -28,13 +28,12 @@ export default async function DashboardPage() {
       createdAt: 'desc',
     },
   })
-  console.log("surveys", surveys)
 
   return (
-    <div className="min-h-screen bg-background bg-gray-50">
+    <div className="min-h-screen bg-background ">
       {/* 顶部导航栏 */}
       <div className=" px-4">
-        <LayoutHeader></LayoutHeader>
+        <LayoutHeader activeTab="dashboard" hideBorder></LayoutHeader>
       </div>
       {/* 主要内容区域 */}
       <main className="container 2xl:px-4 2xl:py-6 py-4 mx-auto ">
