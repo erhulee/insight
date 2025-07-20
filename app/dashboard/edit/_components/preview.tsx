@@ -96,15 +96,27 @@ export function Preview(props: Props) {
                 )}
 
                 {question.type === 'rating' && (
-                  <div className="flex space-x-2">
-                    {Array.from({ length: question.maxRating || 5 }).map((_, i) => (
-                      <button
-                        key={i}
-                        className="w-10 h-10 rounded-md flex items-center justify-center border bg-background hover:bg-muted"
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                  <div className="space-y-2">
+                    <div className="flex space-x-2">
+                      {Array.from({ length: question.maxRating || 5 }).map((_, i) => (
+                        <button
+                          key={i}
+                          className="w-10 h-10 rounded-md flex items-center justify-center border bg-background hover:bg-muted"
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                    {question.props?.minLabel && question.props?.maxLabel && (
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
+                          {question.props.minLabel}
+                        </span>
+                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
+                          {question.props.maxLabel}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
 

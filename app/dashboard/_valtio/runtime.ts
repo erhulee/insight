@@ -1,6 +1,7 @@
 import { QuestionSchemaType } from '@/lib/dsl'
 import { cloneDeep } from 'lodash-es'
 import { proxy } from 'valtio'
+import { DisplayLogicConfig } from '@/lib/custom-display-logic'
 
 export type QuestionLogic = {
   condition: {
@@ -37,6 +38,7 @@ export type RuntimeState = {
   currentPage: number
   currentQuestion: Question[]
   pageCount: number
+  displayLogic: DisplayLogicConfig
 }
 
 export const runtimeStore = proxy<RuntimeState>({
@@ -46,6 +48,10 @@ export const runtimeStore = proxy<RuntimeState>({
   pageCount: 1,
   currentPage: 1,
   currentQuestion: [] as Question[],
+  displayLogic: {
+    rules: [],
+    enabled: false
+  }
 })
 
 function updateCurrentQuestion() {
@@ -139,5 +145,8 @@ export const RuntimeDSLAction = {
       oldQuestion,
       ...runtimeStore.questions.slice(idx + 1),
     ]
+  },
+  updateDisplayLogic: (config: DisplayLogicConfig) => {
+    runtimeStore.displayLogic = config
   },
 }

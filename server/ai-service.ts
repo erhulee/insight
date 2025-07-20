@@ -74,6 +74,7 @@ export function buildSurveyPrompt(userPrompt: string): string {
 问题类型说明：
 - "single": 单选题 - 必须包含props.options数组，每个选项包含label、value、id字段
 - "multiple": 多选题 - 必须包含props.options数组，每个选项包含label、value、id字段
+- "rating": 评价打分 - 包含props.maxRating（最高分值，默认5）、props.ratingType（评分类型：star/number/heart）、props.minLabel（最低分标签）、props.maxLabel（最高分标签）
 - "textarea": 文本域 - 不需要options
 - "input": 文本输入 - 不需要options
 
@@ -84,13 +85,14 @@ export function buildSurveyPrompt(userPrompt: string): string {
 
 请确保：
 1. 生成4-6个问题，避免问卷过长
-2. 问题类型多样化，包含选择类和文本类问题
+2. 问题类型多样化，包含选择类、文本类和评分类问题
 3. 问题逻辑合理，符合问卷目的
 4. 每个问题都有唯一的id
 5. 所有问题都设置pageSize为1
 6. 单选题和多选题必须包含完整的options数组
 7. 每个选项都有label、value、id三个字段
-8. 只返回纯JSON格式，不要markdown代码块标记（如\`\`\`json），不要其他文字
+8. 评分题包含合适的props配置（maxRating、ratingType、minLabel、maxLabel）
+9. 只返回纯JSON格式，不要markdown代码块标记（如\`\`\`json），不要其他文字
 
 现在请生成问卷：`
 }
@@ -230,6 +232,22 @@ function generateCustomerSatisfactionSurvey(): GeneratedSurvey {
                         { label: '可能不会', value: 'probably_not', id: 'opt_probably_not' },
                         { label: '一定不会', value: 'definitely_not', id: 'opt_definitely_not' }
                     ]
+                }
+            },
+            {
+                id: uuidv4(),
+                type: 'rating',
+                title: '请对我们的服务质量进行评分',
+                description: '5分表示非常满意，1分表示非常不满意，分值越低表示满意度越低',
+                required: true,
+                pageSize: 1,
+                props: {
+                    maxRating: 5,
+                    ratingType: 'star',
+                    minLabel: '非常不满意',
+                    maxLabel: '非常满意',
+                    showLabels: true,
+                    description: '5分表示非常满意，1分表示非常不满意，分值越低表示满意度越低'
                 }
             }
         ]

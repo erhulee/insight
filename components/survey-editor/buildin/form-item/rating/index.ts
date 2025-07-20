@@ -28,4 +28,3 @@ export const ratingTypes = [
 ]
 
 export * from './render'
-export * from './config' 
