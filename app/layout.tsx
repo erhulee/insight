@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   description: '创建专业问卷，收集有价值的数据，简单易用的问卷设计工具',
 }
 import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { TooltipProvider } from '@/components/ui/tooltip'
 const douyinFont = localFont({
   src: './DouyinSansBold.ttf',
   display: 'swap',
@@ -23,12 +24,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="scroll-smooth">
-      {/* <head>
-        <script
-          crossOrigin="anonymous"
-          src="//unpkg.com/react-scan/dist/auto.global.js"
-        />
-      </head> */}
       <body className={`${douyinFont.variable}`}>
         <AntdRegistry>
           <ConfigProvider
@@ -40,7 +35,9 @@ export default function RootLayout({
               },
             }}
           >
-            <Provider>{children}</Provider>
+            <TooltipProvider>
+              <Provider>{children}</Provider>
+            </TooltipProvider>
           </ConfigProvider>
         </AntdRegistry>
         <Toaster />

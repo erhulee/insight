@@ -19,12 +19,18 @@ export function SurveyHeader({ survey }: SurveyHeaderProps) {
                     {survey.published ? '已发布' : '草稿'}
                 </Badge>
                 <div className="flex-1">{survey.name}</div>
-                <Badge
+                {survey.published ? <Badge
                     variant="outline"
-                    className="border-green-300 bg-green-100 text-green-600 opacity-50"
+                    className="border-green-300 bg-green-100 text-green-600 opacity-80"
                 >
                     {survey.questionnairesCnt}份回答
-                </Badge>
+                </Badge> : <Badge
+                    variant="outline"
+                    className="border-blue-300 bg-blue-100 text-blue-600 opacity-80"
+                >
+                    暂未发布
+                </Badge>}
+
             </div>
 
             {/* 更新时间 */}

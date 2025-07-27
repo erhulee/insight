@@ -543,6 +543,38 @@ export const appRouter = router({
       }
     }),
 
+  /**
+   * 创建问卷模版(from 现有的问卷)
+   */
+  SaveQuestionsToTemplate: protectedProcedure
+    .input(z.object({
+      question_id: z.string()
+    }))
+    .mutation(async (opt) => {
+      const { question_id } = opt.input
+      const userId = opt.ctx.userId!
+      const survey = await prisma.survey.findUnique({
+        where: {
+          id: question_id
+        }
+      })
+      if (!survey) {
+        throw new TRPCError({
+          message: '问卷不存在',
+          code: 'NOT_FOUND',
+        })
+      }
+      const questions = survey.questions!;
+      const template = await prisma.surverTemplate.create({
+        data: {
+          name: survey.name,
+          questions: questions,
+          createdBy: userId,
+        }
+      })
+      return template
+    }),
+
   GetSurveyResponses: protectedProcedure
     .input(
       z.object({
@@ -607,56 +639,28 @@ export const appRouter = router({
       }
     }),
 
+
   GetSurveyTemplates: protectedProcedure
     .input(
       z.object({
-        page: z.number().optional(),
-        limit: z.number().optional(),
+        page: z.number().default(1).optional(),
+        limit: z.number().default(10).optional(),
         category: z.string().optional(),
         tags: z.string().optional(),
       }),
     )
     .query(async (opt) => {
       try {
-        const page = opt.input.page || 1
-        const limit = opt.input.limit || 10
+        const page = opt.input.page!;
+        const limit = opt.input.limit!;
         const skip = (page - 1) * limit
-
-        const where: any = { isActive: true }
-        if (opt.input.category) {
-          where.category = opt.input.category
-        }
-        if (opt.input.tags) {
-          where.tags = { contains: opt.input.tags }
-        }
-
         const [templates, total] = await Promise.all([
-          prisma.renderTemplate.findMany({
-            where,
+          prisma.surverTemplate.findMany({
             skip,
             take: limit,
-            orderBy: { createdAt: 'desc' },
-            select: {
-              id: true,
-              name: true,
-              description: true,
-              tags: true,
-              category: true,
-              version: true,
-              isPublic: true,
-              createdAt: true,
-              updatedAt: true,
-              creator: {
-                select: {
-                  id: true,
-                  username: true
-                }
-              }
-            }
           }),
-          prisma.renderTemplate.count({ where })
+          prisma.surverTemplate.count({})
         ])
-
         return {
           templates,
           total,
@@ -671,7 +675,42 @@ export const appRouter = router({
         })
       }
     }),
-
+  CreateSurveyByTemplate: protectedProcedure
+    .input(z.object({
+      templateId: z.string()
+    }))
+    .mutation(async (opt) => {
+      const { templateId } = opt.input
+      const userId = opt.ctx.userId!
+      const template = await prisma.surverTemplate.findFirst({
+        where: {
+          id: templateId
+        }
+      })
+      if (!template) {
+        throw new TRPCError({
+          message: '模板不存在',
+          code: 'NOT_FOUND',
+        })
+      }
+      const survey = await prisma.survey.create({
+        data: {
+          ownerId: userId,
+          name: template?.name,
+          questions: template?.questions!,
+          description: "",
+          pageCount: 1,
+          published: false,
+        }
+      })
+      if (!survey) {
+        throw new TRPCError({
+          message: '创建问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+      return survey
+    }),
   CreateApiKey: protectedProcedure
     .input(
       z.object({

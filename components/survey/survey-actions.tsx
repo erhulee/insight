@@ -1,17 +1,19 @@
 import { Button } from '@/components/ui/button'
-import { FileText, Trash2Icon, Eye, BarChart3 } from 'lucide-react'
+import { FileText, Trash2Icon, Eye, BarChart3, Ellipsis, Scroll, ScrollText } from 'lucide-react'
 import Link from 'next/link'
 import { Survey } from '@/types/survey'
+import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
 
 interface SurveyActionsProps {
     survey: Survey
     onDelete?: (surveyId: string) => void
+    onSaveToTemplate?: () => void
 }
 
 /**
  * 调查问卷操作按钮组件
  */
-export function SurveyActions({ survey, onDelete }: SurveyActionsProps) {
+export function SurveyActions({ survey, onDelete, onSaveToTemplate }: SurveyActionsProps) {
     const handleDelete = () => {
         if (onDelete) {
             onDelete(survey.id)
@@ -33,6 +35,19 @@ export function SurveyActions({ survey, onDelete }: SurveyActionsProps) {
                     <FileText className="h-4 w-4" />
                 </Link>
             </Button>
+            {/* 保存 */}
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onSaveToTemplate}
+                    >
+                        <ScrollText className="h-4 w-4" />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>保存到模版</TooltipContent>
+            </Tooltip>
 
             {/* 删除按钮 */}
             <Button
@@ -43,7 +58,6 @@ export function SurveyActions({ survey, onDelete }: SurveyActionsProps) {
             >
                 <Trash2Icon className="h-4 w-4" />
             </Button>
-
             {/* 结果按钮 - 仅已发布的问卷显示 */}
             {survey.published && (
                 <Button variant="ghost" size="icon" asChild>
@@ -52,6 +66,9 @@ export function SurveyActions({ survey, onDelete }: SurveyActionsProps) {
                     </Link>
                 </Button>
             )}
+
         </div>
+
+
     )
 } 

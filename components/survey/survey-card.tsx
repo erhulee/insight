@@ -1,5 +1,4 @@
 "use client"
-
 import {
     Card,
     CardContent,
@@ -7,12 +6,27 @@ import {
 import { SurveyHeader } from '@/components/survey/survey-header'
 import { SurveyFooter } from '@/components/survey/survey-footer'
 import { SurveyOverviewProps } from '@/types/survey'
+import { trpc } from '@/app/_trpc/client'
+import { toast } from 'sonner'
 
 /**
  * 调查问卷概览组件
  * 显示调查问卷的基本信息、状态和操作按钮
  */
 export function SurveyCard({ survey, onDelete }: SurveyOverviewProps) {
+    const saveQuestionsToTemplateMutation = trpc.SaveQuestionsToTemplate.useMutation({
+        onSuccess: () => {
+            toast.success('保存成功')
+        },
+        onError: () => {
+            toast.error('保存失败')
+        }
+    })
+    const handleSaveToTemplate = () => {
+        saveQuestionsToTemplateMutation.mutate({
+            question_id: survey.id
+        })
+    }
     return (
         <Card key={survey.id} className="overflow-hidden">
             {/* 头部：标题、状态、更新时间 */}
@@ -26,7 +40,7 @@ export function SurveyCard({ survey, onDelete }: SurveyOverviewProps) {
             </CardContent>
 
             {/* 底部：统计信息和操作按钮 */}
-            <SurveyFooter survey={survey} onDelete={onDelete} />
+            <SurveyFooter survey={survey} onDelete={onDelete} onSaveToTemplate={handleSaveToTemplate} />
         </Card>
     )
 }
