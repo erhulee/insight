@@ -310,6 +310,18 @@ export const appRouter = router({
             orderBy: {
               createdAt: 'desc',
             },
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              updatedAt: true,
+              published: true,
+              questions: true,
+              pageCount: true,
+              createdAt: true,
+              deletedAt: true,
+              ownerId: true,
+            }
           }),
           prisma.survey.count({
             where: {
@@ -318,6 +330,7 @@ export const appRouter = router({
             },
           }),
         ])
+
 
         return {
           surveys,

@@ -1,10 +1,11 @@
 import { Badge } from '@/components/ui/badge'
 import { Clock } from 'lucide-react'
 import { formatDate } from '@/lib/utils/date'
-import { Survey } from '@/types/survey'
+import { inferProcedureOutput } from '@trpc/server'
+import { AppRouter } from '@/server'
 
 interface SurveyHeaderProps {
-    survey: Survey
+    survey: inferProcedureOutput<AppRouter['GetSurveyList']>['surveys'][number]
 }
 
 /**
@@ -23,7 +24,8 @@ export function SurveyHeader({ survey }: SurveyHeaderProps) {
                     variant="outline"
                     className="border-green-300 bg-green-100 text-green-600 opacity-80"
                 >
-                    {survey.questionnairesCnt}份回答
+                    {/* {survey.} */}
+                    NaN份回答
                 </Badge> : <Badge
                     variant="outline"
                     className="border-blue-300 bg-blue-100 text-blue-600 opacity-80"

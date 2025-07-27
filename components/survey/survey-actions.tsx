@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { FileText, Trash2Icon, Eye, BarChart3, Ellipsis, Scroll, ScrollText } from 'lucide-react'
+import { FileText, Trash2Icon, Eye, BarChart3, ScrollText } from 'lucide-react'
 import Link from 'next/link'
-import { Survey } from '@/types/survey'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
-
+import { inferProcedureOutput } from '@trpc/server'
+import { AppRouter } from '@/server'
 interface SurveyActionsProps {
-    survey: Survey
+    survey: inferProcedureOutput<AppRouter['GetSurveyList']>['surveys'][number]
     onDelete?: (surveyId: string) => void
     onSaveToTemplate?: () => void
 }
@@ -66,9 +66,6 @@ export function SurveyActions({ survey, onDelete, onSaveToTemplate }: SurveyActi
                     </Link>
                 </Button>
             )}
-
         </div>
-
-
     )
 } 
