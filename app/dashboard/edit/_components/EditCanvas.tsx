@@ -12,6 +12,8 @@ import {
 import { QuestionSchemaType } from '@/lib/dsl'
 import { DndContext, PointerSensor, useSensor } from '@dnd-kit/core'
 import { useAction } from '../_hooks/useAction'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 // 问题类型定义
 const questionTypes = preset.map((item) => ({
@@ -58,6 +60,35 @@ export const Canvas: React.FC = () => {
     }, 100)
   }
 
+  const CanvasSkeleton = () => {
+    return (
+      <div className=' space-y-4 flex flex-col justify-center items-center h-full' >
+        {[1, 2, 3].map(() => (<Card className=' w-full' >
+          <CardHeader>
+            <Skeleton className=" h-5 w-[180px]" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 w-full">
+              <Skeleton className=" h-8 w-full" />
+              <Skeleton className=" h-6 w-full" />
+            </div>
+          </CardContent>
+        </Card>))}
+      </div>
+    )
+  }
+
+  const CanvasNoData = () => {
+    return (
+      <div className="text-center py-12 border-2 border-dashed rounded-lg">
+        <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
+        <Button onClick={() => addQuestion(QuestionType.Text)}>
+          <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
+        </Button>
+      </div>
+    )
+  }
+
 
   // 渲染预览内容
   return (
@@ -70,12 +101,7 @@ export const Canvas: React.FC = () => {
         >
           <div className="space-y-4">
             {questions.length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                <p className="text-muted-foreground mb-4">问卷中还没有问题</p>
-                <Button onClick={() => addQuestion(QuestionType.Text)}>
-                  <Plus className="h-4 w-4 mr-2" /> 添加第一个问题
-                </Button>
-              </div>
+              <CanvasNoData />
             ) : (
               questions.map((question, index) => (
                 <EditQuestionItem
@@ -119,6 +145,6 @@ export const Canvas: React.FC = () => {
           </Tabs>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
