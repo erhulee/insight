@@ -27,10 +27,10 @@ import { toast } from "sonner"
 import { signIn } from "next-auth/react"
 import { signInSchema } from '@/auth'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { getCallbackUrl, buildCallbackUrl } from '@/lib/auth-utils'
 
-export default function LoginPage() {
+function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
@@ -145,5 +145,13 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+  )
+}
+export default function Index() {
+  return (
+    // You could have a loading skeleton as the `fallback` too
+    <Suspense>
+      <LoginPage />
+    </Suspense>
   )
 }

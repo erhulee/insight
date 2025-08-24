@@ -26,7 +26,7 @@ import { useForm } from 'react-hook-form'
 import { InsightBrand } from '@/components/common/insight-brand'
 import { trpc } from '../_trpc/client'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
 import { getCallbackUrl, buildCallbackUrl, handleAuthSuccess } from '@/lib/auth-utils'
@@ -43,7 +43,7 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
-export default function RegisterPage() {
+function RegisterPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
@@ -203,5 +203,14 @@ export default function RegisterPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function Index() {
+  return (
+    // You could have a loading skeleton as the `fallback` too
+    <Suspense>
+      <RegisterPage />
+    </Suspense>
   )
 }
