@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { buildCallbackUrl } from '@/lib/auth-utils'
 
 interface WithAuthOptions {
     redirectTo?: string
@@ -27,8 +28,8 @@ export function withAuth<P extends object>(
         useEffect(() => {
             if (!isLoading && !isAuthenticated && requireAuth) {
                 const currentPath = window.location.pathname
-                const callbackUrl = encodeURIComponent(currentPath)
-                router.push(`${redirectTo}?callbackUrl=${callbackUrl}`)
+                const loginUrl = buildCallbackUrl(redirectTo, currentPath)
+                router.push(loginUrl)
             }
         }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
 

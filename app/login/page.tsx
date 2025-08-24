@@ -26,10 +26,18 @@ import { InsightBrand } from '@/components/common/insight-brand'
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
 import { signInSchema } from '@/auth'
-
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { getCallbackUrl, buildCallbackUrl } from '@/lib/auth-utils'
 
 export default function LoginPage() {
-  // const router = useRouter()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [isLoading, setIsLoading] = useState(false)
+
+  // 获取回调URL，如果没有则默认跳转到仪表板
+  const callbackUrl = getCallbackUrl(searchParams)
+
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -38,14 +46,30 @@ export default function LoginPage() {
     },
   })
 
-
   async function onSubmit(values: z.infer<typeof signInSchema>) {
-    const { account, password, } = values
-    await signIn("credentials", {
-      account,
-      password,
-      redirectTo: "/dashboard",
-    })
+    const { account, password } = values
+    setIsLoading(true)
+
+    try {
+      const result = await signIn("credentials", {
+        account,
+        password,
+        redirect: false, // 不自动重定向，手动处理
+      })
+
+      if (result?.error) {
+        toast.error('登录失败，请检查账号密码')
+      } else if (result?.ok) {
+        toast.success('登录成功')
+        // 登录成功后跳转到回调URL
+        router.push(callbackUrl)
+      }
+    } catch (error) {
+      toast.error('登录过程中发生错误')
+      console.error('Login error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -86,14 +110,14 @@ export default function LoginPage() {
                         <FormItem>
                           <FormLabel>密码</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} type="password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      {false ? (
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? (
                         <span className="flex items-center gap-1">
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                           登录中 ...
@@ -112,7 +136,7 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
                 没有账号?{' '}
-                <Link href="/register" className="text-primary hover:underline">
+                <Link href={buildCallbackUrl('/register', callbackUrl)} className="text-primary hover:underline">
                   立即注册
                 </Link>
               </div>

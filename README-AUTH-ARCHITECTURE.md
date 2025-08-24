@@ -4,6 +4,23 @@
 
 本项目实现了一个分层的认证架构，用于区分处理登录态页面和非登录态页面。通过多种方式实现认证保护，确保代码的可维护性和灵活性。
 
+## 🔄 自动回调跳转功能
+
+系统支持登录/注册后的自动跳转功能：
+
+- **智能跳转**: 用户访问需要认证的页面时，未登录会自动跳转到登录页
+- **回调URL**: 登录成功后自动跳转回用户原本要访问的页面
+- **安全验证**: 防止开放重定向攻击，只允许同源跳转
+- **无缝体验**: 注册成功后自动登录并跳转，无需重复操作
+
+### 使用示例
+
+```typescript
+// 用户访问 /dashboard/create 页面
+// 未登录时自动跳转到 /login?callbackUrl=%2Fdashboard%2Fcreate
+// 登录成功后自动跳转回 /dashboard/create
+```
+
 ## 架构组件
 
 ### 1. 认证 Hooks
@@ -99,6 +116,27 @@ function MyComponent() {
 export default withOptionalAuth(MyComponent, <div>请登录查看内容</div>)
 ```
 
+### 4. 认证工具函数
+
+#### 核心工具函数
+```typescript
+import { 
+  getCallbackUrl, 
+  buildCallbackUrl, 
+  handleAuthSuccess,
+  isValidCallbackUrl 
+} from '@/lib/auth-utils'
+
+// 获取安全的回调URL
+const callbackUrl = getCallbackUrl(searchParams)
+
+// 构建带有回调URL的链接
+const loginLink = buildCallbackUrl('/login', callbackUrl)
+
+// 处理认证成功后的跳转
+handleAuthSuccess(router, callbackUrl)
+```
+
 ## 使用场景
 
 ### 1. 需要强制登录的页面
@@ -144,6 +182,33 @@ function UserProfile() {
   }
   
   return <div>欢迎, {user?.name}</div>
+}
+```
+
+## 回调URL机制
+
+### 工作原理
+
+1. **页面访问**: 用户访问需要认证的页面（如 `/dashboard/create`）
+2. **自动跳转**: 系统检测到未登录，自动跳转到登录页并携带回调URL
+3. **登录成功**: 用户登录成功后，系统自动跳转回原页面
+4. **无缝体验**: 用户无需手动导航，体验更加流畅
+
+### 安全特性
+
+- **同源验证**: 只允许跳转到同域名下的页面
+- **路径验证**: 防止路径遍历攻击（如 `../../../etc/passwd`）
+- **参数编码**: 自动处理URL编码，确保参数安全传递
+
+### 配置示例
+
+```typescript
+// 在 types/auth.ts 中配置路由认证要求
+export const DEFAULT_ROUTE_CONFIG: RouteConfig = {
+  '/dashboard': { requireAuth: true, redirectTo: '/login' },
+  '/account': { requireAuth: true, redirectTo: '/login' },
+  '/': { requireAuth: false },
+  '/login': { requireAuth: false },
 }
 ```
 
@@ -272,6 +337,7 @@ const customConfig = getMiddlewareConfig({
 1. **无限重定向**: 检查 `redirectTo` 路径是否正确
 2. **认证状态不更新**: 确保使用了 `AuthProvider` 包装
 3. **中间件不生效**: 检查 `middleware.ts` 配置和 matcher 设置
+4. **回调URL不工作**: 检查URL编码和参数传递
 
 ### 调试技巧
 
@@ -282,6 +348,9 @@ console.log('认证状态:', { isAuthenticated, isLoading, user })
 // 检查路由配置
 console.log('当前路径:', pathname)
 console.log('需要认证:', isPathRequireAuth(pathname))
+
+// 检查回调URL
+console.log('回调URL:', searchParams.get('callbackUrl'))
 ```
 
 ## 总结
@@ -292,5 +361,6 @@ console.log('需要认证:', isPathRequireAuth(pathname))
 - **可维护性**: 清晰的代码结构和类型定义
 - **用户体验**: 自动重定向和回调 URL 支持
 - **性能**: 合理的加载状态和缓存策略
+- **安全性**: 防止开放重定向攻击，验证回调URL安全性
 
 通过合理使用这些组件和 hooks，可以轻松实现页面级别的认证保护，提升应用的安全性和用户体验。

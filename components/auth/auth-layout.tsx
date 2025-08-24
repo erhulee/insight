@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { buildCallbackUrl } from '@/lib/auth-utils'
 
 interface AuthLayoutProps {
     children: React.ReactNode
@@ -26,8 +27,8 @@ export function AuthLayout({
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             const currentPath = window.location.pathname
-            const callbackUrl = encodeURIComponent(currentPath)
-            router.push(`${redirectTo}?callbackUrl=${callbackUrl}`)
+            const loginUrl = buildCallbackUrl(redirectTo, currentPath)
+            router.push(loginUrl)
         }
     }, [isAuthenticated, isLoading, redirectTo, router])
 

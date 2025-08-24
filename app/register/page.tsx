@@ -25,6 +25,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { InsightBrand } from '@/components/common/insight-brand'
 import { trpc } from '../_trpc/client'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { toast } from 'sonner'
+import { getCallbackUrl, buildCallbackUrl, handleAuthSuccess } from '@/lib/auth-utils'
+
 const formSchema = z
   .object({
     username: z.string().min(2).max(50),
@@ -36,7 +42,15 @@ const formSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
+
 export default function RegisterPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [isLoading, setIsLoading] = useState(false)
+
+  // 获取回调URL，如果没有则默认跳转到仪表板
+  const callbackUrl = getCallbackUrl(searchParams)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,16 +60,50 @@ export default function RegisterPage() {
       username: '',
     },
   })
+
   const registerMutation = trpc.Register.useMutation()
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { account, password, username } = values
-    registerMutation.mutate({
-      account,
-      password,
-      username,
-    })
-    // await create(account, password, username)
+    setIsLoading(true)
+
+    try {
+      // 注册用户
+      const result = await registerMutation.mutateAsync({
+        account,
+        password,
+        username,
+      })
+
+      if (result) {
+        toast.success('注册成功，正在自动登录...')
+
+        // 注册成功后自动登录
+        const loginResult = await signIn("credentials", {
+          account,
+          password,
+          redirect: false,
+        })
+
+        if (loginResult?.error) {
+          toast.error('自动登录失败，请手动登录')
+          router.push(buildCallbackUrl('/login', callbackUrl))
+        } else if (loginResult?.ok) {
+          toast.success('登录成功')
+          // 登录成功后跳转到回调URL
+          handleAuthSuccess(router, callbackUrl)
+        }
+      } else {
+        toast.error('注册失败，请重试')
+      }
+    } catch (error) {
+      toast.error('注册过程中发生错误')
+      console.error('Register error:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
@@ -108,7 +156,7 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>密码</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} type="password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -121,14 +169,14 @@ export default function RegisterPage() {
                         <FormItem>
                           <FormLabel>确认密码</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} type="password" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      {false ? (
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? (
                         <span className="flex items-center gap-1">
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                           创建账号...
@@ -147,7 +195,7 @@ export default function RegisterPage() {
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
                 已有账号?{' '}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href={buildCallbackUrl('/login', callbackUrl)} className="text-primary hover:underline">
                   立即登陆
                 </Link>
               </div>
