@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client/edge')
 const prisma = new PrismaClient()
 // 获取单个问卷
 type GetSurverParams = Promise<{

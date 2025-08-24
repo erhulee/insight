@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import BGSrc from './background.jpg'
 import BannerSrc from './banner.png'
-import { PrismaClient, Survey } from '@prisma/client'
+import { PrismaClient, Survey } from '@prisma/client/edge'
 const prisma = new PrismaClient()
 export async function generateStaticParams() {
   const surveys: Survey[] = await prisma.survey.findMany({

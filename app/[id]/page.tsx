@@ -1,5 +1,5 @@
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
 import { SurveyForm } from './Form'
 import { Question } from '@/lib/api-types'
 const prisma = new PrismaClient()

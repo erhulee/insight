@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
 import { z } from 'zod'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/session'

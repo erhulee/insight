@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client/edge"
 
 export function jsonValueParse(value: string | number | true | Prisma.JsonObject | Prisma.JsonArray | Prisma.JsonValue) {
     if (typeof value === 'string') {
