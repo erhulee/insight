@@ -273,7 +273,7 @@ export const TableLoading = ({ rows = 5, columns = 4 }: { rows?: number; columns
           <Skeleton key={`header-${i}`} className="h-4 w-20" />
         ))}
       </div>
-      
+
       {/* 表格行骨架 */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
         <div key={`row-${rowIndex}`} className="flex space-x-4">
