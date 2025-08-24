@@ -24,7 +24,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }),
                 })
                 const response = await res.json()
-                console.log("response", response)
                 return response
             },
         }),
@@ -34,6 +33,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             session.user.id = token.sub!
             return session;
         }
-
     }
 })

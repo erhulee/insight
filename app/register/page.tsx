@@ -77,7 +77,6 @@ export default function RegisterPage() {
 
       if (result) {
         toast.success('注册成功，正在自动登录...')
-
         // 注册成功后自动登录
         const loginResult = await signIn("credentials", {
           account,

@@ -1,7 +1,7 @@
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Question } from '@/lib/types'
 import { PrismaClient } from '@prisma/client'
 import { SurveyForm } from './Form'
+import { Question } from '@/lib/api-types'
 const prisma = new PrismaClient()
 
 export default async function SurveyPage(props: { params: Promise<{ id: string }> }) {
@@ -11,7 +11,8 @@ export default async function SurveyPage(props: { params: Promise<{ id: string }
       id: params.id,
     },
   })
-  const questionList = JSON.parse(survey?.questions || '[]') as Question[]
+  console.log("survey:", survey)
+  const questionList = survey?.questions
   if (!survey) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

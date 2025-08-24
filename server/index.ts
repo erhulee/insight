@@ -1,40 +1,47 @@
 import { procedure, router, protectedProcedure, createContext } from './trpc'
 import { createSession, deleteSession } from '@/lib/session'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/edge'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { generateSurveyFromPrompt, buildSurveyPrompt } from './ai-service'
 import { observable } from '@trpc/server/observable'
+import { withAccelerate } from '@prisma/extension-accelerate'
 
-const prisma = new PrismaClient()
-
+const prisma = new PrismaClient().$extends(withAccelerate())
 export const appRouter = router({
   Register: procedure.input(z.object({
     account: z.string(),
     password: z.string(),
     username: z.string(),
   })).mutation(async (opt) => {
-    const { account, password, username } = opt.input
-    const u = await prisma.user.findFirst({
-      where: {
-        account: account
+    try {
+      const { account, password, username } = opt.input
+      const u = await prisma.user.findFirst({
+        where: {
+          account: account
+        }
+      })
+      if (u) {
+        throw new TRPCError({
+          message: '账号已存在',
+          code: 'CONFLICT',
+        })
       }
-    })
-    if (u) {
+      const user = await prisma.user.create({
+        data: {
+          account: account,
+          password: password,
+          username: username,
+        },
+      })
+      return user
+    } catch (e) {
+      console.error('注册失败:', e)
       throw new TRPCError({
-        message: '账号已存在',
-        code: 'CONFLICT',
+        message: '注册失败',
+        code: 'INTERNAL_SERVER_ERROR',
       })
     }
-    const user = await prisma.user.create({
-      data: {
-        account: account,
-        password: password,
-        username: username,
-      },
-    })
-
-    return user
   }),
   CreateUser: procedure
     .input(
