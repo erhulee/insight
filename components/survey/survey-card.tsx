@@ -11,10 +11,6 @@ import { inferProcedureOutput } from '@trpc/server'
 import { AppRouter } from '@/server'
 export interface SurveyOverviewProps {
     survey: inferProcedureOutput<AppRouter['GetSurveyList']>['surveys'][number]
-    onDelete: (surveyId: string) => void
-    onEdit?: (surveyId: string) => void
-    onView?: (surveyId: string) => void
-    onViewResults?: (surveyId: string) => void
 }
 /**
  * 调查问卷概览组件

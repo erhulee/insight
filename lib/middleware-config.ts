@@ -23,6 +23,7 @@ export interface MiddlewareConfig {
     // 路径配置
     excludedPaths: string[]
     protectedPaths: string[]
+    publicPaths: string[]
 
     // 性能配置
     enableCaching: boolean
@@ -64,7 +65,17 @@ const DEFAULT_CONFIG: MiddlewareConfig = {
     protectedPaths: [
         '/dashboard',
         '/admin',
-        '/profile'
+        '/profile',
+        '/account'
+    ],
+    publicPaths: [
+        '/',
+        '/login',
+        '/register',
+        '/survey',
+        '/templates',
+        '/demo',
+        '/developer'
     ],
 
     // 性能配置

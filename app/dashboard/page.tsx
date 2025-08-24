@@ -6,26 +6,145 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutHeader } from '@/components/layout-header'
 import { SurveyCard } from '@/components/survey/survey-card'
 import { trpc } from '../_trpc/client'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // Constants
 const CREATE_SURVEY_PATH = '/dashboard/create'
 const DEFAULT_TAB = 'all'
-
+const DEFAULT_PAGE = 1
+const DEFAULT_LIMIT = 10
+const PAGE_SIZE_OPTIONS = [10, 20, 50]
 
 
 export default function DashboardPage() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Get pagination params from URL
+  const currentPage = parseInt(searchParams.get('page') || DEFAULT_PAGE.toString())
+  const currentLimit = parseInt(searchParams.get('limit') || DEFAULT_LIMIT.toString())
+  const currentTab = searchParams.get('tab') || DEFAULT_TAB
+  const currentSearch = searchParams.get('search') || ''
+
   const { data, isLoading, isError } = trpc.GetSurveyList.useQuery({
-    page: 1,
-    limit: 10,
+    page: currentPage,
+    limit: currentLimit,
   })
+
+  // Update URL with new query parameters
+  const updateURL = (params: Record<string, string | number>) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === '' || value === 0) {
+        newSearchParams.delete(key)
+      } else {
+        newSearchParams.set(key, value.toString())
+      }
+    })
+
+    router.push(`${pathname}?${newSearchParams.toString()}`)
+  }
+
+  // Handle pagination change
+  const handlePageChange = (page: number) => {
+    updateURL({ page })
+  }
+
+  // Handle page size change
+  const handlePageSizeChange = (limit: string) => {
+    updateURL({ limit: parseInt(limit), page: 1 }) // Reset to first page when changing page size
+  }
+
+  // Handle tab change
+  const handleTabChange = (tab: string) => {
+    updateURL({ tab, page: 1 }) // Reset to first page when changing tabs
+  }
+
+  // Handle search change
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 }) // Reset to first page when searching
+  }
+
+  // Generate pagination items
+  const generatePaginationItems = () => {
+    if (!data) return []
+
+    const { page, pages } = data
+    const items = []
+
+    // Always show first page
+    if (page > 1) {
+      items.push(
+        <PaginationItem key="first">
+          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+        </PaginationItem>
+      )
+    }
+
+    // Show ellipsis if there's a gap
+    if (page > 3) {
+      items.push(
+        <PaginationItem key="ellipsis1">
+          <PaginationEllipsis />
+        </PaginationItem>
+      )
+    }
+
+    // Show current page and neighbors
+    for (let i = Math.max(2, page - 1); i <= Math.min(pages - 1, page + 1); i++) {
+      if (i === 1 || i === pages) continue // Skip first and last as they're handled separately
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => handlePageChange(i)}
+            isActive={i === page}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+
+    // Show ellipsis if there's a gap
+    if (page < pages - 2) {
+      items.push(
+        <PaginationItem key="ellipsis2">
+          <PaginationEllipsis />
+        </PaginationItem>
+      )
+    }
+
+    // Always show last page
+    if (pages > 1 && page < pages) {
+      items.push(
+        <PaginationItem key="last">
+          <PaginationLink onClick={() => handlePageChange(pages)}>{pages}</PaginationLink>
+        </PaginationItem>
+      )
+    }
+
+    return items
+  }
 
   // Render helpers
   const renderSurveyList = useMemo(() => {
     if (isLoading) {
       return null
     }
-    const { surveys, total, page, limit, pages } = data;
+    const { surveys, total, page, limit, pages } = data || {};
     if (surveys.length === 0) {
       return (
         <div className="col-span-full text-center py-12">
@@ -49,8 +168,7 @@ export default function DashboardPage() {
     return surveys.map((survey) => (
       <SurveyCard
         key={survey.id}
-        survey={survey}
-        onDelete={() => { }} // This will be handled by the component internally
+        survey={survey as any}
       />
     ))
   }, [data, isLoading])
@@ -86,10 +204,12 @@ export default function DashboardPage() {
                 type="search"
                 placeholder="搜索问卷..."
                 className="pl-8"
+                value={currentSearch}
+                onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
 
-            <Tabs defaultValue={DEFAULT_TAB} className="w-full sm:w-auto">
+            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
               <TabsList>
                 <TabsTrigger value="all">全部</TabsTrigger>
                 <TabsTrigger value="published">已发布</TabsTrigger>
@@ -102,8 +222,51 @@ export default function DashboardPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
             {renderSurveyList}
           </div>
+
+          {/* Pagination */}
+          {data && data.pages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t">
+              <Pagination className='flex-shrink-0'>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+
+                  {generatePaginationItems()}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => handlePageChange(Math.min(data.pages, currentPage + 1))}
+                      className={currentPage >= data.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground ">
+                <span>每页显示</span>
+                <Select value={currentLimit.toString()} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAGE_SIZE_OPTIONS.map(size => (
+                      <SelectItem key={size} value={size.toString()}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div>条，共 {data.total} 条</div>
+              </div>
+
+            </div>
+          )}
         </div>
       </main>
     </div>
   )
 }
+
