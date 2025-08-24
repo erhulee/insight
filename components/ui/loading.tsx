@@ -2,6 +2,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { LoadingSpinner } from './spin'
 import { Skeleton } from './skeleton'
+import { Card } from 'antd'
 
 // 加载状态类型
 export type LoadingVariant = 'spinner' | 'dots' | 'bars' | 'pulse' | 'skeleton'
@@ -287,17 +288,20 @@ export const TableLoading = ({ rows = 5, columns = 4 }: { rows?: number; columns
 }
 
 // 列表加载组件
-export const ListLoading = ({ items = 3 }: { items?: number }) => {
+export const ListLoading = ({ items = 3, columns = 1 }: { items?: number, columns?: number }) => {
+  const gridClass = `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${columns} gap-4`
   return (
-    <div className="space-y-3">
+    <div className={cn(" gap-3 w-full", gridClass)}>
       {Array.from({ length: items }).map((_, i) => (
-        <div key={i} className="flex items-center space-x-3">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="space-y-2 flex-1">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
+        <Card key={i} >
+          <div className="flex items-center space-x-3">
+            <Skeleton className="h-10 w-10" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   )

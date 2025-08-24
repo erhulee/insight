@@ -18,6 +18,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import Loading, { ListLoading } from '@/components/ui/loading'
 
 // 常量定义
 const CREATE_SURVEY_PATH = '/dashboard/create'
@@ -196,21 +197,21 @@ export default function DashboardPage() {
    */
   const renderSurveyList = useMemo(() => {
     if (isLoading) {
-      return null
+      return <ListLoading items={9} columns={3}></ListLoading>
+
     }
-
     const { surveys = [] } = data || {}
-
     if (surveys.length === 0) {
       return renderEmptyState()
     }
-
-    return surveys.map((survey: any) => (
-      <SurveyCard
-        key={survey.id}
-        survey={survey}
-      />
-    ))
+    return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
+      {surveys.map((survey: any) => (
+        <SurveyCard
+          key={survey.id}
+          survey={survey}
+        />
+      ))}
+    </div>
   }, [data, isLoading])
 
   /**
@@ -307,10 +308,8 @@ export default function DashboardPage() {
           </div>
 
           {/* 问卷网格 */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
-            {renderSurveyList}
-          </div>
 
+          {renderSurveyList}
           {/* 分页控件 */}
           {renderPagination()}
         </div>

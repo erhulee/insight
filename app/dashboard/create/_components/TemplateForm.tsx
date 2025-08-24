@@ -71,15 +71,12 @@ export function TemplateForm() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleCreateBlankSurvey} className="w-full">
-          {/* {isCreating ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            创建中...
-                        </>
-                    ) : ( */}
-          创建问卷
-          {/* )} */}
+        <Button
+          onClick={handleCreateBlankSurvey}
+          className="w-full"
+          disabled={createMutation.isPending}
+        >
+          {createMutation.isPending ? '创建中...' : '创建问卷'}
         </Button>
       </CardFooter>
     </Card>
