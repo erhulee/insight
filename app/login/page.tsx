@@ -29,6 +29,7 @@ import { signInSchema } from '@/auth'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { getCallbackUrl, buildCallbackUrl } from '@/lib/auth-utils'
+import { PageLoading } from '@/components/ui/loading'
 
 function LoginPage() {
   const router = useRouter()
@@ -150,7 +151,7 @@ function LoginPage() {
 export default function Index() {
   return (
     // You could have a loading skeleton as the `fallback` too
-    <Suspense>
+    <Suspense fallback={<PageLoading />}>
       <LoginPage />
     </Suspense>
   )

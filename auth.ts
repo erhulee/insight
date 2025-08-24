@@ -16,7 +16,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             authorize: async (credentials) => {
                 const { account, password } = await signInSchema.parseAsync(credentials)
-                const res = await fetch("http://localhost:3000/api/validate", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/validate`, {
                     method: "POST",
                     body: JSON.stringify({
                         account: account,

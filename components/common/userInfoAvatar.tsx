@@ -10,10 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ArrowRight, LogOut, UserIcon } from 'lucide-react'
 import { trpc } from '@/app/_trpc/client'
+import { signOut } from 'next-auth/react'
 export function UserInfoAvatar() {
   const userInfo = trpc.GetUserInfo.useQuery()
   const handleLogOut = async () => {
-    // await logout()
+    await signOut()
     userInfo.refetch()
   }
   if (userInfo.data) {
