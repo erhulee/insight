@@ -31,10 +31,6 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50] as const
 type TabValue = 'all' | 'published' | 'drafts'
 type PageSize = typeof PAGE_SIZE_OPTIONS[number]
 
-interface PaginationParams {
-  page: number
-  limit: number
-}
 
 interface URLUpdateParams {
   [key: string]: string | number
@@ -108,135 +104,71 @@ export default function DashboardPage() {
   }
 
   /**
-   * 生成分页项目
-   * @returns 分页组件数组
+   * 构建分页序列（包含页码与省略号）
    */
-  const generatePaginationItems = () => {
-    if (!data) return []
+  const buildPaginationSequence = (page: number, pages: number): (number | 'ellipsis')[] => {
+    if (pages <= 1) return []
 
-    const { page, pages } = data
-    const items = []
+    const sequence: (number | 'ellipsis')[] = []
 
-    // 始终显示第一页
-    if (page > 1) {
-      items.push(
-        <PaginationItem key="first">
-          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
-        </PaginationItem>
-      )
-    }
+    const windowStart = Math.max(2, page - 1)
+    const windowEnd = Math.min(pages - 1, page + 1)
 
-    // 如果有间隙则显示省略号
-    if (page > 3) {
-      items.push(
-        <PaginationItem key="ellipsis1">
-          <PaginationEllipsis />
-        </PaginationItem>
-      )
-    }
+    sequence.push(1)
+    if (windowStart > 2) sequence.push('ellipsis')
+    for (let i = windowStart; i <= windowEnd; i++) sequence.push(i)
+    if (windowEnd < pages - 1) sequence.push('ellipsis')
+    if (pages > 1) sequence.push(pages)
 
-    // 显示当前页和相邻页
-    for (let i = Math.max(2, page - 1); i <= Math.min(pages - 1, page + 1); i++) {
-      if (i === 1 || i === pages) continue // 跳过第一页和最后一页，因为它们单独处理
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={() => handlePageChange(i)}
-            isActive={i === page}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      )
-    }
-
-    // 如果有间隙则显示省略号
-    if (page < pages - 2) {
-      items.push(
-        <PaginationItem key="ellipsis2">
-          <PaginationEllipsis />
-        </PaginationItem>
-      )
-    }
-
-    // 始终显示最后一页
-    if (pages > 1 && page < pages) {
-      items.push(
-        <PaginationItem key="last">
-          <PaginationLink onClick={() => handlePageChange(pages)}>{pages}</PaginationLink>
-        </PaginationItem>
-      )
-    }
-
-    return items
+    return sequence
   }
 
   /**
-   * 渲染空状态
+   * 分页组件（更易读、职责单一）
    */
-  const renderEmptyState = () => (
-    <div className="col-span-full text-center py-12">
-      <div className="mx-auto w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4">
-        <FileText className="h-12 w-12 text-muted-foreground" />
-      </div>
-      <h3 className="text-lg font-medium mb-2">没有找到问卷</h3>
-      <p className="text-muted-foreground mb-4">
-        创建您的第一个问卷开始使用
-      </p>
-      <Button asChild className="gap-1">
-        <a href={CREATE_SURVEY_PATH}>
-          <PlusCircle className="h-4 w-4" />
-          创建问卷
-        </a>
-      </Button>
-    </div>
-  )
-
-  /**
-   * 渲染问卷列表
-   */
-  const renderSurveyList = useMemo(() => {
-    if (isLoading) {
-      return <ListLoading items={9} columns={3}></ListLoading>
-
-    }
-    const { surveys = [] } = data || {}
-    if (surveys.length === 0) {
-      return renderEmptyState()
-    }
-    return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
-      {surveys.map((survey: any) => (
-        <SurveyCard
-          key={survey.id}
-          survey={survey}
-        />
-      ))}
-    </div>
-  }, [data, isLoading])
-
-  /**
-   * 渲染分页控件
-   */
-  const renderPagination = () => {
-    if (!data || data.pages <= 1) return null
-
+  const PaginationBar = ({
+    page,
+    pages,
+    total,
+    limit,
+    onPageChange,
+    onLimitChange,
+  }: {
+    page: number
+    pages: number
+    total: number
+    limit: number
+    onPageChange: (p: number) => void
+    onLimitChange: (v: string) => void
+  }) => {
+    const sequence = buildPaginationSequence(page, pages)
     return (
       <div className="flex flex-col sm:flex-row items-center justify-end gap-4 pt-6 border-t">
         <Pagination className="flex-shrink-0">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                onClick={() => onPageChange(Math.max(1, page - 1))}
+                className={page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />
             </PaginationItem>
 
-            {generatePaginationItems()}
+            {sequence.map((item, idx) => (
+              <PaginationItem key={`${item}-${idx}`}>
+                {item === 'ellipsis' ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink onClick={() => onPageChange(item)} isActive={item === page}>
+                    {item}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
 
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(Math.min(data.pages, currentPage + 1))}
-                className={currentPage >= data.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                onClick={() => onPageChange(Math.min(pages, page + 1))}
+                className={page >= pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />
             </PaginationItem>
           </PaginationContent>
@@ -244,7 +176,7 @@ export default function DashboardPage() {
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>每页显示</span>
-          <Select value={currentLimit.toString()} onValueChange={handlePageSizeChange}>
+          <Select value={limit.toString()} onValueChange={onLimitChange}>
             <SelectTrigger className="w-20">
               <SelectValue />
             </SelectTrigger>
@@ -256,9 +188,65 @@ export default function DashboardPage() {
               ))}
             </SelectContent>
           </Select>
-          <div>条，共 {data.total} 条</div>
+          <div>条，共 {total} 条</div>
         </div>
       </div>
+    )
+  }
+
+
+  /**
+   * 渲染问卷列表
+   */
+  const renderSurveyList = useMemo(() => {
+    const { surveys = [] } = data || {}
+    switch (true) {
+      case isLoading:
+        return <ListLoading items={9} columns={3}></ListLoading>
+      case isError:
+        return <div>数据错误</div>
+      case surveys.length === 0:
+        return <div className="col-span-full text-center py-12">
+          <div className="mx-auto w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4">
+            <FileText className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">没有找到问卷</h3>
+          <p className="text-muted-foreground mb-4">
+            创建您的第一个问卷开始使用
+          </p>
+          <Button asChild className="gap-1">
+            <a href={CREATE_SURVEY_PATH}>
+              <PlusCircle className="h-4 w-4" />
+              创建问卷
+            </a>
+          </Button>
+        </div>
+      default:
+        return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2">
+          {surveys.map((survey: any) => (
+            <SurveyCard
+              key={survey.id}
+              survey={survey}
+            />
+          ))}
+        </div>
+    }
+  }, [data, isLoading, isError])
+
+  /**
+   * 渲染分页控件
+   */
+  const renderPagination = () => {
+    if (!data || data.pages <= 1) return null
+    return (
+      <PaginationBar
+        page={currentPage}
+        pages={data.pages}
+        total={data.total}
+        limit={currentLimit}
+        onPageChange={handlePageChange}
+        onLimitChange={handlePageSizeChange}
+      />
     )
   }
 
