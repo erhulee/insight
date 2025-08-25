@@ -297,6 +297,7 @@ export const appRouter = router({
       z.object({
         page: z.number().optional(),
         limit: z.number().optional(),
+        type: z.enum(['all', 'published', 'drafts']).optional(),
       }),
     )
     .query(async (opt) => {
@@ -311,6 +312,7 @@ export const appRouter = router({
             where: {
               ownerId: userId,
               deletedAt: null,
+              published: opt.input.type === 'published' ? true : opt.input.type == "drafts" ? false : undefined,
             },
             skip,
             take: limit,

@@ -18,7 +18,8 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import Loading, { ListLoading } from '@/components/ui/loading'
+import { ListLoading } from '@/components/ui/loading'
+import { useUrlParams } from '@/hooks/common/useUrlParams'
 
 // 常量定义
 const CREATE_SURVEY_PATH = '/dashboard/create'
@@ -31,52 +32,37 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50] as const
 type TabValue = 'all' | 'published' | 'drafts'
 type PageSize = typeof PAGE_SIZE_OPTIONS[number]
 
-
-interface URLUpdateParams {
-  [key: string]: string | number
-}
-
 export default function DashboardPage() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const { params, updateParams } = useUrlParams({
+    defaults: {
+      page: DEFAULT_PAGE,
+      limit: DEFAULT_LIMIT,
+      tab: DEFAULT_TAB,
+      search: ''
+    },
+    parse: {
+      page: (value) => parseInt(value),
+      limit: (value) => parseInt(value),
+      tab: (value) => value as TabValue,
+      search: (value) => value
+    }
+  })
 
-  // 从 URL 获取分页参数
-  const currentPage = parseInt(searchParams.get('page') || DEFAULT_PAGE.toString())
-  const currentLimit = parseInt(searchParams.get('limit') || DEFAULT_LIMIT.toString())
-  const currentTab = searchParams.get('tab') || DEFAULT_TAB
-  const currentSearch = searchParams.get('search') || ''
 
   // 获取问卷列表数据
   const { data, isLoading, isError } = trpc.GetSurveyList.useQuery({
-    page: currentPage,
-    limit: currentLimit,
+    page: params.page,
+    limit: params.limit,
+    type: params.tab as 'all' | 'published' | 'drafts',
   })
 
-  /**
-   * 更新 URL 查询参数
-   * @param params 要更新的参数
-   */
-  const updateURL = (params: URLUpdateParams) => {
-    const newSearchParams = new URLSearchParams(searchParams.toString())
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === '' || value === 0) {
-        newSearchParams.delete(key)
-      } else {
-        newSearchParams.set(key, value.toString())
-      }
-    })
-
-    router.push(`${pathname}?${newSearchParams.toString()}`)
-  }
 
   /**
    * 处理分页变化
    * @param page 页码
    */
   const handlePageChange = (page: number) => {
-    updateURL({ page })
+    updateParams({ page })
   }
 
   /**
@@ -84,7 +70,8 @@ export default function DashboardPage() {
    * @param limit 每页显示数量
    */
   const handlePageSizeChange = (limit: string) => {
-    updateURL({ limit: parseInt(limit), page: 1 }) // 改变页面大小时重置到第一页
+    // 改变页面大小时重置到第一页
+    updateParams({ limit: parseInt(limit), page: 1 })
   }
 
   /**
@@ -92,7 +79,7 @@ export default function DashboardPage() {
    * @param tab 标签值
    */
   const handleTabChange = (tab: string) => {
-    updateURL({ tab, page: 1 }) // 改变标签时重置到第一页
+    updateParams({ tab, page: 1 }) // 改变标签时重置到第一页
   }
 
   /**
@@ -100,7 +87,7 @@ export default function DashboardPage() {
    * @param search 搜索关键词
    */
   const handleSearchChange = (search: string) => {
-    updateURL({ search, page: 1 }) // 搜索时重置到第一页
+    updateParams({ search, page: 1 }) // 搜索时重置到第一页
   }
 
   /**
@@ -240,10 +227,10 @@ export default function DashboardPage() {
     if (!data || data.pages <= 1) return null
     return (
       <PaginationBar
-        page={currentPage}
+        page={params.page}
         pages={data.pages}
         total={data.total}
-        limit={currentLimit}
+        limit={params.limit}
         onPageChange={handlePageChange}
         onLimitChange={handlePageSizeChange}
       />
@@ -281,12 +268,12 @@ export default function DashboardPage() {
                 type="search"
                 placeholder="搜索问卷..."
                 className="pl-8"
-                value={currentSearch}
+                value={params.search}
                 onChange={(e) => handleSearchChange(e.target.value)}
               />
             </div>
 
-            <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full sm:w-auto">
+            <Tabs value={params.tab} onValueChange={handleTabChange} className="w-full sm:w-auto">
               <TabsList>
                 <TabsTrigger value="all">全部</TabsTrigger>
                 <TabsTrigger value="published">已发布</TabsTrigger>
