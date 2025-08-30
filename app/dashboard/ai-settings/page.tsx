@@ -34,55 +34,55 @@ export default function AISettingsPage() {
     } | null>(null)
 
     const testConnectionMutation = trpc.TestOllamaConnection.useMutation()
-    const getOllamaStatusMutation = trpc.GetOllamaStatus.useMutation()
+    const getOllamaStatusMutation = trpc.GetOllamaStatus.useQuery
 
     useEffect(() => {
         loadStatus()
     }, [])
 
-    const loadStatus = async () => {
-        try {
-            const result = await getOllamaStatusMutation.mutateAsync()
-            setStatus(result)
-        } catch (error) {
-            console.error('Failed to load Ollama status:', error)
-        }
-    }
+    // const loadStatus = async () => {
+    //     try {
+    //         const result = await getOllamaStatusMutation.mutateAsync()
+    //         setStatus(result)
+    //     } catch (error) {
+    //         console.error('Failed to load Ollama status:', error)
+    //     }
+    // }
 
     const handleTestConnection = async () => {
-        setIsTesting(true)
-        try {
-            const result = await testConnectionMutation.mutateAsync({
-                baseUrl: settings.baseUrl,
-                model: settings.model
-            })
+        // setIsTesting(true)
+        // try {
+        //     const result = await testConnectionMutation.mutateAsync({
+        //         baseUrl: settings.baseUrl,
+        //         model: settings.model
+        //     })
 
-            if (result.success) {
-                toast.success('连接测试成功！')
-                await loadStatus()
-            } else {
-                toast.error(`连接测试失败: ${result.error}`)
-            }
-        } catch (error) {
-            toast.error('连接测试失败')
-            console.error('Test connection failed:', error)
-        } finally {
-            setIsTesting(false)
-        }
+        //     if (result.success) {
+        //         toast.success('连接测试成功！')
+        //         await loadStatus()
+        //     } else {
+        //         toast.error(`连接测试失败: ${result.error}`)
+        //     }
+        // } catch (error) {
+        //     toast.error('连接测试失败')
+        //     console.error('Test connection failed:', error)
+        // } finally {
+        //     setIsTesting(false)
+        // }
     }
 
     const handleSaveSettings = async () => {
-        setIsLoading(true)
-        try {
-            // 这里应该调用API保存设置
-            toast.success('设置保存成功！')
-            await loadStatus()
-        } catch (error) {
-            toast.error('保存设置失败')
-            console.error('Save settings failed:', error)
-        } finally {
-            setIsLoading(false)
-        }
+        // setIsLoading(true)
+        // try {
+        //     // 这里应该调用API保存设置
+        //     toast.success('设置保存成功！')
+        //     await loadStatus()
+        // } catch (error) {
+        //     toast.error('保存设置失败')
+        //     console.error('Save settings failed:', error)
+        // } finally {
+        //     setIsLoading(false)
+        // }
     }
 
     return (

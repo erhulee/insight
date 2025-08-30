@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutHeader } from '@/components/layout-header'
-import { trpc } from '../_trpc/client'
+import { trpc } from '@/app/_trpc/client'
 import { TemplateCard } from './_components/TemplateCard'
 import { NoData } from './_components/NoData'
 

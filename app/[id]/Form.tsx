@@ -3,7 +3,7 @@ import { QuestionType } from '@/components/survey-editor/buildin/form-item'
 import { Checkbox, Form, Input, Radio } from 'antd'
 import { Button } from '@/components/ui/button'
 
-import { trpc } from '../_trpc/client'
+import { trpc } from '@/app/_trpc/client'
 import { Question } from '@/lib/api-types'
 
 const FormItem = Form.Item

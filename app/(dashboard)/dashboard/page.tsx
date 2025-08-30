@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutHeader } from '@/components/layout-header'
 import { SurveyCard } from '@/components/survey/survey-card'
-import { trpc } from '../_trpc/client'
+import { trpc } from '@/app/_trpc/client'
 import { useMemo } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import {

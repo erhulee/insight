@@ -24,8 +24,8 @@ import { InsightBrand } from '@/components/common/insight-brand'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { trpc } from '../_trpc/client'
 import { useEffect } from 'react'
+import { trpc } from '@/app/_trpc/client'
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: '姓名至少需要2个字符' }),
