@@ -78,6 +78,7 @@ export class AIServiceManager {
     }
 
     public async testConnection(config: AIServiceConfig): Promise<{ success: boolean; error?: string }> {
+        console.log("testConnection:", config)
         try {
             const service = createAIService(config.type)
             return await service.testConnection(config)

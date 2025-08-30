@@ -43,7 +43,7 @@ import {
     deleteAIConfigFromStorage,
     getStoredAIConfigs
 } from '@/lib/ai-service-config'
-import { aiServiceManager } from '@/lib/ai-service-manager'
+import { trpc } from '@/app/_trpc/client'
 
 interface AIServiceConfigManagerProps {
     onConfigChange?: () => void
@@ -95,16 +95,37 @@ export function AIServiceConfigManager({ onConfigChange }: AIServiceConfigManage
     }
 
     const handleSetActive = (configId: string) => {
-        aiServiceManager.setActiveConfig(configId)
+        // 更新本地存储中的活跃配置
+        const configs = getStoredAIConfigs()
+        configs.forEach(c => c.isActive = false)
+        const targetConfig = configs.find(c => c.id === configId)
+        if (targetConfig) {
+            targetConfig.isActive = true
+            localStorage.setItem('ai_service_configs', JSON.stringify(configs))
+        }
         loadConfigs()
         onConfigChange?.()
         toast.success('活跃配置已更新')
     }
 
+    // tRPC 查询和变更
+    const testAIConnection = trpc.TestAIConnection.useMutation()
+
     const handleTestConnection = async (config: AIServiceConfig) => {
         setIsTesting(true)
         try {
-            const result = await aiServiceManager.testConnection(config)
+            const result = await testAIConnection.mutateAsync({
+                config: {
+                    type: config.type,
+                    baseUrl: config.baseUrl,
+                    apiKey: config.apiKey,
+                    model: config.model,
+                    temperature: config.temperature,
+                    topP: config.topP,
+                    repeatPenalty: config.repeatPenalty,
+                    maxTokens: config.maxTokens,
+                }
+            })
             setTestResults(prev => ({ ...prev, [config.id]: result }))
 
             if (result.success) {
@@ -165,7 +186,7 @@ export function AIServiceConfigManager({ onConfigChange }: AIServiceConfigManage
                                         <Badge variant={config.isActive ? 'default' : 'secondary'}>
                                             {config.isActive ? '活跃' : '非活跃'}
                                         </Badge>
-                                        <Badge variant="outline">{provider.name}</Badge>
+                                        <Badge variant="outline">{provider?.name || config.type}</Badge>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {config.isActive ? (
@@ -188,7 +209,7 @@ export function AIServiceConfigManager({ onConfigChange }: AIServiceConfigManage
                             <CardContent className="space-y-3">
                                 <div>
                                     <h4 className="font-medium">{config.name}</h4>
-                                    <p className="text-sm text-muted-foreground">{provider.description}</p>
+                                    <p className="text-sm text-muted-foreground">{provider?.description || 'AI服务配置'}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -301,7 +322,7 @@ function ConfigForm({ config, onSave, onCancel }: ConfigFormProps) {
             model: '',
         }
     )
-    const [selectedProvider, setSelectedProvider] = useState(config?.type || 'ollama')
+    const [selectedProvider, setSelectedProvider] = useState<string>(config?.type || 'ollama')
 
     useEffect(() => {
         if (selectedProvider !== formData.type) {
@@ -309,7 +330,7 @@ function ConfigForm({ config, onSave, onCancel }: ConfigFormProps) {
             if (provider) {
                 setFormData(prev => ({
                     ...prev,
-                    type: selectedProvider,
+                    type: selectedProvider as 'openai' | 'ollama' | 'anthropic' | 'custom',
                     baseUrl: provider.baseUrl,
                     model: provider.models[0] || '',
                     ...provider.defaultConfig,
@@ -395,7 +416,7 @@ function ConfigForm({ config, onSave, onCancel }: ConfigFormProps) {
                             <SelectValue placeholder="选择模型" />
                         </SelectTrigger>
                         <SelectContent>
-                            {provider?.models.map((model) => (
+                            {(provider?.models || []).map((model) => (
                                 <SelectItem key={model} value={model}>
                                     {model}
                                 </SelectItem>

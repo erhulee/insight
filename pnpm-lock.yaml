@@ -206,6 +206,9 @@ importers:
       ollama:
         specifier: ^0.5.16
         version: 0.5.16
+      openai:
+        specifier: ^5.16.0
+        version: 5.16.0(zod@3.24.2)
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -3040,6 +3043,18 @@ packages:
 
   ollama@0.5.16:
     resolution: {integrity: sha512-OEbxxOIUZtdZgOaTPAULo051F5y+Z1vosxEYOoABPnQKeW7i4O8tJNlxCB+xioyoorVqgjkdj+TA1f1Hy2ug/w==}
+
+  openai@5.16.0:
+    resolution: {integrity: sha512-hoEH8ZNvg1HXjU9mp88L/ZH8O082Z8r6FHCXGiWAzVRrEv443aI57qhch4snu07yQydj+AUAWLenAiBXhu89Tw==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -7128,6 +7143,10 @@ snapshots:
   ollama@0.5.16:
     dependencies:
       whatwg-fetch: 3.6.20
+
+  openai@5.16.0(zod@3.24.2):
+    optionalDependencies:
+      zod: 3.24.2
 
   optionator@0.9.4:
     dependencies:

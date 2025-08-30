@@ -6,6 +6,8 @@ import { TRPCError } from '@trpc/server'
 import { generateSurveyFromPrompt, buildSurveyPrompt } from './ai-service'
 import { observable } from '@trpc/server/observable'
 import { withAccelerate } from '@prisma/extension-accelerate'
+import { AIServiceConfig, validateAIServiceConfig } from '@/lib/ai-service-config'
+import { createAIService } from '@/lib/ai-service-interface'
 
 const prisma = new PrismaClient().$extends(withAccelerate())
 export const appRouter = router({
@@ -832,6 +834,212 @@ export const appRouter = router({
           code: 'INTERNAL_SERVER_ERROR',
         })
       }
+    }),
+
+  // AI 服务配置相关路由
+  TestAIConnection: protectedProcedure
+    .input(
+      z.object({
+        config: z.object({
+          type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+          baseUrl: z.string(),
+          apiKey: z.string().optional(),
+          model: z.string(),
+          temperature: z.number(),
+          topP: z.number(),
+          repeatPenalty: z.number().optional(),
+          maxTokens: z.number().optional(),
+        }),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const { config } = opt.input
+
+        // 验证配置
+        const validation = validateAIServiceConfig(config as AIServiceConfig)
+        if (!validation.valid) {
+          return { success: false, error: validation.errors.join(', ') }
+        }
+
+        // 创建 AI 服务实例
+        const service = createAIService(config.type)
+
+        // 测试连接
+        const result = await service.testConnection(config as AIServiceConfig)
+
+        return result
+      } catch (error) {
+        console.error('AI连接测试失败:', error)
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : '连接测试失败'
+        }
+      }
+    }),
+
+  GetAIStatus: protectedProcedure
+    .input(
+      z.object({
+        config: z.object({
+          type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+          baseUrl: z.string(),
+          apiKey: z.string().optional(),
+          model: z.string(),
+          temperature: z.number(),
+          topP: z.number(),
+          repeatPenalty: z.number().optional(),
+          maxTokens: z.number().optional(),
+        }),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const { config } = opt.input
+
+        // 验证配置
+        const validation = validateAIServiceConfig(config as AIServiceConfig)
+        if (!validation.valid) {
+          return {
+            available: false,
+            models: [],
+            currentModel: '',
+            error: validation.errors.join(', '),
+          }
+        }
+
+        // 创建 AI 服务实例
+        const service = createAIService(config.type)
+
+        // 获取服务状态
+        const status = await service.getStatus(config as AIServiceConfig)
+
+        return status
+      } catch (error) {
+        console.error('获取AI服务状态失败:', error)
+        return {
+          available: false,
+          models: [],
+          currentModel: '',
+          error: error instanceof Error ? error.message : '获取状态失败',
+        }
+      }
+    }),
+
+  GenerateAISurveyWithConfig: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string(),
+        config: z.object({
+          type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+          baseUrl: z.string(),
+          apiKey: z.string().optional(),
+          model: z.string(),
+          temperature: z.number(),
+          topP: z.number(),
+          repeatPenalty: z.number().optional(),
+          maxTokens: z.number().optional(),
+        }),
+      }),
+    )
+    .mutation(async (opt) => {
+      try {
+        const { prompt, config } = opt.input
+
+        // 验证配置
+        const validation = validateAIServiceConfig(config as AIServiceConfig)
+        if (!validation.valid) {
+          throw new TRPCError({
+            message: `配置验证失败: ${validation.errors.join(', ')}`,
+            code: 'BAD_REQUEST',
+          })
+        }
+
+        // 创建 AI 服务实例
+        const service = createAIService(config.type)
+
+        // 构建问卷生成提示
+        const surveyPrompt = buildSurveyPrompt(prompt)
+
+        // 生成问卷
+        const result = await service.generate({
+          prompt: surveyPrompt,
+          config: config as AIServiceConfig,
+        })
+
+        return result
+      } catch (error) {
+        console.error('AI生成问卷失败:', error)
+        if (error instanceof TRPCError) throw error
+
+        throw new TRPCError({
+          message: 'AI生成问卷失败',
+          code: 'INTERNAL_SERVER_ERROR',
+        })
+      }
+    }),
+
+  GenerateAISurveyStreamWithConfig: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string(),
+        config: z.object({
+          type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+          baseUrl: z.string(),
+          apiKey: z.string().optional(),
+          model: z.string(),
+          temperature: z.number(),
+          topP: z.number(),
+          repeatPenalty: z.number().optional(),
+          maxTokens: z.number().optional(),
+        }),
+      }),
+    )
+    .subscription(async (opt) => {
+      const { prompt, config } = opt.input
+
+      return observable<string>((emit) => {
+        const generateStream = async () => {
+          try {
+            // 验证配置
+            const validation = validateAIServiceConfig(config as AIServiceConfig)
+            if (!validation.valid) {
+              emit.error(new TRPCError({
+                message: `配置验证失败: ${validation.errors.join(', ')}`,
+                code: 'BAD_REQUEST',
+              }))
+              return
+            }
+
+            // 创建 AI 服务实例
+            const service = createAIService(config.type)
+
+            // 构建问卷生成提示
+            const surveyPrompt = buildSurveyPrompt(prompt)
+
+            // 流式生成问卷
+            await service.generateStream(
+              {
+                prompt: surveyPrompt,
+                config: config as AIServiceConfig,
+              },
+              (chunk) => {
+                emit.next(chunk.content || chunk.text || '')
+              }
+            )
+
+            emit.complete()
+          } catch (error) {
+            console.error('流式生成失败:', error)
+            emit.error(new TRPCError({
+              message: '流式生成失败',
+              code: 'INTERNAL_SERVER_ERROR',
+            }))
+          }
+        }
+
+        generateStream()
+      })
     }),
 
 })

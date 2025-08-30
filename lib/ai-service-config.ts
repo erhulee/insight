@@ -96,11 +96,12 @@ export const DEFAULT_AI_CONFIG: AIServiceConfig = {
 
 // 验证配置
 export function validateAIServiceConfig(config: AIServiceConfig): { valid: boolean; errors: string[] } {
+    console.log('validateAIServiceConfig', config)
     const errors: string[] = []
 
-    if (!config.name?.trim()) {
-        errors.push('服务名称不能为空')
-    }
+    // if (!config.name?.trim()) {
+    //     errors.push('服务名称不能为空')
+    // }
 
     if (!config.baseUrl?.trim()) {
         errors.push('服务地址不能为空')
