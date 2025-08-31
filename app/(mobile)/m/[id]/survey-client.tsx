@@ -1,83 +1,30 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { ChevronLeft, ChevronRight, Send, ArrowLeft } from 'lucide-react'
-import { Question } from '@/lib/api-types'
 import { MobileQuestionRenderer } from '@/components/mobile/mobile-question-renderer'
-import { useRouter } from 'next/navigation'
+import type { Question } from '@/lib/api-types'
 
-interface SurveyPageProps {
-    params: {
+interface SurveyClientProps {
+    survey: {
         id: string
+        name: string
+        description?: string
+        questions: Question[]
     }
 }
 
-// 模拟问卷数据 - 实际开发时会从API获取
-const mockSurvey = {
-    id: '1',
-    title: '用户体验调研问卷',
-    description: '感谢您参与我们的用户体验调研，您的反馈对我们非常重要。',
-    questions: [
-        {
-            id: 'q1',
-            type: 'text',
-            title: '您使用我们的产品多长时间了？',
-            description: '请描述您的使用经验',
-            required: true,
-            placeholder: '请输入您的使用时长...'
-        },
-        {
-            id: 'q2',
-            type: 'select',
-            title: '您最常使用我们产品的哪个功能？',
-            required: true,
-            options: [
-                { text: '功能A', value: 'a' },
-                { text: '功能B', value: 'b' },
-                { text: '功能C', value: 'c' },
-                { text: '其他', value: 'other' }
-            ]
-        },
-        {
-            id: 'q3',
-            type: 'rating',
-            title: '您对我们产品的整体满意度如何？',
-            required: true,
-            maxRating: 5
-        },
-        {
-            id: 'q4',
-            type: 'checkbox',
-            title: '您希望我们产品增加哪些功能？（可多选）',
-            required: false,
-            options: [
-                { text: '移动端应用', value: 'mobile' },
-                { text: '数据分析功能', value: 'analytics' },
-                { text: '团队协作功能', value: 'collaboration' },
-                { text: 'API接口', value: 'api' }
-            ]
-        },
-        {
-            id: 'q5',
-            type: 'textarea',
-            title: '您对我们产品有什么建议或意见？',
-            required: false,
-            placeholder: '请详细描述您的建议...',
-            multiline: true
-        }
-    ] as Question[]
-}
-
-export default function SurveyPage({ params }: SurveyPageProps) {
+export function SurveyClient({ survey }: SurveyClientProps) {
     const router = useRouter()
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [answers, setAnswers] = useState<Record<string, any>>({})
     const [errors, setErrors] = useState<Record<string, string>>({})
 
-    const questions = mockSurvey.questions
+    const questions = survey.questions
     const currentQuestion = questions[currentQuestionIndex]
     const progress = ((currentQuestionIndex + 1) / questions.length) * 100
 
@@ -100,31 +47,30 @@ export default function SurveyPage({ params }: SurveyPageProps) {
 
     // 验证当前问题
     const validateCurrentQuestion = (): boolean => {
-        if (!currentQuestion.required) return true
+        if (!currentQuestion) return false
 
-        const answer = answers[currentQuestion.id]
-        let isValid = true
-        const newErrors: Record<string, string> = {}
-
-        if (currentQuestion.type === 'checkbox') {
+        // 必填项验证
+        if (currentQuestion.required) {
+            const answer = answers[currentQuestion.id]
             if (!answer || (Array.isArray(answer) && answer.length === 0)) {
-                isValid = false
-                newErrors[currentQuestion.id] = '请至少选择一个选项'
-            }
-        } else if (currentQuestion.type === 'rating') {
-            if (!answer || answer === 0) {
-                isValid = false
-                newErrors[currentQuestion.id] = '请选择评分'
-            }
-        } else {
-            if (!answer || (typeof answer === 'string' && answer.trim() === '')) {
-                isValid = false
-                newErrors[currentQuestion.id] = '此问题为必填项'
+                setErrors(prev => ({
+                    ...prev,
+                    [currentQuestion.id]: '此题为必填项'
+                }))
+                return false
             }
         }
 
-        setErrors(prev => ({ ...prev, ...newErrors }))
-        return isValid
+        // 清除错误
+        if (errors[currentQuestion.id]) {
+            setErrors(prev => {
+                const newErrors = { ...prev }
+                delete newErrors[currentQuestion.id]
+                return newErrors
+            })
+        }
+
+        return true
     }
 
     // 下一题
@@ -159,6 +105,16 @@ export default function SurveyPage({ params }: SurveyPageProps) {
         router.back()
     }
 
+    if (!currentQuestion) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-600">问卷加载失败</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* 顶部导航 */}
@@ -174,7 +130,7 @@ export default function SurveyPage({ params }: SurveyPageProps) {
                     </Button>
                     <div className="text-center flex-1">
                         <h1 className="text-lg font-semibold text-gray-900 truncate">
-                            {mockSurvey.title}
+                            {survey.name}
                         </h1>
                     </div>
                     <div className="w-10" /> {/* 占位符，保持标题居中 */}
@@ -191,11 +147,11 @@ export default function SurveyPage({ params }: SurveyPageProps) {
             </div>
 
             {/* 问卷描述 */}
-            {currentQuestionIndex === 0 && (
+            {currentQuestionIndex === 0 && survey.description && (
                 <Card className="mx-4 mt-4">
                     <CardContent className="pt-6">
                         <p className="text-gray-600 text-center leading-relaxed">
-                            {mockSurvey.description}
+                            {survey.description}
                         </p>
                     </CardContent>
                 </Card>
