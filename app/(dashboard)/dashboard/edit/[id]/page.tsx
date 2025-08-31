@@ -69,7 +69,6 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
   const resolvedSearchParams = use(searchParams)
 
   const publishSurveyMutation = trpc.surver.PublishSurvey.useMutation()
-  console.log("111:publishSurveyMutation:", publishSurveyMutation.status)
 
   // 获取问卷数据
   const {

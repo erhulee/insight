@@ -248,7 +248,6 @@ export class SurveyService {
             })
             return survey
         } catch (error) {
-            console.error('发布问卷失败:', error)
             throw new TRPCError({
                 message: '发布问卷失败',
                 code: 'INTERNAL_SERVER_ERROR',
