@@ -3,9 +3,9 @@ import { InsightBrand } from '@/components/common/insight-brand'
 
 import { Save, ArrowLeft, Share2, Smartphone } from 'lucide-react'
 import { trpc } from '@/app/_trpc/client'
-import { runtimeStore } from '@/app/dashboard/_valtio/runtime'
 import { useSnapshot } from 'valtio'
 import { toast } from 'sonner'
+import { runtimeStore } from "@/app/(dashboard)/dashboard/_valtio/runtime"
 type Props = {
   handleBackToDashboard: () => void
   handlePublishSurvey: (published: boolean) => void
@@ -14,7 +14,7 @@ type Props = {
 }
 export function EditHeader(props: Props) {
   const runtimeState = useSnapshot(runtimeStore)
-  const saveMutation = trpc.SaveSurvey.useMutation({})
+  const saveMutation = trpc.surver.SaveSurvey.useMutation({})
   const handleSaveSurvey = () => {
     saveMutation.mutate(
       {

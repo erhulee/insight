@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+You are a senior TypeScript/JavaScript programmer with expertise in Prisma, clean code principles, and modern backend development.
+Generate code, corrections, and refactorings that comply with the following guidelines:
+TypeScript General Guidelines
+
+- 把业务逻辑按照领域或者类型组织成 service，统一管理在 server/service/* 文件夹下
+- 每个 service 的职责单一足够原子化，避免出现循环引用
+- 使用 trpc 调用 service 进行业务逻辑

@@ -13,7 +13,7 @@ import {
   updateRuntimeQuestion,
   RuntimeDSLAction,
   Question,
-} from '@/app/dashboard/_valtio/runtime'
+} from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { QuestionSchemaType } from '@/lib/dsl'
 
 /**

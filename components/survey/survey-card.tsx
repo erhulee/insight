@@ -14,7 +14,7 @@ import { inferProcedureOutput } from '@trpc/server'
 import { AppRouter } from '@/server'
 
 export interface SurveyOverviewProps {
-    survey: inferProcedureOutput<AppRouter['GetSurveyList']>['surveys'][number]
+    survey: inferProcedureOutput<AppRouter['surver']['GetSurveyList']>['surveys'][number]
 }
 
 /**

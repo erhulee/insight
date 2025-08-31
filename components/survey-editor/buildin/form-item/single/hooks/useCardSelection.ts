@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { RuntimeDSLAction } from '@/app/dashboard/_valtio/runtime'
+import { RuntimeDSLAction } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 
 /**
  * useCardSelection Hook 的返回值接口

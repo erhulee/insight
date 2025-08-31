@@ -1,4 +1,4 @@
-import { runtimeStore } from '@/app/dashboard/_valtio/runtime'
+import { runtimeStore } from "@/app/(dashboard)/dashboard/_valtio/runtime"
 import Editor, { loader } from '@monaco-editor/react'
 import { useMemo } from 'react'
 import { useSnapshot } from 'valtio'

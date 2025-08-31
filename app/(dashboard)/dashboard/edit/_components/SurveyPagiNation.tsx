@@ -4,7 +4,8 @@ import {
   insertPage,
   runtimeStore,
   setCurrentPage,
-} from '@/app/dashboard/_valtio/runtime'
+} from '@/app/(dashboard)/dashboard/_valtio/runtime'
+
 import {
   AlertDialog,
   AlertDialogAction,

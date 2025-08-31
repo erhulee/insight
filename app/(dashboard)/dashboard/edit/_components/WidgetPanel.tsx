@@ -1,5 +1,5 @@
 'use client'
-import { addQuestion, runtimeStore } from '@/app/dashboard/_valtio/runtime'
+import { addQuestion, runtimeStore } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { preset } from '@/components/survey-editor/buildin/form-item'
 import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'

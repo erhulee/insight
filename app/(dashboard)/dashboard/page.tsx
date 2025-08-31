@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
 
   // 获取问卷列表数据
-  const { data, isLoading, isError } = trpc.GetSurveyList.useQuery({
+  const { data, isLoading, isError } = trpc.surver.GetSurveyList.useQuery({
     page: params.page,
     limit: params.limit,
     type: params.tab as 'all' | 'published' | 'drafts',

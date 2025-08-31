@@ -11,11 +11,6 @@ export default function RootLayout(
   }>,
 ) {
   const params = use(props.params)
-  // const { data: survey, isError, refetch, isLoading } = trpc.GetSurvey.useQuery({
-  //     id: params.id
-  // }, {
-  //     initialData: {} as any
-  // })
   return <div>
 
     {props.children}</div>

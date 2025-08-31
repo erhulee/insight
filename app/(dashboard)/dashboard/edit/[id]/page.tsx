@@ -77,7 +77,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
     isError,
     refetch,
     isLoading,
-  } = trpc.GetSurvey.useQuery(
+  } = trpc.surver.GetSurvey.useQuery(
     {
       id: resolvedParams.id,
     },
@@ -87,7 +87,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
   )
 
   // 定义 mutations
-  const updateSurveyMutation = trpc.UpdateSurvey.useMutation()
+  const updateSurveyMutation = trpc.surver.UpdateSurvey.useMutation()
   // TODO: 需要实现 CreateTemplateSurvey 或使用现有的 API
   // const saveSurveyAsTemplateMutation = trpc.CreateTemplateSurvey.useMutation()
 

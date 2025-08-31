@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash-es'
 import { EditQuestionItem } from './EditQuestionItem'
 import {
   Question,
-} from '@/app/dashboard/_valtio/runtime'
+} from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { QuestionSchemaType } from '@/lib/dsl'
 import { DndContext, PointerSensor, useSensor } from '@dnd-kit/core'
 import { useAction } from '../_hooks/useAction'

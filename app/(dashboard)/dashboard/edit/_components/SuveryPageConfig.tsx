@@ -1,6 +1,6 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSnapshot } from 'valtio'
-import { runtimeStore } from '@/app/dashboard/_valtio/runtime'
+import { runtimeStore } from "@/app/(dashboard)/dashboard/_valtio/runtime"
 import { Form, Input, Switch, Upload } from 'antd'
 
 
