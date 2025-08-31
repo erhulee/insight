@@ -1,9 +1,9 @@
 'use client'
 import type React from 'react'
-import { useState, use, useEffect } from 'react'
+import { useState, use, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate } from 'lucide-react'
+import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate, File } from 'lucide-react'
 import { DragDropProvider } from '@/components/survey-editor/drag-drop-context'
 import { toast } from 'sonner'
 import { RenameInput } from '../_components/RenameInput'
@@ -36,6 +36,8 @@ import {
 import { EditQuestionConfig } from '../_components/EditQuestionConfig'
 import { SuveryPageConfig } from '../_components/SuveryPageConfig'
 import type { Question, RuntimeState } from '../../_valtio/runtime'
+import { EmptyState } from '@/components/ui/empty-state'
+import { EditHeaderSkeleton } from '../_components/EditHeaderSkeleton'
 
 // 定义页面参数类型
 interface PageParams {
@@ -53,10 +55,8 @@ interface EditSurveyPageProps {
   searchParams: Promise<SearchParams>
 }
 
-// 定义活动标签类型
 type ActiveTab = 'design' | 'json' | 'preview'
 
-// 定义问题更新动作类型
 type QuestionUpdateAction = 'update-attr'
 
 export default function EditSurveyPage({ params, searchParams }: EditSurveyPageProps) {
@@ -81,16 +81,11 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
       id: resolvedParams.id,
     },
     {
-      initialData: {} as any,
+      initialData: null as any,
     },
   )
 
-  // 定义 mutations
   const updateSurveyMutation = trpc.surver.UpdateSurvey.useMutation()
-  // TODO: 需要实现 CreateTemplateSurvey 或使用现有的 API
-  // const saveSurveyAsTemplateMutation = trpc.CreateTemplateSurvey.useMutation()
-
-  // 本地状态
   const [sheetVisible, setSheetVisible] = useState(false)
   const [activeTab, setActiveTab] = useState<ActiveTab>('design')
 
@@ -213,7 +208,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
   }
 
   // 错误状态处理
-  if (isError || survey == null) {
+  if (isError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -224,10 +219,37 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
     )
   }
 
+  const mainContent = useMemo(() => {
+    if (survey == null) {
+      return <div className='flex items-center justify-center h-full'>
+        <EmptyState title="问卷不存在" description="您访问的问卷不存在或已被删除" icons={[File]} />
+      </div>
+    }
+    switch (activeTab) {
+      case 'json':
+        return <JsonEditor />
+      case 'design':
+        return <Canvas />
+      case 'preview':
+        return <div className="p-4 text-center text-muted-foreground">
+          预览功能开发中...
+        </div>
+    }
+
+  }, [activeTab, survey, isLoading])
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-32">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+      <p className="mt-4 text-muted-foreground">加载问卷中...</p>
+    </div>
+  }
+
+
   return (
-    <div className="min-h-screen bg-background flex flex-col w-full">
+    <div className="min-h-screen bg-background flex flex-col w-full ">
       {/* 顶部导航栏 */}
-      <EditHeader
+      {survey == null ? <EditHeaderSkeleton /> : <EditHeader
         handleShareSurvey={handleShareSurvey}
         publish={{
           isPublished: survey.published,
@@ -235,82 +257,71 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
           handlePublishSurvey: handlePublishSurvey,
         }}
         handleBackToDashboard={handleBackToDashboard}
-      />
+      />}
+
 
       {/* 主要内容区域 - 三栏布局 */}
       <DragDropProvider>
-        <div className="flex-1 flex overflow-hidden w-screen">
+        <div className="flex-1 flex overflow-hidden w-screen ">
           {/* 左侧面板 - 问题类型 */}
           <WidgetPanel />
 
           {/* 中间面板 - 问题列表/预览 */}
           <div className="ml-[255px] mr-[320px] w-full">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-muted-foreground">加载中...</div>
-              </div>
-            ) : (
-              <div className="flex-1 overflow-hidden">
-                <div className="py-2 px-4 flex justify-between items-center">
-                  <div className="flex flex-row items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <AlignJustify className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent side="bottom">
-                        <DropdownMenuItem
-                          className="text-sm"
-                          onClick={handleCreateTemplate}
-                        >
-                          <BookTemplate className="w-4 h-4 mr-2" />
-                          <span>保存为模板</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+            <div className="flex-1 overflow-hidden h-full">
+              <div className="py-2 px-4 flex justify-between items-center">
+                <div className="flex flex-row items-center gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <AlignJustify className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom">
+                      <DropdownMenuItem
+                        className="text-sm"
+                        onClick={handleCreateTemplate}
+                      >
+                        <BookTemplate className="w-4 h-4 mr-2" />
+                        <span>保存为模板</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
+                  {survey && (
                     <RenameInput
-                      id={survey.id}
-                      title={survey.name}
+                      id={survey?.id}
+                      title={survey?.name}
                       onUpdate={handleRenameSurvey}
                     />
-                  </div>
-
-                  <SurveyPagiNation />
-
-                  <ToggleGroup
-                    type="single"
-                    size="sm"
-                    value={activeTab}
-                    onValueChange={(value) => {
-                      if (value) {
-                        setActiveTab(value as ActiveTab)
-                      }
-                    }}
-                  >
-                    <ToggleGroupItem value="json">
-                      <Braces className="w-4 h-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="design">
-                      <Brush className="w-4 h-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="preview">
-                      <Eye className="w-4 h-4" />
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+                  )}
                 </div>
-
-                {/* 内容区域 */}
-                {activeTab === 'json' && <JsonEditor />}
-                {activeTab === 'design' && <Canvas />}
-                {activeTab === 'preview' && (
-                  <div className="p-4 text-center text-muted-foreground">
-                    预览功能开发中...
-                  </div>
-                )}
+                <SurveyPagiNation />
+                <ToggleGroup
+                  type="single"
+                  size="sm"
+                  value={activeTab}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setActiveTab(value as ActiveTab)
+                    }
+                  }}
+                >
+                  <ToggleGroupItem value="json">
+                    <Braces className="w-4 h-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="design">
+                    <Brush className="w-4 h-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="preview">
+                    <Eye className="w-4 h-4" />
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
-            )}
+
+              {/* 内容区域 */}
+              {mainContent}
+            </div>
           </div>
 
           {/* 右侧面板 - 问题设置 */}

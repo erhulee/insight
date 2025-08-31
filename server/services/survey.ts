@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client/edge'
 import { TRPCError } from '@trpc/server'
 import { withAccelerate } from '@prisma/extension-accelerate'
+import { Survey } from '@/lib/types'
 
 const prisma = new PrismaClient().$extends(withAccelerate())
 
@@ -74,7 +75,7 @@ export class SurveyService {
     /**
      * 获取问卷详情
      */
-    async getSurvey(userId: string, surveyId: string): Promise<any | null> {
+    async getSurvey(userId: string, surveyId: string): Promise<Survey | null> {
         try {
             const survey = await prisma.survey.findUnique({
                 where: {

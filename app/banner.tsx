@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { LayoutHeader } from '@/components/layout-header'
 import { GlowEffect } from '@/components/ui/glow-effect'
+import { AnimatedText } from '@/components/ui/animated-text'
 export function Banner() {
   return (
     <AuroraBackground className=" h-[700px] px-8">
@@ -22,9 +23,13 @@ export function Banner() {
         <div className=" max-w-[1328px] absolute top-0 w-full 2xl:py-8 py-1 ">
           <LayoutHeader hideBorder activeTab="dashboard"></LayoutHeader>
         </div>
-        <h1 className="text-3xl md:text-5xl dark:text-white text-left font-douyin  ">
-          创建专业问卷，收集有价值的数据
-        </h1>
+        <AnimatedText
+          text="创建专业问卷，收集有价值的数据"
+          textClassName="text-3xl md:text-5xl dark:text-white text-left font-douyin"
+          underlinePath="M 0,10 Q 75,0 150,10 Q 225,20 300,10"
+          underlineHoverPath="M 0,10 Q 75,20 150,10 Q 225,0 300,10"
+          underlineDuration={1.5}
+        />
         <p className="font-extralight text-base md:text-3xl dark:text-neutral-200 py-4">
           简单易用的问卷设计工具，强大的数据分析功能，帮助您获取洞察，做出更好的决策。
         </p>
