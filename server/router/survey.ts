@@ -159,5 +159,24 @@ export const surveyRouter = router({
             }
         }),
 
+    PublishSurvey: protectedProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                published: z.boolean(),
+            }),
+        )
+        .mutation(async (opt) => {
+            try {
+                const userId = opt.ctx.userId!
+                return await surveyService.publishSurvey(userId, opt.input.id, opt.input.published)
+            } catch (e) {
+                throw new TRPCError({
+                    message: '发布问卷失败',
+                    code: 'INTERNAL_SERVER_ERROR',
+                })
+            }
+        }),
+
 
 })

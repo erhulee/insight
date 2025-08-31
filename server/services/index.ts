@@ -1,6 +1,6 @@
 // 导出所有服务
 export { userService } from './user-service'
-export { surveyService } from './survey-service'
+export { surveyService } from './survey'
 export { templateService } from './template-service'
 export { apiKeyService } from './api-key-service'
 export { aiConfigService } from './ai-config-service'
@@ -15,13 +15,12 @@ export type {
 
 export type {
     CreateSurveyInput,
-    UpdateSurveyInput,
     SurveyListInput,
     SurveyListResult,
     SurveyResponseInput,
     SurveyResponsesInput,
     SurveyResponsesResult,
-} from './survey-service'
+} from './survey'
 
 export type {
     CreateTemplateInput,

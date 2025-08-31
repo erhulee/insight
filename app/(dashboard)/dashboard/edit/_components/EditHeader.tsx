@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { InsightBrand } from '@/components/common/insight-brand'
-
 import { Save, ArrowLeft, Share2, Smartphone } from 'lucide-react'
 import { trpc } from '@/app/_trpc/client'
 import { useSnapshot } from 'valtio'
@@ -8,9 +7,13 @@ import { toast } from 'sonner'
 import { runtimeStore } from "@/app/(dashboard)/dashboard/_valtio/runtime"
 type Props = {
   handleBackToDashboard: () => void
-  handlePublishSurvey: (published: boolean) => void
+  publish: {
+    isPublished: boolean
+    mutationStatus: string
+    handlePublishSurvey: (published: boolean) => void
+
+  }
   handleShareSurvey: () => void
-  published: boolean
 }
 export function EditHeader(props: Props) {
   const runtimeState = useSnapshot(runtimeStore)
@@ -32,7 +35,8 @@ export function EditHeader(props: Props) {
       },
     )
   }
-  const { handleBackToDashboard, handleShareSurvey, handlePublishSurvey, published } = props
+  const { isPublished, mutationStatus, handlePublishSurvey } = props.publish
+  const { handleBackToDashboard, handleShareSurvey, } = props
   return (
     <header className="border-b sticky top-0 z-10 bg-background">
       <div className=" flex h-16 items-center justify-between px-4">
@@ -43,7 +47,7 @@ export function EditHeader(props: Props) {
           <InsightBrand></InsightBrand>
         </div>
         <div className="flex items-center gap-2">
-          {published ? (
+          {isPublished ? (
             <Button
               variant="outline"
               size="sm"
@@ -51,6 +55,7 @@ export function EditHeader(props: Props) {
                 handlePublishSurvey(false)
               }}
               className="gap-1"
+              disabled={mutationStatus === 'pending'}
             >
               <Smartphone className="h-4 w-4" />
               取消发布
@@ -63,6 +68,7 @@ export function EditHeader(props: Props) {
                 handlePublishSurvey(true)
               }}
               className="gap-1"
+              disabled={mutationStatus === 'pending'}
             >
               <Smartphone className="h-4 w-4" />
               发布

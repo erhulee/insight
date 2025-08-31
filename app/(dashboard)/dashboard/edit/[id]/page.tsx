@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate } from 'lucide-react'
 import { DragDropProvider } from '@/components/survey-editor/drag-drop-context'
 import { toast } from 'sonner'
-import { publish, unpublish } from './service'
 import { RenameInput } from '../_components/RenameInput'
 import { trpc } from '@/app/_trpc/client'
 import { Canvas } from '../_components/EditCanvas'
@@ -69,7 +68,8 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
   const resolvedParams = use(params)
   const resolvedSearchParams = use(searchParams)
 
-  console.log('searchParams:', resolvedSearchParams)
+  const publishSurveyMutation = trpc.surver.PublishSurvey.useMutation()
+  console.log("111:publishSurveyMutation:", publishSurveyMutation.status)
 
   // 获取问卷数据
   const {
@@ -191,30 +191,19 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
    */
   const handlePublishSurvey = async (published: boolean) => {
     try {
-      if (published) {
-        const success = await publish(resolvedParams.id)
-        if (success) {
-          refetch()
-          toast.success('发布成功', {
-            description: '问卷已成功发布，现在可以分享给他人填写',
-          })
-        } else {
-          toast.error('发布失败', {
-            description: '发布问卷时出现错误，请重试',
-          })
-        }
+      const response = await publishSurveyMutation.mutateAsync({
+        id: resolvedParams.id,
+        published,
+      })
+      if (response.published) {
+        refetch()
+        toast.success('发布成功', {
+          description: '问卷已成功发布，现在可以分享给他人填写',
+        })
       } else {
-        const success = await unpublish(resolvedParams.id)
-        if (success) {
-          refetch()
-          toast.success('已取消发布', {
-            description: '线上用户将无法访问该问卷',
-          })
-        } else {
-          toast.error('取消失败', {
-            description: '修改问卷状态时出现错误，请重试',
-          })
-        }
+        toast.success('已取消发布', {
+          description: '线上用户将无法访问该问卷',
+        })
       }
     } catch (error) {
       toast.error('操作失败', {
@@ -241,9 +230,12 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
       {/* 顶部导航栏 */}
       <EditHeader
         handleShareSurvey={handleShareSurvey}
-        handlePublishSurvey={handlePublishSurvey}
+        publish={{
+          isPublished: survey.published,
+          mutationStatus: publishSurveyMutation.status,
+          handlePublishSurvey: handlePublishSurvey,
+        }}
         handleBackToDashboard={handleBackToDashboard}
-        published={survey.published}
       />
 
       {/* 主要内容区域 - 三栏布局 */}

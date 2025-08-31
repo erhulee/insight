@@ -10,11 +10,7 @@ export interface CreateSurveyInput {
     questions?: any[]
 }
 
-export interface UpdateSurveyInput {
-    title?: string
-    questions?: any
-    pageCnt?: number
-}
+
 
 export interface SurveyListInput {
     page?: number
@@ -171,26 +167,29 @@ export class SurveyService {
     /**
      * 更新问卷
      */
-    async updateSurvey(userId: string, surveyId: string, input: UpdateSurveyInput): Promise<any> {
+    async updateSurvey(userId: string, surveyId: string, input: {
+        title?: string
+        questions?: any
+        pageCnt?: number
+        published?: boolean
+    }): Promise<any> {
         try {
             const updateData: any = {}
-
             if (input.title) {
                 updateData.name = input.title
             }
-
             if (input.questions !== undefined) {
                 updateData.questions = input.questions
             }
-
             if (input.pageCnt !== undefined) {
                 updateData.pageCount = input.pageCnt
             }
-
             if (Object.keys(updateData).length === 0) {
                 return null
             }
-
+            if (typeof input.published === 'boolean') {
+                updateData.published = input.published
+            }
             const survey = await prisma.survey.update({
                 where: {
                     id: surveyId,
@@ -236,7 +235,7 @@ export class SurveyService {
     /**
      * 发布/取消发布问卷
      */
-    async publishSurvey(userId: string, surveyId: string, published: boolean): Promise<any> {
+    async publishSurvey(userId: string, surveyId: string, published: boolean): Promise<{ published: boolean }> {
         try {
             const survey = await prisma.survey.update({
                 where: {
