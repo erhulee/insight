@@ -409,8 +409,11 @@ framer-motion
 - Optimize performance by using `shouldComponentUpdate` or `React.memo`.
 - Use `AnimatePresence` for handling exit animations effectively.
 
- dnd-kit
+dnd-kit
 - Use `DndContext` to manage drag-and-drop state.
 - Implement `useDraggable` and `useDroppable` hooks for custom components.
 - Optimize performance by minimizing re-renders during drag events.
 - Provide visual feedback during drag-and-drop interactions.
+
+git
+- 使用中文提交commit

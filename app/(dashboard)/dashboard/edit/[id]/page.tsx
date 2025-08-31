@@ -38,6 +38,7 @@ import { SuveryPageConfig } from '../_components/SuveryPageConfig'
 import type { Question, RuntimeState } from '../../_valtio/runtime'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditHeaderSkeleton } from '../_components/EditHeaderSkeleton'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 // 定义页面参数类型
 interface PageParams {
@@ -247,7 +248,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
 
 
   return (
-    <div className="min-h-screen bg-background flex flex-col w-full ">
+    <div className="h-screen bg-background w-full overflow-hidden flex flex-col ">
       {/* 顶部导航栏 */}
       {survey == null ? <EditHeaderSkeleton /> : <EditHeader
         handleShareSurvey={handleShareSurvey}
@@ -259,82 +260,82 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
         handleBackToDashboard={handleBackToDashboard}
       />}
 
-
-      {/* 主要内容区域 - 三栏布局 */}
-      <DragDropProvider>
-        <div className="flex-1 flex overflow-hidden w-screen ">
+      <ResizablePanelGroup direction="horizontal"
+        className=" w-full rounded-lg border md:min-w-[450px] flex-shrink">
+        <ResizablePanel defaultSize={20} >
           {/* 左侧面板 - 问题类型 */}
           <WidgetPanel />
-          {/* 中间面板 - 问题列表/预览 */}
-          <div className="ml-[255px] mr-[320px] w-full">
-            <div className="flex-1 overflow-hidden h-full">
-              <div className="py-2 px-4 flex justify-between items-center">
-                <div className="flex flex-row items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <AlignJustify className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom">
-                      <DropdownMenuItem
-                        className="text-sm"
-                        onClick={handleCreateTemplate}
-                      >
-                        <BookTemplate className="w-4 h-4 mr-2" />
-                        <span>保存为模板</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={60}   >
+          {/* 中间面板 - 问题类型 */}
+          <div className="flex-1 overflow-hidden h-full">
+            <div className="py-2 px-4 flex justify-between items-center">
+              <div className="flex flex-row items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <AlignJustify className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom">
+                    <DropdownMenuItem
+                      className="text-sm"
+                      onClick={handleCreateTemplate}
+                    >
+                      <BookTemplate className="w-4 h-4 mr-2" />
+                      <span>保存为模板</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-                  {survey && (
-                    <RenameInput
-                      id={survey?.id}
-                      title={survey?.name}
-                      onUpdate={handleRenameSurvey}
-                    />
-                  )}
-                </div>
-                <SurveyPagiNation />
-                <ToggleGroup
-                  type="single"
-                  size="sm"
-                  value={activeTab}
-                  onValueChange={(value) => {
-                    if (value) {
-                      setActiveTab(value as ActiveTab)
-                    }
-                  }}
-                >
-                  <ToggleGroupItem value="json">
-                    <Braces className="w-4 h-4" />
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="design">
-                    <Brush className="w-4 h-4" />
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="preview">
-                    <Eye className="w-4 h-4" />
-                  </ToggleGroupItem>
-                </ToggleGroup>
+                {survey && (
+                  <RenameInput
+                    id={survey?.id}
+                    title={survey?.name}
+                    onUpdate={handleRenameSurvey}
+                  />
+                )}
               </div>
-
-              {/* 内容区域 */}
-              {mainContent}
+              <SurveyPagiNation />
+              <ToggleGroup
+                type="single"
+                size="sm"
+                value={activeTab}
+                onValueChange={(value) => {
+                  if (value) {
+                    setActiveTab(value as ActiveTab)
+                  }
+                }}
+              >
+                <ToggleGroupItem value="json">
+                  <Braces className="w-4 h-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="design">
+                  <Brush className="w-4 h-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="preview">
+                  <Eye className="w-4 h-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
+            <DragDropProvider>
+              {mainContent}
+            </DragDropProvider>
           </div>
-          {/* 右侧面板 - 问题设置 */}
-          <div className='h-screen w-80 border-l fixed top-[64px] right-0 bottom-0' >
-            {resolvedSearchParams.tab === 'page' ? (
-              <SuveryPageConfig />
-            ) : (
-              <EditQuestionConfig />
-            )}
-          </div>
-        </div>
-      </DragDropProvider>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel defaultSize={20} >
+          {resolvedSearchParams.tab === 'page' ? (
+            <SuveryPageConfig />
+          ) : (
+            <EditQuestionConfig />
+          )}
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       {/* 发布配置 */}
-      <Sheet open={sheetVisible} onOpenChange={setSheetVisible}>
+      {/* <Sheet open={sheetVisible} onOpenChange={setSheetVisible}>
         <SheetContent className="w-96">
           <SheetHeader>
             <SheetTitle className="flex flex-row gap-2 items-center">
@@ -356,7 +357,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
             </SheetClose>
           </SheetFooter>
         </SheetContent>
-      </Sheet>
+      </Sheet> */}
     </div>
   )
 }

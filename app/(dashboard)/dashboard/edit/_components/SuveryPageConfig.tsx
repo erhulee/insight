@@ -1,21 +1,18 @@
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useSnapshot } from 'valtio'
-import { runtimeStore } from "@/app/(dashboard)/dashboard/_valtio/runtime"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Upload, FileText, Save } from 'lucide-react'
+import { Upload, Save } from 'lucide-react'
 import { SurveyCoverConfig } from './SurveyCoverConfig'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { trpc } from '@/app/_trpc/client'
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export function SuveryPageConfig() {
-    const runtimeState = useSnapshot(runtimeStore)
     const params = useParams()
     const surveyId = params.id as string
 
@@ -59,21 +56,6 @@ export function SuveryPageConfig() {
             ...config
         }))
     }
-
-    // 保存基本设置
-    const handleSaveBasicSettings = async () => {
-        try {
-            await updateBasicSettingsMutation.mutateAsync({
-                surveyId,
-                basicSettings,
-            })
-            toast.success('基本设置保存成功')
-        } catch (error) {
-            console.error('保存基本设置失败:', error)
-            toast.error('保存基本设置失败')
-        }
-    }
-
     // 保存所有配置
     const handleSaveAll = async () => {
         try {
@@ -95,15 +77,15 @@ export function SuveryPageConfig() {
     }
 
     return (
-        <div className="bg-muted/30 overflow-hidden hidden md:flex flex-col h-full">
+        <div className="bg-muted/30 flex flex-col max-h-screen">
             <div className="border-b p-4">
                 <h3 className="font-medium">页面配置</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                     编辑问卷的属性和选项
                 </p>
             </div>
-            <div className='flex-1'>
-                <Tabs defaultValue="cover" className="w-full">
+            <div className='overflow-y-scroll'>
+                <Tabs defaultValue="cover" >
                     <TabsList className="grid grid-cols-2 m-4">
                         <TabsTrigger value="basic">基本设置</TabsTrigger>
                         <TabsTrigger value="cover">封面配置</TabsTrigger>
@@ -175,7 +157,7 @@ export function SuveryPageConfig() {
                             </div>
                         </div>
                     </TabsContent>
-                    <TabsContent value="cover" className="pt-2 px-4 h-full">
+                    <TabsContent value="cover" className="pt-2 px-4 h-full overflow-y-auto">
                         <SurveyCoverConfig
                             coverConfig={coverConfig}
                             onUpdate={handleCoverConfigUpdate}

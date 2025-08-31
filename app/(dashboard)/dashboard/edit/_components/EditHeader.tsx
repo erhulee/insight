@@ -53,71 +53,69 @@ export function EditHeader({
   const isSavePending = saveMutation.isPending
 
   return (
-    <header className="sticky top-0 z-10 border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4">
-        {/* 左侧区域 */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBackToDashboard}
-            aria-label="返回仪表板"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <InsightBrand />
-        </div>
+    <header className="flex h-16 items-center justify-between px-4">
+      {/* 左侧区域 */}
+      <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleBackToDashboard}
+          aria-label="返回仪表板"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <InsightBrand />
+      </div>
 
-        {/* 右侧操作区域 */}
-        <div className="flex items-center gap-2">
-          {/* 发布/取消发布按钮 */}
-          {isPublished ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePublishSurvey(false)}
-              disabled={isMutationPending}
-              className="gap-1"
-            >
-              <Smartphone className="h-4 w-4" />
-              取消发布
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePublishSurvey(true)}
-              disabled={isMutationPending}
-              className="gap-1"
-            >
-              <Smartphone className="h-4 w-4" />
-              发布
-            </Button>
-          )}
-
-          {/* 分享按钮 */}
+      {/* 右侧操作区域 */}
+      <div className="flex items-center gap-2">
+        {/* 发布/取消发布按钮 */}
+        {isPublished ? (
           <Button
             variant="outline"
             size="sm"
-            onClick={handleShareSurvey}
+            onClick={() => handlePublishSurvey(false)}
+            disabled={isMutationPending}
             className="gap-1"
           >
-            <Share2 className="h-4 w-4" />
-            分享
+            <Smartphone className="h-4 w-4" />
+            取消发布
           </Button>
-
-          {/* 保存按钮 */}
+        ) : (
           <Button
-            variant="default"
+            variant="outline"
             size="sm"
-            onClick={handleSaveSurvey}
-            disabled={isSavePending}
+            onClick={() => handlePublishSurvey(true)}
+            disabled={isMutationPending}
             className="gap-1"
           >
-            <Save className="h-4 w-4" />
-            {isSavePending ? '保存中...' : '保存'}
+            <Smartphone className="h-4 w-4" />
+            发布
           </Button>
-        </div>
+        )}
+
+        {/* 分享按钮 */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleShareSurvey}
+          className="gap-1"
+        >
+          <Share2 className="h-4 w-4" />
+          分享
+        </Button>
+
+        {/* 保存按钮 */}
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleSaveSurvey}
+          disabled={isSavePending}
+          className="gap-1"
+        >
+          <Save className="h-4 w-4" />
+          {isSavePending ? '保存中...' : '保存'}
+        </Button>
       </div>
     </header>
   )
