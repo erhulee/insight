@@ -1,5 +1,5 @@
 'use client'
-import { addQuestion, runtimeStore } from '@/app/(dashboard)/dashboard/_valtio/runtime'
+import { addQuestion } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { preset } from '@/components/survey-editor/buildin/form-item'
 import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'
@@ -15,7 +15,6 @@ const questionTypes = preset.map((item) => ({
 }))
 export function WidgetPanel() {
   const path = usePathname()
-  console.log("path:", path)
   const handleAddQuestion = (questionType: string) => {
     const meta = preset.find((item) => item.type === questionType)!
     const id = uuidv4()
@@ -60,6 +59,9 @@ export function WidgetPanel() {
               基本设置
             </Button>
           </Link>
+          <div className="text-xs text-muted-foreground px-2">
+            点击可配置问卷基本信息和封面设置
+          </div>
         </div>
       </div>
     </div>

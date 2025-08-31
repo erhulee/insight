@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress'
 import { ChevronLeft, ChevronRight, Send, ArrowLeft } from 'lucide-react'
 import { MobileQuestionRenderer } from '@/components/mobile/mobile-question-renderer'
 import type { Question } from '@/lib/api-types'
+import { SurveyCover } from './survey-cover'
+
 
 interface SurveyClientProps {
     survey: {
@@ -15,10 +17,21 @@ interface SurveyClientProps {
         name: string
         description?: string
         questions: Question[]
+        // 封面配置字段
+        estimatedTime?: string
+        coverDescription?: string
+        privacyNotice?: string
+        bottomNotice?: string
+        coverIcon?: string
+        coverColor?: string
+        showProgressInfo?: boolean
+        showPrivacyNotice?: boolean
     }
 }
 
+
 export function SurveyClient({ survey }: SurveyClientProps) {
+    const [showQuestions, setShowQuestions] = React.useState(false)
     const router = useRouter()
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [answers, setAnswers] = useState<Record<string, any>>({})
@@ -113,6 +126,15 @@ export function SurveyClient({ survey }: SurveyClientProps) {
                 </div>
             </div>
         )
+    }
+
+    const handleStartSurvey = () => {
+        setShowQuestions(true)
+    }
+
+    // 如果还没开始，显示封面
+    if (!showQuestions) {
+        return <SurveyCover survey={survey} onStart={handleStartSurvey} />
     }
 
     return (

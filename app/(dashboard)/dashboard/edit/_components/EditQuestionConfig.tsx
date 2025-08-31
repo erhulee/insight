@@ -18,7 +18,7 @@ export function EditQuestionConfig() {
     return runtimeState.currentQuestion.find((q) => q.id === runtimeState.selectedQuestionID)
   }, [runtimeState.selectedQuestionID])
   return (
-    <div className="w-80 border-l bg-muted/30 overflow-hidden hidden md:block fixed top-[64px] right-0 h-screen">
+    <div className=" h-full bg-muted/30 overflow-hidden hidden md:block">
       <div className="border-b p-4">
         <h3 className="font-medium">问题配置</h3>
         <p className="text-xs text-muted-foreground mt-1">

@@ -31,6 +31,17 @@ model Survey {
   published   Boolean   @default(false)
   pageCount   Int       @default(1)
 
+  // 新增：封面配置字段
+  coverConfig       Json? // 封面配置，包含图标、颜色、布局等
+  estimatedTime     String? // 预计用时，如 "3-5分钟"
+  coverDescription  String? // 封面描述文案
+  privacyNotice     String? // 隐私保护说明
+  bottomNotice      String? // 底部说明文案
+  coverIcon         String? // 封面图标类型
+  coverColor        String? // 封面主色调
+  showProgressInfo  Boolean @default(true) // 是否显示进度信息（预计用时、问题数量）
+  showPrivacyNotice Boolean @default(true) // 是否显示隐私保护说明
+
   responses Questionnaires[]
 }
 

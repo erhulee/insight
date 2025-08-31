@@ -265,7 +265,6 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
         <div className="flex-1 flex overflow-hidden w-screen ">
           {/* 左侧面板 - 问题类型 */}
           <WidgetPanel />
-
           {/* 中间面板 - 问题列表/预览 */}
           <div className="ml-[255px] mr-[320px] w-full">
             <div className="flex-1 overflow-hidden h-full">
@@ -323,13 +322,14 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
               {mainContent}
             </div>
           </div>
-
           {/* 右侧面板 - 问题设置 */}
-          {resolvedSearchParams.tab === 'page' ? (
-            <SuveryPageConfig />
-          ) : (
-            <EditQuestionConfig />
-          )}
+          <div className='h-screen w-80 border-l fixed top-[64px] right-0 bottom-0' >
+            {resolvedSearchParams.tab === 'page' ? (
+              <SuveryPageConfig />
+            ) : (
+              <EditQuestionConfig />
+            )}
+          </div>
         </div>
       </DragDropProvider>
 
