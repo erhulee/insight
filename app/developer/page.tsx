@@ -59,16 +59,59 @@ export default function DeveloperPage() {
       {/* 主要内容区域 */}
       <main className=" container mx-auto px-4 py-8">
         {/* 开发者中心标题 */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">问卷星开发者中心</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            使用我们强大的API和工具，将问卷功能集成到您的应用程序中，或构建自定义解决方案
-          </p>
+        <div className="relative overflow-hidden rounded-xl border bg-gradient-to-b from-muted/50 to-background p-8 md:p-12 mb-10">
+          <div className="relative z-10 text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">开放平台 · 开发者中心</h1>
+            <p className="text-base md:text-lg text-muted-foreground">
+              标准化 REST/tRPC 能力：创建、配置、发布、数据获取、事件推送与导出
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Button asChild>
+                <Link href="/developer/docs">查看文档</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/developer/api-keys">管理 API 密钥</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* 能力直达 */}
+        <div className="max-w-6xl mx-auto mb-10">
+          <div className="mb-4 text-center">
+            <span className="text-xs tracking-wider text-muted-foreground uppercase">能力直达</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <Link href="/developer/docs" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="text-sm">文档站</span>
+            </Link>
+            <Link href="/developer/api-keys" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <Key className="h-4 w-4 text-primary" />
+              <span className="text-sm">API 密钥</span>
+            </Link>
+            <Link href="/developer/webhooks" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              <span className="text-sm">Webhooks</span>
+            </Link>
+            <Link href="/developer/api-explorer" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <Terminal className="h-4 w-4 text-primary" />
+              <span className="text-sm">API Explorer</span>
+            </Link>
+            <Link href="/developer/examples" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <Code className="h-4 w-4 text-primary" />
+              <span className="text-sm">代码示例</span>
+            </Link>
+            <Link href="/openapi.yaml" className="group rounded-lg border bg-background hover:bg-muted transition-colors p-4 flex items-center justify-center gap-2">
+              <ExternalLink className="h-4 w-4 text-primary" />
+              <span className="text-sm">OpenAPI</span>
+            </Link>
+          </div>
         </div>
 
         {/* 主要功能卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 max-w-6xl mx-auto">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -76,11 +119,11 @@ export default function DeveloperPage() {
                 </div>
                 <CardTitle>API密钥管理</CardTitle>
               </div>
-              <CardDescription>创建和管理API密钥，用于访问问卷星API</CardDescription>
+              <CardDescription>创建/重置 API Key，最小权限与速率控制</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
               <p className="text-muted-foreground">
-                安全地管理您的API密钥，设置权限和使用限制，并监控API使用情况。
+                管理应用级凭证，支持只读密钥与每分钟速率限制；写操作建议携带 Idempotency-Key。
               </p>
             </CardContent>
             <CardFooter>
@@ -90,7 +133,7 @@ export default function DeveloperPage() {
             </CardFooter>
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -112,7 +155,7 @@ export default function DeveloperPage() {
             </CardFooter>
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -124,7 +167,7 @@ export default function DeveloperPage() {
             </CardHeader>
             <CardContent className="flex-1">
               <p className="text-muted-foreground">
-                使用交互式工具测试API请求，查看响应结果，并生成多种编程语言的代码示例。
+                测试 REST 端点与响应，验证鉴权/签名/限流行为，生成多语言代码示例。
               </p>
             </CardContent>
             <CardFooter>
@@ -134,7 +177,7 @@ export default function DeveloperPage() {
             </CardFooter>
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -156,7 +199,7 @@ export default function DeveloperPage() {
             </CardFooter>
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -178,7 +221,7 @@ export default function DeveloperPage() {
             </CardFooter>
           </Card>
 
-          <Card className="flex flex-col">
+          <Card className="flex flex-col hover:shadow-md transition-shadow border-muted/40">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-md bg-primary/10">
@@ -190,7 +233,7 @@ export default function DeveloperPage() {
             </CardHeader>
             <CardContent className="flex-1">
               <p className="text-muted-foreground">
-                配置Webhooks接收实时事件通知，如问卷提交、更新等，实现自动化工作流。
+                订阅 response.submitted 等事件，HMAC-SHA256 签名（X-OpenEvent/X-OpenTs/X-OpenSig），失败自动重试。
               </p>
             </CardContent>
             <CardFooter>
@@ -204,17 +247,17 @@ export default function DeveloperPage() {
         {/* 快速入门 */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">快速入门</h2>
-          <Card>
+          <Card className="border-muted/40">
             <CardContent className="pt-6">
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
                     1
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium mb-2">创建API密钥</h3>
+                    <h3 className="text-lg font-medium mb-2">创建 API 密钥</h3>
                     <p className="text-muted-foreground mb-4">
-                      首先，您需要创建一个API密钥，用于访问问卷星API。API密钥是您的身份凭证，请妥善保管。
+                      在开发者中心创建应用与密钥，可选只读密钥与速率限制；请妥善保管凭证。
                     </p>
                     <Button asChild variant="outline" size="sm">
                       <Link href="/developer/api-keys" className="gap-1">
@@ -226,14 +269,13 @@ export default function DeveloperPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
                     2
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium mb-2">了解API</h3>
+                    <h3 className="text-lg font-medium mb-2">配置 Webhooks 与签名</h3>
                     <p className="text-muted-foreground mb-4">
-                      浏览API文档，了解可用的端点、请求参数和响应格式。您可以使用API
-                      Explorer交互式地测试API。
+                      在 Webhooks 页面设置回调、签名密钥与订阅事件；使用交互工具发送测试事件并校验 HMAC 签名。
                     </p>
                     <div className="flex gap-2">
                       <Button asChild variant="outline" size="sm">
@@ -253,14 +295,39 @@ export default function DeveloperPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
                     3
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium mb-2">集成到您的应用</h3>
+                    <h3 className="text-lg font-medium mb-2">调用 API（幂等与限流）</h3>
                     <p className="text-muted-foreground mb-4">
-                      使用我们提供的代码示例和SDK，将问卷星API集成到您的应用程序中。您可以创建、管理问卷，收集和分析回复数据。
+                      通过 REST 端点集成，写请求携带 Idempotency-Key；注意 429 返回与 Retry-After 处理。
                     </p>
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+                        4
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium mb-2">查看 PRD 与 OpenAPI</h3>
+                        <p className="text-muted-foreground mb-4">
+                          对照 PRD 能力清单与数据模型进行集成，参考 OpenAPI 规范与示例。
+                        </p>
+                        <div className="flex gap-2">
+                          <Button asChild variant="outline" size="sm">
+                            <Link href="/developer/docs/open-platform-prd" className="gap-1">
+                              打开 PRD 要点
+                              <ChevronRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline" size="sm">
+                            <Link href="/openapi.yaml" className="gap-1">
+                              下载 OpenAPI
+                              <ChevronRight className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
                     <div className="relative">
                       <Button
                         variant="ghost"
@@ -1134,6 +1201,15 @@ createSurvey();`,
                     >
                       <BookOpen className="h-4 w-4" />
                       API文档
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/developer/docs/open-platform-prd"
+                      className="flex items-center gap-2 text-primary hover:underline"
+                    >
+                      <FileText className="h-4 w-4" />
+                      开放平台 PRD
                     </Link>
                   </li>
                   <li>
