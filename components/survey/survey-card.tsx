@@ -102,7 +102,7 @@ export function SurveyCard({ survey }: SurveyOverviewProps) {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button variant="ghost" size="icon" asChild>
-                                <Link href={`/dashboard/edit/${id}`}>
+                                <Link href={`/edit/${id}`}>
                                     <FileText className="h-4 w-4" />
                                 </Link>
                             </Button>

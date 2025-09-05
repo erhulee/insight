@@ -239,10 +239,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* 页面头部 */}
-      <div className="px-4">
-        <LayoutHeader activeTab="dashboard" hideBorder />
-      </div>
 
       {/* 主要内容 */}
       <main className="container 2xl:px-4 2xl:py-6 py-4 mx-auto">

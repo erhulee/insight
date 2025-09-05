@@ -25,7 +25,7 @@ import { WidgetPanel } from '../_components/WidgetPanel'
 import { cloneDeep } from 'lodash-es'
 import { SurveyPagiNation } from '../_components/SurveyPagiNation'
 import { useSnapshot } from 'valtio'
-import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from '../../_valtio/runtime'
+import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { JsonEditor } from '../_components/JsonEditor'
 import {
   DropdownMenu,
@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { EditQuestionConfig } from '../_components/EditQuestionConfig'
 import { SuveryPageConfig } from '../_components/SuveryPageConfig'
-import type { Question, RuntimeState } from '../../_valtio/runtime'
+import type { Question, RuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EditHeaderSkeleton } from '../_components/EditHeaderSkeleton'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'

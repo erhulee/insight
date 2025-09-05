@@ -90,10 +90,6 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="px-4">
-        <LayoutHeader activeTab="templates" hideBorder />
-      </div>
 
       {/* Main Content */}
       <main className="container mx-auto lg:px-4 lg:py-8 py-4">
