@@ -10,16 +10,6 @@ import { RenameInput } from '../_components/RenameInput'
 import { trpc } from '@/app/_trpc/client'
 import { Canvas } from '../_components/EditCanvas'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
-import { ShareConfig } from '../_components/shareConfig'
 import { EditHeader } from '../_components/EditHeader'
 import { WidgetPanel } from '../_components/WidgetPanel'
 import { cloneDeep } from 'lodash-es'
