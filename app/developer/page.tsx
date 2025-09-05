@@ -24,6 +24,11 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
+import { PromotionalHeader } from '@/components/developer/promotional-header'
+import { PromotionalHero } from '@/components/developer/promotional-hero'
+import { PromotionalFeatures } from '@/components/developer/promotional-features'
+import { PromotionalNews } from '@/components/developer/promotional-news'
+import { PromotionalOpenForms } from '@/components/developer/promotional-open-forms'
 
 export default function DeveloperPage() {
   const handleCopyCode = (code: string) => {
@@ -58,23 +63,7 @@ export default function DeveloperPage() {
 
       {/* 主要内容区域 */}
       <main className=" container mx-auto px-4 py-8">
-        {/* 开发者中心标题 */}
-        <div className="relative overflow-hidden rounded-xl border bg-gradient-to-b from-muted/50 to-background p-8 md:p-12 mb-10">
-          <div className="relative z-10 text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">开放平台 · 开发者中心</h1>
-            <p className="text-base md:text-lg text-muted-foreground">
-              标准化 REST/tRPC 能力：创建、配置、发布、数据获取、事件推送与导出
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <Button asChild>
-                <Link href="/developer/docs">查看文档</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/developer/api-keys">管理 API 密钥</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <PromotionalHero />
 
         {/* 能力直达 */}
         <div className="max-w-6xl mx-auto mb-10">
@@ -108,6 +97,11 @@ export default function DeveloperPage() {
             </Link>
           </div>
         </div>
+
+        {/* 宣传模块 */}
+        <PromotionalFeatures />
+        <PromotionalNews />
+        <PromotionalOpenForms />
 
         {/* 主要功能卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 max-w-6xl mx-auto">
