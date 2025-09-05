@@ -22,16 +22,16 @@ export default function CreateSurveyPage() {
         <header className=" max-w-[1500px] mx-auto mt-5">
           <div className="flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-4">
-              <InsightBrand></InsightBrand>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/dashboard" className="gap-1">
+                  <ArrowLeft className="h-4 w-4" />
+                  返回
+                </Link>
+              </Button>
               <h1 className="text-lg font-medium ml-2">创建问卷</h1>
             </div>
 
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard" className="gap-1">
-                <ArrowLeft className="h-4 w-4" />
-                返回
-              </Link>
-            </Button>
+
           </div>
         </header>
 
