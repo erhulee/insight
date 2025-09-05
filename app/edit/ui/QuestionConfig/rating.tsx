@@ -102,4 +102,5 @@ export function RatingConfig() {
             </Form.Item>
         </div>
     )
-} 
+}
+

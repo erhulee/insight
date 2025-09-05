@@ -3,31 +3,26 @@ import type React from 'react'
 import { useState, use, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Eye, Braces, Brush, LinkIcon, AlignJustify, BookTemplate, File } from 'lucide-react'
+import { Eye, Braces, Brush, AlignJustify, BookTemplate, File } from 'lucide-react'
 import { DragDropProvider } from '@/components/survey-editor/drag-drop-context'
 import { toast } from 'sonner'
-import { RenameInput } from '../_components/RenameInput'
+import { RenameInput, Canvas, EditHeader, WidgetPanel, SurveyPagiNation, JsonEditor, EditQuestionConfig, SuveryPageConfig, EditHeaderSkeleton } from '../ui'
 import { trpc } from '@/app/_trpc/client'
-import { Canvas } from '../_components/EditCanvas'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { EditHeader } from '../_components/EditHeader'
-import { WidgetPanel } from '../_components/WidgetPanel'
 import { cloneDeep } from 'lodash-es'
-import { SurveyPagiNation } from '../_components/SurveyPagiNation'
 import { useSnapshot } from 'valtio'
 import { initRuntimeStore, runtimeStore, updateRuntimeQuestion } from '@/app/(dashboard)/dashboard/_valtio/runtime'
-import { JsonEditor } from '../_components/JsonEditor'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EditQuestionConfig } from '../_components/EditQuestionConfig'
-import { SuveryPageConfig } from '../_components/SuveryPageConfig'
+
 import type { Question, RuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { EmptyState } from '@/components/ui/empty-state'
-import { EditHeaderSkeleton } from '../_components/EditHeaderSkeleton'
+
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 // 定义页面参数类型
@@ -282,7 +277,7 @@ export default function EditSurveyPage({ params, searchParams }: EditSurveyPageP
                 {survey && (
                   <RenameInput
                     id={survey?.id}
-                    title={survey?.name}
+                    title={survey?.title}
                     onUpdate={handleRenameSurvey}
                   />
                 )}
