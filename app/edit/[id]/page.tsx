@@ -1,7 +1,7 @@
 'use client'
 import type React from 'react'
 import { useState, use, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
 	Eye,
@@ -85,6 +85,7 @@ export default function EditSurveyPage({
 	const resolvedParams = use(params)
 	const resolvedSearchParams = use(searchParams)
 	const publishSurveyMutation = trpc.surver.PublishSurvey.useMutation()
+	const updateSurveyMutation = trpc.surver.UpdateSurvey.useMutation()
 
 	// 获取问卷数据
 	const {
@@ -96,8 +97,9 @@ export default function EditSurveyPage({
 		id: resolvedParams.id,
 	})
 
-	const updateSurveyMutation = trpc.surver.UpdateSurvey.useMutation()
-	const [activeTab, setActiveTab] = useState<ActiveTab>('design')
+	const clientSearchParams = useSearchParams()
+	const pathname = usePathname()
+	const activeTab = (clientSearchParams.get('view') as ActiveTab) ?? 'design'
 
 	// 初始化运行时存储
 	useEffect(() => {
@@ -339,7 +341,11 @@ export default function EditSurveyPage({
 								value={activeTab}
 								onValueChange={(value) => {
 									if (value) {
-										setActiveTab(value as ActiveTab)
+										const params = new URLSearchParams(
+											clientSearchParams.toString(),
+										)
+										params.set('view', value)
+										router.replace(`${pathname}?${params.toString()}`)
 									}
 								}}
 							>
