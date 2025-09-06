@@ -89,7 +89,7 @@ export function useSortableOptions(
 		}
 
 		// 更新 DSL 数据
-		RuntimeDSLAction.updateQuestion('props', {
+		RuntimeDSLAction.patchQuestion({
 			props: {
 				...props,
 				options: [...options, newOption],
@@ -110,7 +110,7 @@ export function useSortableOptions(
 				i === index ? { ...opt, label } : opt,
 			)
 
-			RuntimeDSLAction.updateQuestion('props', {
+			RuntimeDSLAction.patchQuestion({
 				props: {
 					...props,
 					options: newOptions,
@@ -128,7 +128,7 @@ export function useSortableOptions(
 		(id: string) => {
 			const newOptions = options.filter((item) => item.id !== id)
 
-			RuntimeDSLAction.updateQuestion('props', {
+			RuntimeDSLAction.patchQuestion({
 				props: {
 					...props,
 					options: newOptions,
@@ -147,7 +147,7 @@ export function useSortableOptions(
 		(oldIndex: number, newIndex: number) => {
 			const items = arrayMove(options, oldIndex, newIndex)
 
-			RuntimeDSLAction.updateQuestion('props', {
+			RuntimeDSLAction.patchQuestion({
 				props: {
 					...props,
 					options: items,

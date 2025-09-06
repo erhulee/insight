@@ -47,9 +47,7 @@ export function QuestionConfig() {
 						form={formClient}
 						layout="vertical"
 						onValuesChange={(_, value) => {
-							RuntimeDSLAction.updateQuestion('form-basic', {
-								attr: value,
-							})
+							RuntimeDSLAction.patchQuestion({ ...value })
 						}}
 					>
 						<BasicConfig></BasicConfig>
@@ -79,15 +77,31 @@ export function QuestionConfig() {
 							id: q.id,
 							type: q.type,
 							title: q.title,
-							description: q.description,
-							required: q.required,
-							options: q.props.options || [],
-							multiline: q.type === 'textarea',
-							placeholder: q.props.placeholder,
-							maxRating: q.props.maxRating,
-							ratingType: q.props.ratingType,
-							minDate: q.props.minDate,
-							maxDate: q.props.maxDate,
+							...(typeof q.description !== 'undefined'
+								? { description: q.description }
+								: {}),
+							...(typeof q.required !== 'undefined'
+								? { required: q.required }
+								: {}),
+							...(Array.isArray(q.props?.options)
+								? { options: q.props.options }
+								: {}),
+							...(q.type === 'textarea' ? { multiline: true } : {}),
+							...(typeof q.props?.placeholder !== 'undefined'
+								? { placeholder: q.props.placeholder }
+								: {}),
+							...(typeof q.props?.maxRating !== 'undefined'
+								? { maxRating: q.props.maxRating }
+								: {}),
+							...(typeof q.props?.ratingType !== 'undefined'
+								? { ratingType: q.props.ratingType }
+								: {}),
+							...(typeof q.props?.minDate !== 'undefined'
+								? { minDate: q.props.minDate }
+								: {}),
+							...(typeof q.props?.maxDate !== 'undefined'
+								? { maxDate: q.props.maxDate }
+								: {}),
 						}))}
 						logicConfig={JSON.parse(
 							JSON.stringify(

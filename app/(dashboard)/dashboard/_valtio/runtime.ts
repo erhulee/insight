@@ -235,49 +235,72 @@ export const RuntimeDSLAction = {
 			}>
 		},
 	) => {
-		setState((prev) => {
-			const idx = prev.questions.findIndex(
-				(q) => q.id === prev.selectedQuestionID,
-			)
-			if (idx === -1) return prev
-			const oldQuestion = cloneDeep(prev.questions[idx])
-			if (!oldQuestion) return prev
-			if (action == 'props') {
-				const mergedProps = {
-					...(oldQuestion.props || {}),
-					...(params.props || {}),
-				}
-				oldQuestion.props = mergedProps
-			} else if (action == 'form-basic') {
-				if (typeof params.attr?.title !== 'undefined') {
-					oldQuestion.title = params.attr.title
-				}
+		// Backward compatibility: convert to patchQuestion
+		RuntimeDSLAction.patchQuestion((prevQ) => {
+			const next = cloneDeep(prevQ)
+			if (action === 'props') {
+				next.props = { ...(next.props || {}), ...(params.props || {}) }
+			} else if (action === 'form-basic') {
+				if (typeof params.attr?.title !== 'undefined')
+					next.title = params.attr.title!
 				if (typeof params.attr?.description !== 'undefined') {
-					if (params.attr.description === undefined) {
-						delete (oldQuestion as any).description
-					} else {
-						oldQuestion.description = params.attr.description
-					}
+					if (params.attr.description === undefined)
+						delete (next as any).description
+					else next.description = params.attr.description
 				}
 				if (typeof params.attr?.required !== 'undefined') {
-					if (params.attr.required === undefined) {
-						delete (oldQuestion as any).required
-					} else {
-						oldQuestion.required = params.attr.required
-					}
+					if (params.attr.required === undefined) delete (next as any).required
+					else next.required = params.attr.required
 				}
 			}
-			const questions = [
-				...prev.questions.slice(0, idx),
-				oldQuestion,
-				...prev.questions.slice(idx + 1),
-			]
-			return { ...prev, questions }
+			return next
 		})
 	},
 	updateDisplayLogic: (config: DisplayLogicConfig) => {
 		setState((prev) => ({ ...prev, displayLogic: config }))
 	},
+	patchQuestion: (
+		patch: Partial<Question> | ((prev: Question) => Question),
+	) => {
+		setState((prev) => {
+			const idx = prev.questions.findIndex(
+				(q) => q.id === prev.selectedQuestionID,
+			)
+			if (idx === -1) return prev
+			const current = cloneDeep(prev.questions[idx])
+			if (!current) return prev
+			const next =
+				typeof patch === 'function'
+					? patch(current)
+					: applyPatch(current, patch)
+			const questions = [
+				...prev.questions.slice(0, idx),
+				next,
+				...prev.questions.slice(idx + 1),
+			]
+			return { ...prev, questions }
+		})
+	},
+}
+
+function applyPatch(base: Question, patch: Partial<Question>): Question {
+	const next: Question = { ...base }
+	if ('title' in patch) next.title = patch.title as string
+	if ('description' in patch) {
+		if (patch.description === undefined) delete (next as any).description
+		else next.description = patch.description
+	}
+	if ('required' in patch) {
+		if (patch.required === undefined) delete (next as any).required
+		else next.required = patch.required
+	}
+	if ('logic' in patch) {
+		if (patch.logic === undefined) delete (next as any).logic
+		else next.logic = patch.logic
+	}
+	if (patch.props)
+		next.props = { ...(next.props || {}), ...(patch.props || {}) }
+	return next
 }
 
 export class CoreRuntime {
@@ -351,6 +374,10 @@ export class CoreRuntime {
 
 	clearSelection() {
 		clearSelection()
+	}
+
+	patchQuestion(patch: Partial<Question> | ((prev: Question) => Question)) {
+		RuntimeDSLAction.patchQuestion(patch)
 	}
 }
 
