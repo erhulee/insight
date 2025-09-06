@@ -102,58 +102,30 @@ export const Canvas: React.FC = () => {
 
 	// 渲染预览内容
 	return (
-		<div className="h-full flex flex-col">
-			<div className="flex-1 overflow-y-auto p-4">
-				{/* 问题列表 */}
-				<DndContext sensors={[pointerSensor]} onDragEnd={handleDragEnd}>
-					<div className="space-y-4">
-						{questionsList.length === 0 ? (
-							<CanvasNoData />
-						) : (
-							questionsList.map((question, index) => (
-								<EditQuestionItem
-									key={question.id}
-									question={question as QuestionSchemaType}
-									isPreview={false}
-									isSelected={isQuestionSelected(question.id)}
-									onSelect={() =>
-										handleSelectQuestion(question as QuestionSchemaType)
-									}
-									onDelete={deleteQuestion}
-									onDuplicate={handleDuplicateQuestion}
-									index={index}
-								/>
-							))
-						)}
-					</div>
-				</DndContext>
-
-				{/* 添加问题按钮 - 移动设备上显示 */}
-				<div className="mt-6 lg:hidden">
-					<Tabs defaultValue="questions">
-						<TabsList className="grid w-full grid-cols-2">
-							<TabsTrigger value="questions">问题类型</TabsTrigger>
-							<TabsTrigger value="settings">问卷设置</TabsTrigger>
-						</TabsList>
-						<TabsContent value="questions" className="mt-4">
-							<div className="grid grid-cols-2 gap-2">
-								{questionTypes.map((type) => (
-									<Button
-										key={type.id}
-										variant="outline"
-										size="sm"
-										onClick={() => addQuestion(type.id as QuestionType)}
-										className="justify-start gap-1 h-auto py-2"
-									>
-										{type.icon}
-										<span className="text-xs">{type.name}</span>
-									</Button>
-								))}
-							</div>
-						</TabsContent>
-					</Tabs>
+		<div className="flex-1 overflow-y-auto p-4 h-full pb-60">
+			{/* 问题列表 */}
+			<DndContext sensors={[pointerSensor]} onDragEnd={handleDragEnd}>
+				<div className="space-y-4">
+					{questionsList.length === 0 ? (
+						<CanvasNoData />
+					) : (
+						questionsList.map((question, index) => (
+							<EditQuestionItem
+								key={question.id}
+								question={question as QuestionSchemaType}
+								isPreview={false}
+								isSelected={isQuestionSelected(question.id)}
+								onSelect={() =>
+									handleSelectQuestion(question as QuestionSchemaType)
+								}
+								onDelete={deleteQuestion}
+								onDuplicate={handleDuplicateQuestion}
+								index={index}
+							/>
+						))
+					)}
 				</div>
-			</div>
+			</DndContext>
 		</div>
 	)
 }
