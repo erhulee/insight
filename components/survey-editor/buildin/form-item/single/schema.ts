@@ -21,6 +21,7 @@ export const SingleQuestionSchema = QuestionSchema.extend({
 					id: 'option1',
 				},
 			]),
+		random: z.boolean().default(false),
 	}),
 })
 export type SingleQuestionSchemaType = z.infer<typeof SingleQuestionSchema>

@@ -1,7 +1,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
-import { QuestionConfig } from './QuestionConfig'
 import { useMemo } from 'react'
+import { QuestionConfig } from './question-config'
 
 function Empty() {
 	return (

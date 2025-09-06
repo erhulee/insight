@@ -12,6 +12,7 @@ import {
 } from '../form-item/description'
 import { SingleQuestionSchemaType } from '../form-item/single/schema'
 import { RatingQuestion } from '../form-item/rating/render'
+import { DatePickerQuestionSchemaType } from '../form-item/date-picker/schema'
 
 export function QuestionRender(props: { question: QuestionSchemaType }) {
 	const { question } = props
@@ -46,8 +47,7 @@ export function QuestionRender(props: { question: QuestionSchemaType }) {
 			)
 		case 'date':
 			return (
-				<div>date 不支持</div>
-				// <DatePicker dsl={question as DatePickerQuestionSchemaType}></DatePicker>
+				<DatePicker dsl={question as DatePickerQuestionSchemaType}></DatePicker>
 			)
 		case 'rating':
 			return (

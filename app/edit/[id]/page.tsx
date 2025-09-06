@@ -52,6 +52,7 @@ import {
 import { WidgetPanel } from '../_component/widget-panel'
 import { EditHeader } from '../_component/EditHeader'
 import { EditHeaderSkeleton } from '../_component/EditHeader/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // 定义页面参数类型
 interface PageParams {
@@ -299,7 +300,7 @@ export default function EditSurveyPage({
 				direction="horizontal"
 				className=" w-full rounded-lg border md:min-w-[450px] flex-shrink"
 			>
-				<ResizablePanel defaultSize={20}>
+				<ResizablePanel defaultSize={18}>
 					{/* 左侧面板 - 问题类型 */}
 					<WidgetPanel />
 				</ResizablePanel>

@@ -1,5 +1,4 @@
 'use client'
-import type React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useEffect, useMemo } from 'react'
 import { Form } from 'antd'
@@ -12,7 +11,7 @@ import { InputConfig } from './input'
 import { DateConfig } from './date'
 import { RatingConfig } from './rating'
 import { DisplayLogicConfigurator } from '@/components/survey-editor/display-logic/DisplayLogicConfigurator'
-import { DisplayLogicConfig } from '@/lib/custom-display-logic'
+import { SingleConfig } from './single'
 
 export function QuestionConfig() {
 	const runtimeState = useRuntimeState()
@@ -63,6 +62,8 @@ export function QuestionConfig() {
 									return <DateConfig></DateConfig>
 								case 'rating':
 									return <RatingConfig></RatingConfig>
+								case 'single':
+									return <SingleConfig></SingleConfig>
 							}
 						})()}
 					</Form>
