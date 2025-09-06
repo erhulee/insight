@@ -4,7 +4,7 @@ import { preset } from '@/components/survey-editor/buildin/form-item'
 import { Button } from '@/components/ui/button'
 import { Settings } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { QuestionSchema, QuestionSchemaType } from '@/lib/dsl'
+import { QuestionSchemaType } from '@/lib/dsl'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { SingleQuestionSchema } from '@/components/survey-editor/buildin/form-item/single'
@@ -12,6 +12,10 @@ import { ZodObject } from 'zod'
 import { toast } from 'sonner'
 import { MultipleQuestionSchema } from '@/components/survey-editor/buildin/form-item/multiple'
 import { TextareaQuestionSchema } from '@/components/survey-editor/buildin/form-item/text-area/schema'
+import { TextInputQuestionSchema } from '@/components/survey-editor/buildin/form-item/text-input/schema'
+import { DatePickerQuestionSchema } from '@/components/survey-editor/buildin/form-item/date-picker/schema'
+import { RatingQuestionSchema } from '@/components/survey-editor/buildin/form-item/rating'
+import { DescriptionSchema } from '@/components/survey-editor/buildin/form-item/description'
 const questionTypes = preset.map((item) => ({
 	id: item.type,
 	name: item.title,
@@ -34,13 +38,23 @@ export function WidgetPanel() {
 				schema = TextareaQuestionSchema
 				break
 			case 'input':
-
+				schema = TextInputQuestionSchema
+				break
+			case 'date':
+				schema = DatePickerQuestionSchema
+				break
+			case 'rating':
+				schema = RatingQuestionSchema
+				break
+			case 'description':
+				schema = DescriptionSchema
+				break
 			default:
 				schema = null
 				break
 		}
 		if (schema == null) {
-			toast.error('该问题类型不存在')
+			toast.error('该问题类型不存在:' + questionType)
 			return
 		}
 		const newQuestion = schema.parse({

@@ -1,3 +1,4 @@
+'use client'
 import { useRuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import Editor, { loader } from '@monaco-editor/react'
 import { useMemo } from 'react'
@@ -15,6 +16,7 @@ export function JsonEditor() {
 	}, [runtimeState.questions])
 	return (
 		<Editor
+			loading="Loading..."
 			height="80vh"
 			defaultLanguage="javascript"
 			defaultValue={question_str}
