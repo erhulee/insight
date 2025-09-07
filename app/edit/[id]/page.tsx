@@ -53,6 +53,7 @@ import { WidgetPanel } from '../_component/widget-panel'
 import { EditHeader } from '../_component/EditHeader'
 import { EditHeaderSkeleton } from '../_component/EditHeader/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { SurveyRendererWithLogic } from '@/components/survey/SurveyRendererWithLogic'
 
 // 定义页面参数类型
 interface PageParams {
@@ -272,8 +273,19 @@ export default function EditSurveyPage({
 				return <Canvas />
 			case 'preview':
 				return (
-					<div className="p-4 text-center text-muted-foreground">
-						预览功能开发中...
+					<div className="p-4">
+						<SurveyRendererWithLogic
+							questions={runtimeState.questions as unknown as PcQuestion[]}
+							logicConfig={{}}
+							onSubmit={(answers) => {
+								console.log('预览提交答案:', answers)
+								toast.success('预览提交成功', {
+									description: '该提交仅用于验证展示与逻辑，不会落库',
+								})
+							}}
+							showProgress
+							showLogicDebug
+						/>
 					</div>
 				)
 		}
@@ -373,31 +385,6 @@ export default function EditSurveyPage({
 					)}
 				</ResizablePanel>
 			</ResizablePanelGroup>
-
-			{/* 发布配置 */}
-			{/* <Sheet open={sheetVisible} onOpenChange={setSheetVisible}>
-        <SheetContent className="w-96">
-          <SheetHeader>
-            <SheetTitle className="flex flex-row gap-2 items-center">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
-                <LinkIcon className="h-4 w-4" />
-              </div>
-              用户满意度调查
-            </SheetTitle>
-            <SheetDescription>创建于 2023-04-15 · 124 份回复</SheetDescription>
-          </SheetHeader>
-
-          <div className="grid gap-4 py-4">
-            <ShareConfig />
-          </div>
-
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit">保存更改</Button>
-            </SheetClose>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet> */}
 		</div>
 	)
 }

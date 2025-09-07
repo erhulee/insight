@@ -135,7 +135,6 @@ export function SingleQuestion({ dsl }: SingleQuestionProps) {
 		deleteOption,
 		activeItem,
 	} = useSortableOptions(dsl)
-	console.log('sortableItems:', sortableItems)
 
 	// 使用自定义 Hook 管理卡片选择逻辑
 	const {
