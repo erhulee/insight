@@ -35,7 +35,7 @@ export function QuestionConfig() {
 
 	return (
 		<div className="space-y-6">
-			<Tabs defaultValue="basic" className="w-full">
+			<Tabs defaultValue="basic" className="w-full h-full">
 				<TabsList className="w-full grid grid-cols-4">
 					<TabsTrigger value="basic">基本设置</TabsTrigger>
 					<TabsTrigger value="options">选项</TabsTrigger>
@@ -71,7 +71,7 @@ export function QuestionConfig() {
 					{/* {renderOptionsConfig()} */}
 				</TabsContent>
 
-				<TabsContent value="logic" className="space-y-4 pt-4">
+				<TabsContent value="logic" className="space-y-4 pt-4 h-full">
 					<DisplayLogicConfigurator
 						questions={runtimeState.questions.map((q) => ({
 							id: q.id,

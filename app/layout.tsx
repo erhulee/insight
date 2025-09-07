@@ -8,43 +8,45 @@ import localFont from 'next/font/local'
 import { ConfigProvider } from 'antd'
 import { AuthProvider } from '@/components/auth/auth-provider'
 export const metadata: Metadata = {
-  title: 'Insight - 专业的在线问卷调查平台',
-  description: '创建专业问卷，收集有价值的数据，简单易用的问卷设计工具',
+	title: 'Insight - 专业的在线问卷调查平台',
+	description: '创建专业问卷，收集有价值的数据，简单易用的问卷设计工具',
 }
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { TooltipProvider } from '@/components/ui/tooltip'
 const douyinFont = localFont({
-  src: './DouyinSansBold.ttf',
-  display: 'swap',
-  variable: '--font-douyin',
+	src: './DouyinSansBold.ttf',
+	display: 'swap',
+	variable: '--font-douyin',
 })
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode
+	children: React.ReactNode
 }>) {
-  return (
-    <html lang="zh-CN" className="scroll-smooth">
-      <body className={`${douyinFont.variable}`}>
-        <AntdRegistry>
-          <ConfigProvider
-            theme={{
-              components: {
-                Form: {
-                  itemMarginBottom: 12,
-                },
-              },
-            }}
-          >
-            <TooltipProvider>
-              <AuthProvider>
-                <Provider>{children}</Provider>
-              </AuthProvider>
-            </TooltipProvider>
-          </ConfigProvider>
-        </AntdRegistry>
-        <Toaster />
-      </body>
-    </html>
-  )
+	return (
+		<html lang="zh-CN" className="scroll-smooth">
+			<body
+				className={`${douyinFont.variable} overflow-y-scroll [scrollbar-gutter:stable]`}
+			>
+				<AntdRegistry>
+					<ConfigProvider
+						theme={{
+							components: {
+								Form: {
+									itemMarginBottom: 12,
+								},
+							},
+						}}
+					>
+						<TooltipProvider>
+							<AuthProvider>
+								<Provider>{children}</Provider>
+							</AuthProvider>
+						</TooltipProvider>
+					</ConfigProvider>
+				</AntdRegistry>
+				<Toaster />
+			</body>
+		</html>
+	)
 }

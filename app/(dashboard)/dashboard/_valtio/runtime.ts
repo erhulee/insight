@@ -1,7 +1,8 @@
 'use client'
 import { QuestionSchemaType } from '@/lib/dsl'
 import { cloneDeep } from 'lodash-es'
-import { DisplayLogicConfig } from '@/lib/custom-display-logic'
+import { DisplayLogicConfig } from '@/lib/logic/dsl'
+import { evaluateAll } from '@/lib/logic/engine'
 import { BehaviorSubject } from 'rxjs'
 import { useEffect, useState } from 'react'
 
@@ -41,6 +42,8 @@ export type RuntimeState = {
 	currentQuestion: Question[]
 	pageCount: number
 	displayLogic: DisplayLogicConfig
+	answers?: Record<string, unknown>
+	visibleMap?: Record<string, boolean>
 }
 
 const initialRuntimeState: RuntimeState = {
@@ -50,10 +53,9 @@ const initialRuntimeState: RuntimeState = {
 	pageCount: 1,
 	currentPage: 1,
 	currentQuestion: [] as Question[],
-	displayLogic: {
-		rules: [],
-		enabled: false,
-	},
+	displayLogic: { rules: [], enabled: false, version: 1 },
+	answers: {},
+	visibleMap: {},
 }
 
 export const runtimeState$ = new BehaviorSubject<RuntimeState>(
@@ -100,6 +102,12 @@ export const initRuntimeStore = (params: RuntimeState) => {
 			? (q as Question)
 			: normalizeQuestion(q as QuestionSchemaType, ownerPageDefault),
 	)
+	const initialAnswers = (params as any).answers || {}
+	const initialVisible = evaluateAll(
+		initialAnswers,
+		params.displayLogic,
+		normalizedQuestions,
+	)
 	const next: RuntimeState = {
 		surveyId: params.surveyId,
 		questions: normalizedQuestions,
@@ -111,6 +119,8 @@ export const initRuntimeStore = (params: RuntimeState) => {
 				: normalizedQuestions,
 		selectedQuestionID: params.selectedQuestionID,
 		displayLogic: params.displayLogic,
+		answers: initialAnswers,
+		visibleMap: Object.fromEntries(initialVisible),
 	}
 	runtimeState$.next(next)
 }
@@ -257,7 +267,38 @@ export const RuntimeDSLAction = {
 		})
 	},
 	updateDisplayLogic: (config: DisplayLogicConfig) => {
-		setState((prev) => ({ ...prev, displayLogic: config }))
+		setState((prev) => {
+			const nextVisible = evaluateAll(
+				prev.answers || {},
+				config,
+				prev.questions,
+			)
+			return {
+				...prev,
+				displayLogic: config,
+				visibleMap: Object.fromEntries(nextVisible),
+			}
+		})
+	},
+
+	updateAnswer: (questionId: string, value: unknown) => {
+		setState((prev) => {
+			const nextAnswers = { ...(prev.answers || {}), [questionId]: value }
+			const nextVisible = evaluateAll(
+				nextAnswers,
+				prev.displayLogic,
+				prev.questions,
+			)
+			// 当题目变为不可见时清空答案
+			const visibleMap = Object.fromEntries(nextVisible)
+			const clearedAnswers = { ...nextAnswers }
+			for (const q of prev.questions) {
+				if (visibleMap[q.id] === false && q.id in clearedAnswers) {
+					delete (clearedAnswers as any)[q.id]
+				}
+			}
+			return { ...prev, answers: clearedAnswers, visibleMap }
+		})
 	},
 	patchQuestion: (
 		patch: Partial<Question> | ((prev: Question) => Question),

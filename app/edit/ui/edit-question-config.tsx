@@ -19,7 +19,7 @@ export function EditQuestionConfig() {
 		)
 	}, [runtimeState.selectedQuestionID])
 	return (
-		<div className=" h-full bg-muted/30 overflow-hidden hidden md:block">
+		<div className=" h-full bg-muted/30 overflow-hidden flex flex-col">
 			<div className="border-b p-4">
 				<h3 className="font-medium">问题配置</h3>
 				<p className="text-xs text-muted-foreground mt-1">
@@ -28,7 +28,7 @@ export function EditQuestionConfig() {
 						: '请从左侧选择一个问题进行编辑'}
 				</p>
 			</div>
-			<ScrollArea>
+			<ScrollArea className="flex-1">
 				<div className="p-4">
 					{selectedQuestion ? <QuestionConfig /> : <Empty></Empty>}
 				</div>

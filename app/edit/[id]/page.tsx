@@ -310,7 +310,7 @@ export default function EditSurveyPage({
 					<div className="flex-1 overflow-hidden h-full">
 						<div className="py-2 px-4 flex justify-between items-center">
 							<div className="flex flex-row items-center gap-2">
-								<DropdownMenu>
+								<DropdownMenu modal={false}>
 									<DropdownMenuTrigger asChild>
 										<Button variant="ghost" size="sm" className="h-8 w-8 p-0">
 											<AlignJustify className="w-4 h-4" />
