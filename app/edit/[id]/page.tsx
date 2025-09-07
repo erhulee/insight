@@ -52,8 +52,9 @@ import {
 import { WidgetPanel } from '../_component/widget-panel'
 import { EditHeader } from '../_component/EditHeader'
 import { EditHeaderSkeleton } from '../_component/EditHeader/skeleton'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SurveyRendererWithLogic } from '@/components/survey/SurveyRendererWithLogic'
+import { AIAssistantPanel } from '../ui/ai-assistant-panel'
 
 // 定义页面参数类型
 interface PageParams {
@@ -378,11 +379,46 @@ export default function EditSurveyPage({
 				</ResizablePanel>
 				<ResizableHandle />
 				<ResizablePanel defaultSize={20}>
-					{resolvedSearchParams.tab === 'page' ? (
-						<SuveryPageConfig />
-					) : (
-						<EditQuestionConfig />
-					)}
+					<Tabs defaultValue="config" className="h-full">
+						<TabsList className="grid w-full grid-cols-3 h-8">
+							<TabsTrigger value="config" className="text-xs">
+								配置
+							</TabsTrigger>
+							<TabsTrigger value="ai" className="text-xs">
+								AI 助手
+							</TabsTrigger>
+							<TabsTrigger value="insight" className="text-xs">
+								洞察
+							</TabsTrigger>
+						</TabsList>
+						<TabsContent value="config" className="h-[calc(100%-2rem)] mt-0">
+							{resolvedSearchParams.tab === 'page' ? (
+								<SuveryPageConfig />
+							) : (
+								<EditQuestionConfig />
+							)}
+						</TabsContent>
+						<TabsContent value="ai" className="h-[calc(100%-2rem)] mt-0">
+							<AIAssistantPanel
+								surveyId={survey?.id}
+								selectedQuestionId={selectedQuestionId}
+								onQuestionUpdate={handleUpdateQuestion}
+								onSurveyUpdate={(updates) => {
+									// TODO: 实现问卷更新逻辑
+									console.log('Survey updates:', updates)
+								}}
+							/>
+						</TabsContent>
+						<TabsContent
+							value="insight"
+							className="h-[calc(100%-2rem)] mt-0 p-4"
+						>
+							<div className="text-center text-muted-foreground">
+								<p className="text-sm">洞察功能开发中...</p>
+								<p className="text-xs mt-1">将提供响应数据分析和可视化</p>
+							</div>
+						</TabsContent>
+					</Tabs>
 				</ResizablePanel>
 			</ResizablePanelGroup>
 		</div>

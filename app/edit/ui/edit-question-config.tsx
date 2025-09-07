@@ -2,6 +2,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useRuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
 import { useMemo } from 'react'
 import { QuestionConfig } from './question-config'
+import { Settings } from 'lucide-react'
 
 function Empty() {
 	return (
@@ -21,7 +22,10 @@ export function EditQuestionConfig() {
 	return (
 		<div className=" h-full bg-muted/30 overflow-hidden flex flex-col">
 			<div className="border-b p-4">
-				<h3 className="font-medium">问题配置</h3>
+				<h3 className="font-medium flex items-center gap-2">
+					<Settings className="h-5 w-5 text-primary" />
+					问题配置
+				</h3>
 				<p className="text-xs text-muted-foreground mt-1">
 					{selectedQuestion
 						? '编辑问题的属性和选项'
