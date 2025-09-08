@@ -1,7 +1,6 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AIServiceConfigManager } from '@/components/ai-service-config-manager'
 import { useAISettings } from './hooks/use-ai-settings'
 import {
 	AISettingsHeader,
@@ -11,6 +10,7 @@ import {
 	QuickStartGuide,
 	FAQCard,
 } from './components'
+import { AIServiceConfigManager } from '@/components/ai-service-config-manager-new'
 
 export default function AISettingsPage() {
 	const {
@@ -53,7 +53,7 @@ export default function AISettingsPage() {
 						{/* 连接状态标签页 */}
 						<TabsContent value="status" className="space-y-6">
 							<ConnectionStatusCard
-								activeConfig={activeConfig}
+								activeConfig={activeConfig || null}
 								isTesting={isTesting}
 								testResult={testResult}
 								onTestConnection={handleTestConnection}

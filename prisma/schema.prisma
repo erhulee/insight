@@ -14,9 +14,10 @@ model User {
   username String
   password String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   ApiKey    ApiKey[]
+  aiConfigs AIConfig[]
 }
 
 model Survey {
@@ -143,4 +144,23 @@ model DataCollection {
   metadata   Json? // 元数据 (IP、UserAgent等)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+// 新增：AI服务配置表
+model AIConfig {
+  id            String   @id @default(uuid())
+  name          String
+  type          String // 'openai' | 'ollama' | 'anthropic' | 'custom'
+  baseUrl       String
+  apiKey        String? // 加密存储
+  model         String
+  repeatPenalty Float?
+  maxTokens     Int?
+  isActive      Boolean  @default(false)
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

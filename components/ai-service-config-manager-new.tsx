@@ -78,10 +78,12 @@ export function AIServiceConfigManager({
 	// 表单状态
 	const [formData, setFormData] = useState({
 		name: '',
-		type: 'ollama' as 'openai' | 'ollama' | 'anthropic' | 'custom',
+		type: 'ollama' as const,
 		baseUrl: '',
 		apiKey: '',
 		model: '',
+		temperature: 0.7,
+		topP: 0.9,
 		repeatPenalty: 1.1,
 		maxTokens: 4000,
 		isActive: false,
@@ -95,6 +97,8 @@ export function AIServiceConfigManager({
 			baseUrl: '',
 			apiKey: '',
 			model: '',
+			temperature: 0.7,
+			topP: 0.9,
 			repeatPenalty: 1.1,
 			maxTokens: 4000,
 			isActive: false,
@@ -110,6 +114,8 @@ export function AIServiceConfigManager({
 			baseUrl: config.baseUrl,
 			apiKey: '', // 不显示真实API密钥
 			model: config.model,
+			temperature: config.temperature,
+			topP: config.topP,
 			repeatPenalty: config.repeatPenalty || 1.1,
 			maxTokens: config.maxTokens || 4000,
 			isActive: config.isActive,
@@ -209,23 +215,16 @@ export function AIServiceConfigManager({
 		<div className="space-y-6">
 			{/* 配置列表 */}
 			<Card>
-				<CardHeader>
-					<div className="flex items-center justify-between">
-						<div>
-							<CardTitle className="flex items-center gap-2">
-								<Settings className="h-5 w-5" />
-								AI 服务配置
-							</CardTitle>
-							<CardDescription>
-								管理您的AI服务提供商配置，支持OpenAI、Ollama、Anthropic等
-							</CardDescription>
+				{configs.length === 0 ? null : (
+					<CardHeader>
+						<div className="flex items-center justify-between">
+							<Button onClick={handleCreateConfig}>
+								<Plus className="h-4 w-4 mr-2" />
+								添加配置
+							</Button>
 						</div>
-						<Button onClick={handleCreateConfig}>
-							<Plus className="h-4 w-4 mr-2" />
-							添加配置
-						</Button>
-					</div>
-				</CardHeader>
+					</CardHeader>
+				)}
 				<CardContent>
 					{configs.length === 0 ? (
 						<div className="text-center py-8">
@@ -257,12 +256,10 @@ export function AIServiceConfigManager({
 													<div className="text-sm text-muted-foreground space-y-1">
 														<p>服务地址: {config.baseUrl}</p>
 														<p>模型: {config.model}</p>
-														{config.repeatPenalty && (
-															<p>重复惩罚: {config.repeatPenalty}</p>
-														)}
-														{config.maxTokens && (
-															<p>最大令牌数: {config.maxTokens}</p>
-														)}
+														<p>
+															参数: Temperature={config.temperature}, TopP=
+															{config.topP}
+														</p>
 													</div>
 												</div>
 												<div className="flex items-center gap-2">
@@ -436,51 +433,57 @@ export function AIServiceConfigManager({
 						</div>
 
 						{/* 高级参数 */}
-						<div className="grid grid-cols-2 gap-4">
-							{formData.type === 'ollama' && (
-								<div>
-									<Label htmlFor="repeatPenalty">重复惩罚</Label>
-									<Input
-										id="repeatPenalty"
-										type="number"
-										min="0"
-										max="2"
-										step="0.1"
-										value={formData.repeatPenalty}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												repeatPenalty: parseFloat(e.target.value),
-											})
-										}
-									/>
-									<p className="text-xs text-muted-foreground mt-1">
-										减少重复内容的生成 (0-2)
-									</p>
-								</div>
-							)}
-							{(formData.type === 'openai' ||
-								formData.type === 'anthropic') && (
-								<div>
-									<Label htmlFor="maxTokens">最大令牌数</Label>
-									<Input
-										id="maxTokens"
-										type="number"
-										min="1"
-										max="8000"
-										value={formData.maxTokens}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												maxTokens: parseInt(e.target.value),
-											})
-										}
-									/>
-									<p className="text-xs text-muted-foreground mt-1">
-										限制生成内容的最大长度 (1-8000)
-									</p>
-								</div>
-							)}
+						<div className="grid grid-cols-3 gap-4">
+							<div>
+								<Label htmlFor="temperature">Temperature</Label>
+								<Input
+									id="temperature"
+									type="number"
+									min="0"
+									max="2"
+									step="0.1"
+									value={formData.temperature}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											temperature: parseFloat(e.target.value),
+										})
+									}
+								/>
+							</div>
+							<div>
+								<Label htmlFor="topP">Top P</Label>
+								<Input
+									id="topP"
+									type="number"
+									min="0"
+									max="1"
+									step="0.1"
+									value={formData.topP}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											topP: parseFloat(e.target.value),
+										})
+									}
+								/>
+							</div>
+							<div>
+								<Label htmlFor="maxTokens">最大令牌数</Label>
+								<Input
+									id="maxTokens"
+									type="number"
+									min="1"
+									max="8000"
+									value={formData.maxTokens}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											maxTokens: parseInt(e.target.value),
+										})
+									}
+								/>
+							</div>
 						</div>
 
 						{/* 活跃配置开关 */}

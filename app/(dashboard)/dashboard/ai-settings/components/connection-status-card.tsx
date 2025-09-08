@@ -17,10 +17,26 @@ import {
 	Sparkles,
 } from 'lucide-react'
 import type { TestResult } from '../hooks/use-ai-settings'
-import type { AIServiceConfig } from '@/lib/ai-service-config'
+
+interface AIConfig {
+	id: string
+	name: string
+	type: string
+	baseUrl: string
+	model: string
+	temperature: number
+	topP: number
+	repeatPenalty?: number | null
+	maxTokens?: number | null
+	isActive: boolean
+	createdAt: string | Date
+	updatedAt: string | Date
+	userId: string
+	apiKey?: string
+}
 
 interface ConnectionStatusCardProps {
-	activeConfig: AIServiceConfig | null
+	activeConfig: AIConfig | null
 	isTesting: boolean
 	testResult: TestResult | null
 	onTestConnection: () => void
