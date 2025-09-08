@@ -12,6 +12,19 @@ import {
 	Code,
 } from 'lucide-react'
 import { InsightBrand } from '@/components/common/insight-brand'
+import {
+	SidebarProvider,
+	Sidebar,
+	SidebarHeader,
+	SidebarContent,
+	SidebarMenu,
+	SidebarMenuItem,
+	SidebarMenuButton,
+	SidebarInset,
+	SidebarGroup,
+	SidebarGroupLabel,
+	SidebarGroupContent,
+} from '@/components/ui/sidebar'
 
 function SidebarNav() {
 	const pathname = usePathname()
@@ -25,32 +38,31 @@ function SidebarNav() {
 	]
 
 	return (
-		<aside className="w-60 border-r bg-white">
-			<div className="h-16 flex items-center px-4 border-b font-semibold">
+		<Sidebar collapsible="icon">
+			<SidebarHeader>
 				<InsightBrand />
-			</div>
-			<nav className="p-3 space-y-1">
-				{items.map((item) => {
-					const Icon = item.icon
-					const isActive = pathname === item.href
-					return (
-						<Link
-							key={item.href}
-							href={item.href}
-							className={
-								`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ` +
-								(isActive
-									? 'bg-primary/10 text-primary'
-									: 'text-muted-foreground hover:text-foreground hover:bg-muted')
-							}
-						>
-							<Icon className="h-4 w-4" />
-							{item.label}
-						</Link>
-					)
-				})}
-			</nav>
-		</aside>
+			</SidebarHeader>
+			<SidebarContent>
+				<SidebarGroup>
+					<SidebarMenu>
+						{items.map((item) => {
+							const Icon = item.icon
+							const isActive = pathname === item.href
+							return (
+								<SidebarMenuItem key={item.href}>
+									<SidebarMenuButton asChild isActive={isActive}>
+										<a href={item.href}>
+											<Icon className="h-4 w-4" />
+											<span>{item.label}</span>
+										</a>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							)
+						})}
+					</SidebarMenu>
+				</SidebarGroup>
+			</SidebarContent>
+		</Sidebar>
 	)
 }
 
@@ -61,10 +73,10 @@ export default function DashboardGroupLayout({
 }) {
 	return (
 		<AuthLayout>
-			<div className="min-h-screen bg-background flex">
+			<SidebarProvider>
 				<SidebarNav />
 				<main className="flex-1">{children}</main>
-			</div>
+			</SidebarProvider>
 		</AuthLayout>
 	)
 }
