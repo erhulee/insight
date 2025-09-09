@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { FeatureCard } from '@/components/feature-card'
 import { Banner } from './banner'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export default function Home() {
 	return (
@@ -30,7 +31,7 @@ export default function Home() {
 								>
 									核心功能
 								</div>
-								<p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
+								<p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
 									我们提供从问卷设计、发布、数据收集到分析的全流程支持
 								</p>
 							</div>
@@ -54,7 +55,7 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-				<section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-gray-50 to-white">
+				<section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-background">
 					<div className="container mx-auto px-4 md:px-6">
 						<div className="flex flex-col items-center justify-center space-y-4 text-center">
 							<div className="space-y-2 relative flex flex-row w-full justify-center">
@@ -71,7 +72,7 @@ export default function Home() {
 											<ArrowRight className=" w-3 h-3"></ArrowRight>
 										</Link>
 									</div>
-									<p className="max-w-[900px] mt-4 text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+									<p className="max-w-[900px] mt-4 text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
 										将问卷功能集成到您的应用程序中，或构建自定义解决方案
 									</p>
 								</div>
@@ -104,7 +105,9 @@ export default function Home() {
 							<FileText className="h-5 w-5" />
 							<span>问卷星</span>
 						</div>
-						<p className="mt-2 text-sm text-gray-500">专业的在线问卷调查平台</p>
+						<p className="mt-2 text-sm text-muted-foreground">
+							专业的在线问卷调查平台
+						</p>
 					</div>
 					<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-3">
 						<div className="space-y-3">
@@ -185,7 +188,10 @@ export default function Home() {
 									</Link>
 								</li>
 								<li>
-									<Link href="#" className="text-gray-500 hover:text-gray-900">
+									<Link
+										href="#"
+										className="text-muted-foreground hover:text-foreground"
+									>
 										服务条款
 									</Link>
 								</li>
@@ -193,7 +199,7 @@ export default function Home() {
 						</div>
 					</div>
 				</div>
-				<div className="container py-4 text-center text-sm text-gray-500 px-4 sm:px-6 lg:px-8">
+				<div className="container py-4 text-center text-sm text-muted-foreground px-4 sm:px-6 lg:px-8">
 					&copy; {new Date().getFullYear()} 问卷星. 保留所有权利.
 				</div>
 			</footer>

@@ -120,7 +120,7 @@ export function SurveyClient({ survey }: SurveyClientProps) {
 		return (
 			<div className="min-h-screen bg-muted flex items-center justify-center">
 				<div className="text-center">
-					<p className="text-gray-600">问卷加载失败</p>
+					<p className="text-muted-foreground">问卷加载失败</p>
 				</div>
 			</div>
 		)
