@@ -1,14 +1,11 @@
-import { Form, Input, InputNumber, Select, Switch } from 'antd'
+import { Switch } from '@/components/ui/switch'
 export function SingleConfig() {
 	return (
 		<div>
-			<Form.Item
-				layout="horizontal"
-				name={['props', 'random']}
-				label="选项顺序随机"
-			>
-				<Switch></Switch>
-			</Form.Item>
+			<div className="flex items-center justify-between py-1">
+				<div className="text-sm text-muted-foreground">选项顺序随机</div>
+				<Switch />
+			</div>
 		</div>
 	)
 }

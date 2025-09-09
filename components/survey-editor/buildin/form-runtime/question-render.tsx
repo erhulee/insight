@@ -1,5 +1,5 @@
 import { QuestionSchemaType, RatingQuestionSchemaType } from '@/lib/dsl'
-import { Input } from 'antd'
+import { Input } from '@/components/ui/input'
 import { SingleQuestion } from '../form-item/single/render'
 import { DatePicker } from '../form-item/date-picker'
 import {
@@ -22,16 +22,15 @@ export function QuestionRender(props: { question: QuestionSchemaType }) {
 				<Input
 					placeholder={question.props['placeholder'] || ''}
 					maxLength={question.props.maxlength}
-					showCount={question.props.showCount}
-				></Input>
+				/>
 			)
 		case 'textarea':
 			return (
-				<Input.TextArea
-					showCount
+				<textarea
+					className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 					maxLength={question.props['maxlength']}
 					placeholder={question.props['placeholder'] || ''}
-				></Input.TextArea>
+				/>
 			)
 		case 'multiple':
 			return (

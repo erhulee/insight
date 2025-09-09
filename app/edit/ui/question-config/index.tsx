@@ -1,7 +1,6 @@
 'use client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useEffect, useMemo } from 'react'
-import { Form } from 'antd'
 import {
 	RuntimeDSLAction,
 	useRuntimeState,
@@ -15,12 +14,8 @@ import { SingleConfig } from './single'
 
 export function QuestionConfig() {
 	const runtimeState = useRuntimeState()
-	const [formClient] = Form.useForm()
 	useEffect(() => {
-		const id = runtimeState.selectedQuestionID
-		const selectedQuestion = runtimeState.questions.find((q) => q.id === id)!
-		formClient.resetFields()
-		formClient.setFieldsValue(selectedQuestion)
+		// selection change side-effects can be handled here if needed
 	}, [runtimeState.selectedQuestionID])
 
 	const selectedQuestion = useMemo(() => {
@@ -43,28 +38,21 @@ export function QuestionConfig() {
 					<TabsTrigger value="advanced">高级</TabsTrigger>
 				</TabsList>
 				<TabsContent value="basic" className="space-y-4 pt-4">
-					<Form
-						form={formClient}
-						layout="vertical"
-						onValuesChange={(_, value) => {
-							RuntimeDSLAction.patchQuestion({ ...value })
-						}}
-					>
-						<BasicConfig></BasicConfig>
-						{(() => {
-							switch (selectedQuestion?.type) {
-								case 'input':
-								case 'textarea':
-									return <InputConfig></InputConfig>
-								case 'date':
-									return <DateConfig></DateConfig>
-								case 'rating':
-									return <RatingConfig></RatingConfig>
-								case 'single':
-									return <SingleConfig></SingleConfig>
-							}
-						})()}
-					</Form>
+					<BasicConfig />
+					{(() => {
+						switch (selectedQuestion?.type) {
+							case 'input':
+							case 'textarea':
+								return <InputConfig />
+							case 'date':
+								return <DateConfig />
+							case 'rating':
+								return <RatingConfig />
+							case 'single':
+								return <SingleConfig />
+						}
+						return null
+					})()}
 				</TabsContent>
 
 				<TabsContent value="options" className="space-y-4 pt-4">

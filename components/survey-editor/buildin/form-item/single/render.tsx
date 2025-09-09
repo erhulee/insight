@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Radio } from 'antd'
+import { Circle } from 'lucide-react'
 import { PlusCircle, XIcon } from 'lucide-react'
 import { useRef, useCallback } from 'react'
 import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core'
@@ -48,23 +48,23 @@ function SortableQuestionItem(props: SingleQuestionItemProps) {
 			ref={setNodeRef}
 			style={style}
 			className={`
-        bg-slate-100 p-2 rounded-md flex items-center gap-2 cursor-move
+        bg-muted p-2 rounded-md flex items-center gap-2 cursor-move
         ${
 					isDragging
 						? 'shadow-lg scale-105 z-10' // 拖拽时的样式
-						: 'hover:bg-slate-200 transition-colors duration-150' // 悬停时的样式
+						: 'hover:bg-accent transition-colors duration-150' // 悬停时的样式
 				}
       `}
 			{...attributes}
 			{...listeners}
 		>
-			{/* 单选按钮 */}
-			<Radio />
+			{/* 单选按钮占位（样式化替代） */}
+			<Circle className="w-4 h-4 text-muted-foreground" />
 
 			{/* 选项文本输入框 */}
 			<input
 				ref={inputRef}
-				className="bg-transparent outline-none w-full text-sm text-gray-700 flex-1"
+				className="bg-transparent outline-none w-full text-sm text-foreground flex-1"
 				defaultValue={label}
 				onChange={handleInputChange}
 				placeholder="输入选项内容"
@@ -91,9 +91,9 @@ function SortableQuestionItem(props: SingleQuestionItemProps) {
  */
 function DragOverlayItem({ label }: { label: string }) {
 	return (
-		<div className="bg-slate-200 p-2 rounded-md flex items-center gap-2 shadow-xl border-2 border-blue-300 transform">
-			<Radio />
-			<span className="text-sm text-gray-700 font-medium">{label}</span>
+		<div className="bg-accent p-2 rounded-md flex items-center gap-2 shadow-xl border-2 border-primary/40 transform">
+			<Circle className="w-4 h-4 text-muted-foreground" />
+			<span className="text-sm text-foreground font-medium">{label}</span>
 		</div>
 	)
 }
@@ -162,7 +162,7 @@ export function SingleQuestion({ dsl }: SingleQuestionProps) {
 
 	return (
 		<div
-			className="p-4 border border-gray-200 rounded-lg bg-white cursor-pointer"
+			className="p-4 border border-border rounded-lg bg-card cursor-pointer"
 			onClick={handleCardClick}
 		>
 			{/* 拖拽上下文，管理拖拽状态和事件 */}
