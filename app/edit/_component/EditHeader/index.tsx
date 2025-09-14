@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { InsightBrand } from '@/components/common/insight-brand'
+import { Brand } from '@/components/common/brand'
 import { Save, ArrowLeft, Share2, Smartphone } from 'lucide-react'
 import { trpc } from '@/app/_trpc/client'
 import { toast } from 'sonner'
 import { useRuntimeState } from '@/app/(dashboard)/dashboard/_valtio/runtime'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 interface PublishProps {
 	isPublished: boolean
@@ -63,7 +64,7 @@ export function EditHeader({
 				>
 					<ArrowLeft className="h-5 w-5" />
 				</Button>
-				<InsightBrand />
+				<Brand />
 			</div>
 
 			{/* 右侧操作区域 */}
@@ -115,6 +116,8 @@ export function EditHeader({
 					<Save className="h-4 w-4" />
 					{isSavePending ? '保存中...' : '保存'}
 				</Button>
+
+				<ThemeToggle></ThemeToggle>
 			</div>
 		</header>
 	)

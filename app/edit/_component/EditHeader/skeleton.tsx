@@ -22,6 +22,7 @@ export function EditHeaderSkeleton() {
 					<Skeleton className="h-9 w-16 rounded-md" />
 					{/* 保存按钮骨架屏 */}
 					<Skeleton className="h-9 w-16 rounded-md" />
+					<Skeleton className="h-9 w-9 rounded-md" />
 				</div>
 			</div>
 		</header>

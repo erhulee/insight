@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { FeatureCard } from '@/components/feature-card'
 import { Banner } from './banner'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export default function Home() {
 	return (

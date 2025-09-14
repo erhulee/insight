@@ -13,7 +13,7 @@ import {
 	ChevronRight,
 	type LucideIcon,
 } from 'lucide-react'
-import { InsightBrand } from '@/components/common/insight-brand'
+import { Brand } from '@/components/common/brand'
 import {
 	Sidebar,
 	SidebarHeader,
@@ -173,7 +173,7 @@ function SidebarNav() {
 	return (
 		<Sidebar collapsible="icon">
 			<SidebarHeader>
-				<InsightBrand />
+				<Brand />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>{renderTree(items)}</SidebarGroup>
