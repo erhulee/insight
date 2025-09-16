@@ -18,12 +18,11 @@ export const aiConfigRouter = router({
 		.input(
 			z.object({
 				name: z.string().min(1, '配置名称不能为空'),
-				type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+				type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 				baseUrl: z.string().min(1, '服务地址不能为空'),
 				apiKey: z.string().optional(),
 				model: z.string().min(1, '模型名称不能为空'),
 				repeatPenalty: z.number().min(0).max(2).optional(),
-				maxTokens: z.number().min(1).max(8000).optional(),
 				isActive: z.boolean().default(false),
 			}),
 		)
@@ -37,12 +36,13 @@ export const aiConfigRouter = router({
 			z.object({
 				id: z.string(),
 				name: z.string().min(1, '配置名称不能为空').optional(),
-				type: z.enum(['openai', 'ollama', 'anthropic', 'custom']).optional(),
+				type: z
+					.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom'])
+					.optional(),
 				baseUrl: z.string().min(1, '服务地址不能为空').optional(),
 				apiKey: z.string().optional(),
 				model: z.string().min(1, '模型名称不能为空').optional(),
 				repeatPenalty: z.number().min(0).max(2).optional(),
-				maxTokens: z.number().min(1).max(8000).optional(),
 				isActive: z.boolean().optional(),
 			}),
 		)
@@ -72,12 +72,17 @@ export const aiConfigRouter = router({
 				id: z.string().optional(), // 如果提供ID，则测试已保存的配置
 				config: z
 					.object({
-						type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+						type: z.enum([
+							'openai',
+							'ollama',
+							'anthropic',
+							'volcano',
+							'custom',
+						]),
 						baseUrl: z.string(),
 						apiKey: z.string().optional(),
 						model: z.string(),
 						repeatPenalty: z.number().optional(),
-						maxTokens: z.number().optional(),
 					})
 					.optional(), // 如果提供config，则测试临时配置
 			}),
@@ -97,12 +102,11 @@ export const aiConfigRouter = router({
 		.input(
 			z.object({
 				config: z.object({
-					type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+					type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 					baseUrl: z.string(),
 					apiKey: z.string().optional(),
 					model: z.string(),
 					repeatPenalty: z.number().optional(),
-					maxTokens: z.number().optional(),
 				}),
 			}),
 		)

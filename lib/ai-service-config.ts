@@ -1,14 +1,15 @@
 export interface AIServiceConfig {
 	id: string
 	name: string
-	type: 'openai' | 'ollama' | 'anthropic' | 'custom'
+	type: 'openai' | 'ollama' | 'anthropic' | 'volcano' | 'custom'
 	baseUrl: string
 	apiKey?: string
 	model: string
-	temperature: number
-	topP: number
+	// 以下参数由后端固定配置，不在前端显示
+	// temperature: number
+	// topP: number
+	// maxTokens?: number
 	repeatPenalty?: number
-	maxTokens?: number
 	isActive: boolean
 	createdAt: Date
 	updatedAt: Date
@@ -17,7 +18,7 @@ export interface AIServiceConfig {
 export interface AIServiceProvider {
 	id: string
 	name: string
-	type: 'openai' | 'ollama' | 'anthropic' | 'custom'
+	type: 'openai' | 'ollama' | 'anthropic' | 'volcano' | 'custom'
 	description: string
 	baseUrl: string
 	models: string[]
@@ -33,9 +34,7 @@ export const AI_SERVICE_PROVIDERS: AIServiceProvider[] = [
 		description: 'OpenAI官方API服务，支持GPT-4、GPT-3.5等模型',
 		baseUrl: 'https://api.openai.com/v1',
 		models: ['gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k'],
-		defaultConfig: {
-			maxTokens: 4000,
-		},
+		defaultConfig: {},
 	},
 	{
 		id: 'ollama',
@@ -59,9 +58,22 @@ export const AI_SERVICE_PROVIDERS: AIServiceProvider[] = [
 			'claude-3-sonnet-20240229',
 			'claude-3-haiku-20240307',
 		],
-		defaultConfig: {
-			maxTokens: 4000,
-		},
+		defaultConfig: {},
+	},
+	{
+		id: 'volcano',
+		name: '火山引擎',
+		type: 'volcano',
+		description: '字节跳动火山引擎大模型服务，支持豆包等模型',
+		baseUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+		models: [
+			'doubao-seed-1-6-250615',
+			'doubao-pro-4k-20241220',
+			'doubao-lite-4k-20241220',
+			'doubao-pro-32k-20241220',
+			'doubao-lite-32k-20241220',
+		],
+		defaultConfig: {},
 	},
 	{
 		id: 'custom',
@@ -78,11 +90,9 @@ export const AI_SERVICE_PROVIDERS: AIServiceProvider[] = [
 export const DEFAULT_AI_CONFIG: AIServiceConfig = {
 	id: 'default',
 	name: '默认配置',
-	type: 'ollama',
-	baseUrl: 'http://localhost:11434',
-	model: 'qwen2.5:7b',
-	temperature: 0.7, // 内置值
-	topP: 0.9, // 内置值
+	type: 'volcano',
+	baseUrl: 'https://ark.cn-beijing.volces.com/api/v3',
+	model: 'doubao-pro-4k-20241220',
 	repeatPenalty: 1.1,
 	isActive: true,
 	createdAt: new Date(),
@@ -105,7 +115,11 @@ export function validateAIServiceConfig(config: AIServiceConfig): {
 		errors.push('服务地址不能为空')
 	}
 
-	if (config.type === 'openai' || config.type === 'anthropic') {
+	if (
+		config.type === 'openai' ||
+		config.type === 'anthropic' ||
+		config.type === 'volcano'
+	) {
 		if (!config.apiKey?.trim()) {
 			errors.push('API密钥不能为空')
 		}
@@ -115,14 +129,6 @@ export function validateAIServiceConfig(config: AIServiceConfig): {
 		errors.push('模型名称不能为空')
 	}
 
-	if (config.temperature < 0 || config.temperature > 2) {
-		errors.push('Temperature值必须在0-2之间')
-	}
-
-	if (config.topP < 0 || config.topP > 1) {
-		errors.push('Top P值必须在0-1之间')
-	}
-
 	if (
 		config.repeatPenalty &&
 		(config.repeatPenalty < 0 || config.repeatPenalty > 2)
@@ -130,9 +136,7 @@ export function validateAIServiceConfig(config: AIServiceConfig): {
 		errors.push('重复惩罚值必须在0-2之间')
 	}
 
-	if (config.maxTokens && (config.maxTokens < 1 || config.maxTokens > 8000)) {
-		errors.push('最大令牌数必须在1-8000之间')
-	}
+	// maxTokens验证已移除，由后端固定配置
 
 	return {
 		valid: errors.length === 0,

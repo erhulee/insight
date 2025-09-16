@@ -128,12 +128,11 @@ export const appRouter = router({
 		.input(
 			z.object({
 				config: z.object({
-					type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+					type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 					baseUrl: z.string(),
 					apiKey: z.string().optional(),
 					model: z.string(),
 					repeatPenalty: z.number().optional(),
-					maxTokens: z.number().optional(),
 				}),
 			}),
 		)
@@ -166,12 +165,11 @@ export const appRouter = router({
 		.input(
 			z.object({
 				config: z.object({
-					type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+					type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 					baseUrl: z.string(),
 					apiKey: z.string().optional(),
 					model: z.string(),
 					repeatPenalty: z.number().optional(),
-					maxTokens: z.number().optional(),
 				}),
 			}),
 		)
@@ -194,12 +192,11 @@ export const appRouter = router({
 			z.object({
 				prompt: z.string(),
 				config: z.object({
-					type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+					type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 					baseUrl: z.string(),
 					apiKey: z.string().optional(),
 					model: z.string(),
 					repeatPenalty: z.number().optional(),
-					maxTokens: z.number().optional(),
 				}),
 			}),
 		)
@@ -220,17 +217,60 @@ export const appRouter = router({
 			}
 		}),
 
+	GenerateAISurvey: protectedProcedure
+		.input(z.object({ prompt: z.string() }))
+		.mutation(async (opt) => {
+			try {
+				// 获取用户的活跃配置
+				const activeConfig = await aiConfigService.getActiveConfig(
+					opt.ctx.userId,
+				)
+				if (!activeConfig) {
+					throw new TRPCError({
+						code: 'NOT_FOUND',
+						message: '没有可用的AI服务配置',
+					})
+				}
+
+				// 解密API密钥
+				const decryptedApiKey =
+					activeConfig.apiKey && activeConfig.apiKey !== '***'
+						? Buffer.from(activeConfig.apiKey, 'base64').toString('utf-8')
+						: undefined
+
+				const configWithKey = {
+					...activeConfig,
+					apiKey: decryptedApiKey || '',
+					temperature: 0.7, // 固定值
+					topP: 0.9, // 固定值
+					maxTokens: 4000, // 固定值
+				}
+
+				return await aiConfigService.generateSurvey({
+					prompt: opt.input.prompt,
+					config: configWithKey,
+				})
+			} catch (error) {
+				console.error('AI生成问卷失败:', error)
+				if (error instanceof TRPCError) throw error
+
+				throw new TRPCError({
+					message: 'AI生成问卷失败',
+					code: 'INTERNAL_SERVER_ERROR',
+				})
+			}
+		}),
+
 	GenerateAISurveyStreamWithConfig: protectedProcedure
 		.input(
 			z.object({
 				prompt: z.string(),
 				config: z.object({
-					type: z.enum(['openai', 'ollama', 'anthropic', 'custom']),
+					type: z.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom']),
 					baseUrl: z.string(),
 					apiKey: z.string().optional(),
 					model: z.string(),
 					repeatPenalty: z.number().optional(),
-					maxTokens: z.number().optional(),
 				}),
 			}),
 		)

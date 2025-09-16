@@ -10,7 +10,7 @@ import {
 	QuickStartGuide,
 	FAQCard,
 } from './components'
-import { AIServiceConfigManager } from '@/components/ai-service-config-manager-new'
+import { AIServiceConfigManager } from './components/ai-service-config-manager'
 
 export default function AISettingsPage() {
 	const {

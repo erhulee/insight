@@ -27,6 +27,12 @@ const services: ServiceInfo[] = [
 		recommendedModels: 'claude-3-sonnet, claude-3-haiku',
 	},
 	{
+		name: '火山引擎',
+		description:
+			'字节跳动火山引擎大模型服务，支持豆包等模型。需要API密钥，按使用量计费。',
+		recommendedModels: 'doubao-pro-4k, doubao-lite-4k',
+	},
+	{
 		name: '自定义服务',
 		description: '支持自定义AI服务配置。适用于私有部署的AI服务。',
 		recommendedModels: '',
