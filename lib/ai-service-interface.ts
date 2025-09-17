@@ -56,15 +56,6 @@ export interface AIService {
 // 服务工厂
 export function createAIService(type: string): AIService {
 	switch (type) {
-		case 'openai':
-			const { OpenAIService } = require('./ai-services/openai-service')
-			return new OpenAIService()
-		case 'ollama':
-			const { OllamaService } = require('./ai-services/ollama-service')
-			return new OllamaService()
-		case 'anthropic':
-			const { AnthropicService } = require('./ai-services/anthropic-service')
-			return new AnthropicService()
 		case 'volcano':
 			const { VolcanoService } = require('./ai-services/volcano-service')
 			return new VolcanoService()

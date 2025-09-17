@@ -1,13 +1,15 @@
 import { z } from 'zod'
 import { router, protectedProcedure } from '../trpc'
-import { aiConfigService } from '../services/ai-config-service'
+import { aiConfigService } from '../services/ai-config'
 
 export const aiConfigRouter = router({
+	getAIServiceProviders: protectedProcedure.query(async () => {
+		return await aiConfigService.getAIServiceProviders()
+	}),
 	// 获取用户的AI配置列表
 	getConfigs: protectedProcedure.query(async ({ ctx }) => {
 		return await aiConfigService.getUserConfigs(ctx.userId)
 	}),
-
 	// 获取活跃的AI配置
 	getActiveConfig: protectedProcedure.query(async ({ ctx }) => {
 		return await aiConfigService.getActiveConfig(ctx.userId)
@@ -36,9 +38,7 @@ export const aiConfigRouter = router({
 			z.object({
 				id: z.string(),
 				name: z.string().min(1, '配置名称不能为空').optional(),
-				type: z
-					.enum(['openai', 'ollama', 'anthropic', 'volcano', 'custom'])
-					.optional(),
+				type: z.enum(['volcano', 'custom']).optional(),
 				baseUrl: z.string().min(1, '服务地址不能为空').optional(),
 				apiKey: z.string().optional(),
 				model: z.string().min(1, '模型名称不能为空').optional(),

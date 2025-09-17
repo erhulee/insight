@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { PrismaClient } from '@prisma/client'
 import { createAIService } from '@/lib/ai-service-interface'
 import type { AIServiceConfig } from '@/lib/ai-service-config'
+import { AI_SERVICE_PROVIDERS } from './constant'
 
 const prisma = new PrismaClient()
 
@@ -34,6 +35,10 @@ export interface TestConnectionInput {
 }
 
 export class AIConfigService {
+	// 获取AI服务提供商
+	async getAIServiceProviders() {
+		return AI_SERVICE_PROVIDERS
+	}
 	// 获取用户的所有AI配置
 	async getUserConfigs(userId: string) {
 		try {
@@ -41,14 +46,12 @@ export class AIConfigService {
 				where: { userId },
 				orderBy: { createdAt: 'desc' },
 			})
-
 			// 解密API密钥（如果需要显示）
 			return configs.map((config: any) => ({
 				...config,
 				apiKey: config.apiKey ? '***' : undefined, // 不返回真实API密钥
 			}))
 		} catch (error) {
-			console.error('获取AI配置列表失败:', error)
 			throw new TRPCError({
 				code: 'INTERNAL_SERVER_ERROR',
 				message: '获取AI配置列表失败',
@@ -72,7 +75,6 @@ export class AIConfigService {
 				apiKey: config.apiKey ? '***' : undefined, // 不返回真实API密钥
 			}
 		} catch (error) {
-			console.error('获取活跃AI配置失败:', error)
 			throw new TRPCError({
 				code: 'INTERNAL_SERVER_ERROR',
 				message: '获取活跃AI配置失败',
