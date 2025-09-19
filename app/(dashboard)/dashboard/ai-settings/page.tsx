@@ -6,6 +6,7 @@ import { useAISettings } from './hooks/use-ai-settings'
 import Useage from './views/useage'
 import { ConnectionStatusCard } from './views/connect-status'
 import { AIServiceConfigManager } from './views/config'
+import { OllamaServiceManager } from './views/ollama'
 
 export default function AISettingsPage() {
 	const {
@@ -38,6 +39,9 @@ export default function AISettingsPage() {
 							<TabsTrigger value="configs" className=" w-36">
 								服务配置
 							</TabsTrigger>
+							<TabsTrigger value="ollama" className=" w-36">
+								Ollama
+							</TabsTrigger>
 							<TabsTrigger value="status" className=" w-36">
 								连接状态
 							</TabsTrigger>
@@ -49,6 +53,11 @@ export default function AISettingsPage() {
 						{/* 服务配置标签页 */}
 						<TabsContent value="configs" className="space-y-6">
 							<AIServiceConfigManager onConfigChange={handleConfigChange} />
+						</TabsContent>
+
+						{/* Ollama服务管理标签页 */}
+						<TabsContent value="ollama" className="space-y-6">
+							<OllamaServiceManager onConfigChange={handleConfigChange} />
 						</TabsContent>
 
 						{/* 连接状态标签页 */}

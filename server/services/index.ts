@@ -2,6 +2,7 @@
 export { userService } from './user-service'
 export { surveyService } from './survey'
 export { templateService } from './template-service'
+export { aiConfigService } from './ai-config'
 
 // 导出类型
 export type { CreateUserInput, UpdateUserInput, UserInfo } from './user-service'
@@ -20,5 +21,3 @@ export type {
 	TemplateListInput,
 	TemplateListResult,
 } from './template-service'
-
-export type { TestConnectionInput } from './ai-config.service'

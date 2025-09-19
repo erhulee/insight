@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { router, protectedProcedure } from '../trpc'
 import { aiConfigService } from '../services/ai-config'
+import { ollamaService } from '../services/ai/ollama'
 
 export const aiConfigRouter = router({
 	getAIServiceProviders: protectedProcedure.query(async () => {
@@ -113,4 +114,48 @@ export const aiConfigRouter = router({
 		.mutation(async ({ input }) => {
 			return await aiConfigService.getServiceStatus(input.config)
 		}),
+
+	// === Ollama 专用接口 ===
+
+	// 获取 Ollama 服务状态和模型列表
+	GetOllamaModels: protectedProcedure.query(async () => {
+		return await ollamaService.getServiceInfo()
+	}),
+
+	// 下载 Ollama 模型
+	PullOllamaModel: protectedProcedure
+		.input(
+			z.object({
+				modelName: z.string().min(1, '模型名称不能为空'),
+			}),
+		)
+		.mutation(async ({ input }) => {
+			return await ollamaService.pullModel(input.modelName)
+		}),
+
+	// 删除 Ollama 模型
+	DeleteOllamaModel: protectedProcedure
+		.input(
+			z.object({
+				modelName: z.string().min(1, '模型名称不能为空'),
+			}),
+		)
+		.mutation(async ({ input }) => {
+			return await ollamaService.deleteModel(input.modelName)
+		}),
+
+	// 检查 Ollama 服务状态
+	CheckOllamaStatus: protectedProcedure.query(async () => {
+		return await ollamaService.checkServiceStatus()
+	}),
+
+	// 获取 Ollama 系统信息
+	GetOllamaSystemInfo: protectedProcedure.query(async () => {
+		return await ollamaService.getSystemInfo()
+	}),
+
+	// 自动配置 Ollama
+	AutoConfigureOllama: protectedProcedure.mutation(async ({ ctx }) => {
+		return await ollamaService.autoConfigure()
+	}),
 })

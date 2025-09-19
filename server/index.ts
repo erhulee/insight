@@ -2,19 +2,15 @@ import { procedure, router, protectedProcedure, createContext } from './trpc'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { observable } from '@trpc/server/observable'
-import {
-	userService,
-	templateService,
-	apiKeyService,
-	aiConfigService,
-	ollamaService,
-} from './services'
+import { userService, templateService, aiConfigService } from './services'
 import { surveyRouter } from './router/survey'
 import { aiConfigRouter } from './router/ai-config'
+import { AIRouter } from './router/ai'
 
 export const appRouter = router({
 	surver: surveyRouter,
 	aiConfig: aiConfigRouter,
+	ai: AIRouter,
 	// 用户相关路由
 	Register: procedure
 		.input(
@@ -149,7 +145,7 @@ export const appRouter = router({
 				if (config.apiKey) testConfig.apiKey = config.apiKey
 				if (config.repeatPenalty)
 					testConfig.repeatPenalty = config.repeatPenalty
-				if (config.maxTokens) testConfig.maxTokens = config.maxTokens
+				// maxTokens由AI服务内部处理，不需要传递
 
 				return await aiConfigService.testConnection(testConfig)
 			} catch (error) {
@@ -202,9 +198,24 @@ export const appRouter = router({
 		)
 		.mutation(async (opt) => {
 			try {
+				const config = {
+					id: 'temp-config',
+					name: '临时配置',
+					type: opt.input.config.type,
+					baseUrl: opt.input.config.baseUrl,
+					apiKey: opt.input.config.apiKey || '',
+					model: opt.input.config.model,
+					...(opt.input.config.repeatPenalty && {
+						repeatPenalty: opt.input.config.repeatPenalty,
+					}),
+					isActive: true,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				}
+
 				return await aiConfigService.generateSurvey({
 					prompt: opt.input.prompt,
-					config: opt.input.config,
+					config,
 				})
 			} catch (error) {
 				console.error('AI生成问卷失败:', error)
@@ -239,11 +250,23 @@ export const appRouter = router({
 						: undefined
 
 				const configWithKey = {
-					...activeConfig,
+					id: activeConfig.id,
+					name: activeConfig.name,
+					type: activeConfig.type as
+						| 'openai'
+						| 'ollama'
+						| 'anthropic'
+						| 'volcano'
+						| 'custom',
+					baseUrl: activeConfig.baseUrl,
 					apiKey: decryptedApiKey || '',
-					temperature: 0.7, // 固定值
-					topP: 0.9, // 固定值
-					maxTokens: 4000, // 固定值
+					model: activeConfig.model,
+					...(activeConfig.repeatPenalty && {
+						repeatPenalty: activeConfig.repeatPenalty,
+					}),
+					isActive: activeConfig.isActive,
+					createdAt: activeConfig.createdAt,
+					updatedAt: activeConfig.updatedAt,
 				}
 
 				return await aiConfigService.generateSurvey({
@@ -276,71 +299,35 @@ export const appRouter = router({
 		)
 		.subscription(async (opt) => {
 			return observable<{ text: string }>((emit) => {
+				const config = {
+					id: 'temp-config',
+					name: '临时配置',
+					type: opt.input.config.type,
+					baseUrl: opt.input.config.baseUrl,
+					apiKey: opt.input.config.apiKey || '',
+					model: opt.input.config.model,
+					...(opt.input.config.repeatPenalty && {
+						repeatPenalty: opt.input.config.repeatPenalty,
+					}),
+					isActive: true,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				}
+
 				aiConfigService
 					.generateSurveyStream(
 						{
 							prompt: opt.input.prompt,
-							config: opt.input.config,
+							config,
 						},
-						(chunk) => {
+						(chunk: any) => {
 							emit.next({ text: chunk.text || chunk.response || '' })
 						},
 					)
-					.catch((error) => {
+					.catch((error: any) => {
 						emit.error(error)
 					})
 			})
-		}),
-
-	// Ollama相关路由
-	GetOllamaModels: procedure.query(async () => {
-		try {
-			return await ollamaService.getModels()
-		} catch (error) {
-			throw new TRPCError({
-				message: '获取Ollama模型列表失败',
-				code: 'INTERNAL_SERVER_ERROR',
-			})
-		}
-	}),
-
-	GetOllamaModelInfo: procedure
-		.input(z.object({ modelName: z.string() }))
-		.query(async (opt) => {
-			try {
-				return await ollamaService.getModelInfo(opt.input.modelName)
-			} catch (error) {
-				throw new TRPCError({
-					message: '获取Ollama模型信息失败',
-					code: 'INTERNAL_SERVER_ERROR',
-				})
-			}
-		}),
-
-	PullOllamaModel: procedure
-		.input(z.object({ modelName: z.string() }))
-		.mutation(async (opt) => {
-			try {
-				return await ollamaService.pullModel(opt.input.modelName)
-			} catch (error) {
-				throw new TRPCError({
-					message: '拉取Ollama模型失败',
-					code: 'INTERNAL_SERVER_ERROR',
-				})
-			}
-		}),
-
-	DeleteOllamaModel: procedure
-		.input(z.object({ modelName: z.string() }))
-		.mutation(async (opt) => {
-			try {
-				return await ollamaService.deleteModel(opt.input.modelName)
-			} catch (error) {
-				throw new TRPCError({
-					message: '删除Ollama模型失败',
-					code: 'INTERNAL_SERVER_ERROR',
-				})
-			}
 		}),
 
 	// 模板相关路由
@@ -372,7 +359,13 @@ export const appRouter = router({
 		)
 		.query(async (opt) => {
 			try {
-				return await templateService.getTemplateList(opt.input)
+				const input = {
+					page: opt.input.page ?? 1,
+					limit: opt.input.limit ?? 10,
+					...(opt.input.category && { category: opt.input.category }),
+					...(opt.input.tags && { tags: opt.input.tags }),
+				}
+				return await templateService.getTemplateList(input)
 			} catch (error) {
 				throw new TRPCError({
 					message: '获取模板列表失败',
@@ -393,54 +386,6 @@ export const appRouter = router({
 			} catch (error) {
 				throw new TRPCError({
 					message: '根据模板创建问卷失败',
-					code: 'INTERNAL_SERVER_ERROR',
-				})
-			}
-		}),
-
-	// API密钥相关路由
-	CreateApiKey: protectedProcedure
-		.input(
-			z.object({
-				name: z.string(),
-				templateId: z.string().optional(),
-				permissions: z.record(z.any()).optional(),
-				expiresAt: z.date().optional(),
-			}),
-		)
-		.mutation(async (opt) => {
-			try {
-				const userId = opt.ctx.userId!
-				return await apiKeyService.createApiKey(userId, opt.input)
-			} catch (error) {
-				throw new TRPCError({
-					message: '创建API密钥失败',
-					code: 'INTERNAL_SERVER_ERROR',
-				})
-			}
-		}),
-
-	GetApiKeys: protectedProcedure.query(async (opt) => {
-		try {
-			const userId = opt.ctx.userId!
-			return await apiKeyService.getApiKeys(userId)
-		} catch (error) {
-			throw new TRPCError({
-				message: '获取API密钥列表失败',
-				code: 'INTERNAL_SERVER_ERROR',
-			})
-		}
-	}),
-
-	DeleteApiKey: protectedProcedure
-		.input(z.object({ apiKeyId: z.string() }))
-		.mutation(async (opt) => {
-			try {
-				const userId = opt.ctx.userId!
-				return await apiKeyService.deleteApiKey(userId, opt.input.apiKeyId)
-			} catch (error) {
-				throw new TRPCError({
-					message: '删除API密钥失败',
 					code: 'INTERNAL_SERVER_ERROR',
 				})
 			}
