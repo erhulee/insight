@@ -10,11 +10,11 @@ import {
 	Play,
 	RefreshCw,
 	Trash2,
+	Star,
 } from 'lucide-react'
 import { ProgressIndicator } from './ui/progress-indicator'
 import type { ModelManagementCardProps } from '../types/ollama.types'
-import { formatModelSize } from '@/lib/format/formatModelSize'
-import { trpc } from '@/app/_trpc/client'
+import { formatModelSize } from '@/lib/utils/model-size'
 const statusText = {
 	ready: '就绪',
 	loading: '加载中',
@@ -32,13 +32,17 @@ export function ModelManagementCard({
 	serviceInfo,
 	isDownloading,
 	progress,
+	activeModel,
 	onDownloadModel,
+	onCancelDownload,
+	onSetActiveModel,
 }: ModelManagementCardProps) {
 	// 模拟已安装模型数据，包含状态信息
 	const installedModels =
 		serviceInfo?.models?.map((model) => ({
 			name: model.name,
-			size: formatModelSize(model.size),
+			size: model.size, // 保持原始数字格式，用于计算
+			sizeFormatted: formatModelSize(model.size), // 格式化后的字符串用于显示
 			status: 'ready' as const,
 		})) || []
 
@@ -72,7 +76,7 @@ export function ModelManagementCard({
 											<div>
 												<p className="font-medium">{model.name}</p>
 												<p className="text-sm text-muted-foreground">
-													{model.size}
+													{model.sizeFormatted}
 												</p>
 											</div>
 											<Badge
@@ -95,6 +99,24 @@ export function ModelManagementCard({
 													启动
 												</Button>
 											)}
+
+											{/* 设为活跃按钮 */}
+											<Button
+												variant={
+													activeModel?.modelName === model.name
+														? 'default'
+														: 'outline'
+												}
+												size="sm"
+												onClick={() => onSetActiveModel(model.name, model.size)}
+												disabled={false}
+											>
+												<Star className="w-4 h-4 mr-1" />
+												{activeModel?.modelName === model.name
+													? '当前活跃'
+													: '设为活跃'}
+											</Button>
+
 											<Button variant="outline" size="sm">
 												<RefreshCw className="w-4 h-4 mr-1" />
 												更新
@@ -121,7 +143,9 @@ export function ModelManagementCard({
 							{serviceInfo?.recommendedModels
 								?.slice(0, 5)
 								.map((model: string) => {
-									const isInstalled = serviceInfo?.models?.includes(model)
+									const isInstalled = serviceInfo?.models?.some(
+										(m) => m.name === model,
+									)
 									return (
 										<div
 											key={model}

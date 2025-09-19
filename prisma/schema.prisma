@@ -14,10 +14,11 @@ model User {
   username String
   password String
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  ApiKey    ApiKey[]
-  aiConfigs AIConfig[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  ApiKey             ApiKey[]
+  aiConfigs          AIConfig[]
+  activeModelConfigs ActiveModelConfig[]
 }
 
 model Survey {
@@ -157,10 +158,29 @@ model AIConfig {
   repeatPenalty Float?
   maxTokens     Int?
   isActive      Boolean  @default(false)
+  modelSize     BigInt? // 模型大小（字节）
   userId        String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   // 关联关系
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 新增：活跃模型配置表
+model ActiveModelConfig {
+  id        String   @id @default(uuid())
+  userId    String
+  modelName String
+  modelSize BigInt? // 模型大小（字节）
+  modelType String   @default("ollama")
+  baseUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, modelType])
+  @@map("active_model_config")
 }

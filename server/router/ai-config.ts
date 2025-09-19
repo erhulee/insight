@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { router, protectedProcedure } from '../trpc'
 import { aiConfigService } from '../services/ai-config'
 import { ollamaService } from '../services/ai/ollama'
+import { activeModelService } from '../services/ai/active-model'
+import { PrismaClient } from '@prisma/client'
 
 export const aiConfigRouter = router({
 	getAIServiceProviders: protectedProcedure.query(async () => {
@@ -157,5 +159,35 @@ export const aiConfigRouter = router({
 	// 自动配置 Ollama
 	AutoConfigureOllama: protectedProcedure.mutation(async ({ ctx }) => {
 		return await ollamaService.autoConfigure()
+	}),
+
+	// 活跃模型相关路由
+	setActiveModel: protectedProcedure
+		.input(
+			z.object({
+				modelName: z.string(),
+				modelSize: z.number().optional(),
+				baseUrl: z.string().optional(),
+			}),
+		)
+		.mutation(async ({ input, ctx }) => {
+			return await activeModelService.setActiveModel(ctx.userId, {
+				modelName: input.modelName,
+				modelSize: input.modelSize,
+				baseUrl: input.baseUrl,
+			})
+		}),
+
+	getActiveModel: protectedProcedure.query(async ({ ctx }) => {
+		return await activeModelService.getActiveModel(ctx.userId)
+	}),
+
+	clearActiveModel: protectedProcedure.mutation(async ({ ctx }) => {
+		await activeModelService.clearActiveModel(ctx.userId)
+		return { success: true }
+	}),
+
+	getActiveAIConfig: protectedProcedure.query(async ({ ctx }) => {
+		return await activeModelService.getActiveAIConfig(ctx.userId)
 	}),
 })

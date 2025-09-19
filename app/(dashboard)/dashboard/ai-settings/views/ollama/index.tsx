@@ -6,6 +6,7 @@ import { QuickConfigCard } from './components/quick-config-card'
 import { useOllamaService } from './hooks/use-ollama-service'
 import { useModelDownload } from './hooks/use-model-download'
 import { useOllamaConfig } from './hooks/use-ollama-config'
+import { useActiveModel } from './hooks/use-active-model'
 import type {
 	OllamaServiceManagerProps,
 	OllamaConfig,
@@ -15,12 +16,22 @@ export function OllamaServiceManager({
 	onConfigChange,
 }: OllamaServiceManagerProps) {
 	const ollamaService = useOllamaService()
-	console.log('serviceInfo:', ollamaService.serviceInfo)
 	const modelDownload = useModelDownload()
 	const ollamaConfig = useOllamaConfig()
+	const { activeModel, setActiveModelMutation } = useActiveModel()
 
 	const handleConfigChange = (config: OllamaConfig) => {
 		onConfigChange?.(config)
+	}
+
+	const handleSetActiveModel = async (
+		modelName: string,
+		modelSize?: number,
+	) => {
+		await setActiveModelMutation.mutateAsync({
+			modelName,
+			modelSize,
+		})
 	}
 
 	return (
@@ -29,6 +40,7 @@ export function OllamaServiceManager({
 				serviceInfo={ollamaService.serviceInfo}
 				isLoading={ollamaService.isLoading}
 				error={ollamaService.error}
+				activeModel={activeModel}
 				onRefresh={ollamaService.refetch}
 			/>
 
@@ -36,8 +48,10 @@ export function OllamaServiceManager({
 				serviceInfo={ollamaService.serviceInfo}
 				isDownloading={modelDownload.isDownloading}
 				progress={modelDownload.progress}
+				activeModel={activeModel}
 				onDownloadModel={modelDownload.downloadModel}
 				onCancelDownload={modelDownload.cancelDownload}
+				onSetActiveModel={handleSetActiveModel}
 			/>
 
 			<QuickConfigCard

@@ -6,15 +6,24 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Server, Cpu, RefreshCw, CheckCircle, XCircle } from 'lucide-react'
+import {
+	Server,
+	Cpu,
+	RefreshCw,
+	CheckCircle,
+	XCircle,
+	Star,
+} from 'lucide-react'
 import { StatusBadge } from './ui/status-badge'
 import { ErrorAlert } from './ui/error-alert'
+import { formatModelSize } from '@/lib/utils/model-size'
 import type { ServiceStatusCardProps } from '../types/ollama.types'
 
 export function ServiceStatusCard({
 	serviceInfo,
 	isLoading,
 	error,
+	activeModel,
 	onRefresh,
 }: ServiceStatusCardProps) {
 	const getStatusIcon = (isAvailable: boolean) => {
@@ -73,6 +82,29 @@ export function ServiceStatusCard({
 									{serviceInfo.systemInfo.gpu}
 								</div>
 							)}
+						</div>
+					</div>
+				)}
+
+				{/* 活跃模型信息 */}
+				{activeModel && (
+					<div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+						<div className="flex items-center gap-2 mb-2">
+							<Star className="h-4 w-4 text-green-600" />
+							<span className="font-medium text-green-800 dark:text-green-200">
+								当前活跃模型
+							</span>
+						</div>
+						<div className="ml-6">
+							<p className="font-medium">{activeModel.modelName}</p>
+							{activeModel.modelSize && (
+								<p className="text-sm text-muted-foreground">
+									大小: {formatModelSize(activeModel.modelSize)}
+								</p>
+							)}
+							<p className="text-xs text-muted-foreground mt-1">
+								更新时间: {new Date(activeModel.updatedAt).toLocaleString()}
+							</p>
 						</div>
 					</div>
 				)}

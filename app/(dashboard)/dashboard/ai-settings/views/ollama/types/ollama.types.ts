@@ -1,3 +1,21 @@
+// 活跃模型配置
+export interface ActiveModelConfig {
+	id: string
+	userId: string
+	modelName: string
+	modelSize?: number
+	modelType: string
+	baseUrl?: string
+	createdAt: Date
+	updatedAt: Date
+}
+
+export interface SetActiveModelRequest {
+	modelName: string
+	modelSize?: number
+	baseUrl?: string
+}
+
 // Ollama 服务状态
 export interface OllamaServiceStatus {
 	isAvailable: boolean
@@ -65,6 +83,7 @@ export interface ServiceStatusCardProps {
 	serviceInfo: OllamaServiceStatus | null
 	isLoading: boolean
 	error: string | null
+	activeModel: ActiveModelConfig | null
 	onRefresh: () => void
 }
 
@@ -72,8 +91,10 @@ export interface ModelManagementCardProps {
 	serviceInfo: OllamaServiceStatus | null
 	isDownloading: boolean
 	progress: PullProgress | null
+	activeModel: ActiveModelConfig | null
 	onDownloadModel: (modelName: string) => Promise<void>
 	onCancelDownload: () => void
+	onSetActiveModel: (modelName: string, modelSize?: number) => Promise<void>
 }
 
 export interface QuickConfigCardProps {

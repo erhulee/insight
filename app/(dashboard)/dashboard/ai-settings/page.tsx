@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAISettings } from './hooks/use-ai-settings'
 
 import Useage from './views/useage'
-import { ConnectionStatusCard } from './views/connect-status'
+import { ConnectStatusPage } from './views/connect-status/connect-status-page'
 import { AIServiceConfigManager } from './views/config'
 import { OllamaServiceManager } from './views/ollama'
 
@@ -62,12 +62,7 @@ export default function AISettingsPage() {
 
 						{/* 连接状态标签页 */}
 						<TabsContent value="status" className="space-y-6">
-							<ConnectionStatusCard
-								activeConfig={activeConfig || null}
-								isTesting={isTesting}
-								testResult={testResult}
-								onTestConnection={handleTestConnection}
-							/>
+							<ConnectStatusPage />
 						</TabsContent>
 
 						{/* 使用说明标签页 */}
