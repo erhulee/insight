@@ -1,7 +1,7 @@
 'use client'
 
 import { useAIConfigManager } from '@/hooks/ai-config'
-import { AIConfigList, AIConfigDialog } from './ai-config'
+import { AIConfigDialog, AIConfigList } from '../../components/ai-config'
 
 interface AIServiceConfigManagerProps {
 	onConfigChange?: () => void

@@ -16,7 +16,7 @@ import {
 	TestTube,
 	Sparkles,
 } from 'lucide-react'
-import type { TestResult } from '../hooks/use-ai-settings'
+import { TestResult } from '@/hooks/ai-config'
 
 interface AIConfig {
 	id: string
