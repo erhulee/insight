@@ -137,8 +137,6 @@ export const selectQuestion = (question: QuestionSchemaType) => {
 export const addQuestion = (question: QuestionSchemaType) => {
 	setState((prev) => {
 		const newQuestion = normalizeQuestion(question, prev.currentPage)
-		console.log('addQuestion setState', prev, question, newQuestion)
-
 		const questions = [...prev.questions, newQuestion]
 		const { currentQuestion, selectedQuestionID } = deriveAllQuestions(
 			questions,

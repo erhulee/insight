@@ -105,7 +105,7 @@ export function SurveyClient({ survey }: SurveyClientProps) {
 	// 提交问卷
 	const handleSubmit = () => {
 		if (validateCurrentQuestion()) {
-			console.log('提交答案:', answers)
+			'提交答案:', answers
 			// TODO: 实际开发时调用API提交答案
 			alert('问卷提交成功！')
 		}

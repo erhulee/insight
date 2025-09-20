@@ -14,11 +14,13 @@ model User {
   username String
   password String
 
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  ApiKey             ApiKey[]
-  aiConfigs          AIConfig[]
-  activeModelConfigs ActiveModelConfig[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  ApiKey               ApiKey[]
+  aiConfigs            AIConfig[]
+  activeModelConfigs   ActiveModelConfig[]
+  conversationSessions ConversationSession[]
+  generatedSurveys     GeneratedSurvey[]
 }
 
 model Survey {
@@ -183,4 +185,64 @@ model ActiveModelConfig {
 
   @@unique([userId, modelType])
   @@map("active_model_config")
+}
+
+// 对话会话表
+model ConversationSession {
+  id        String   @id @default(uuid())
+  userId    String?
+  sessionId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联关系
+  user            User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages        ConversationMessage[]
+  GeneratedSurvey GeneratedSurvey[]
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("conversation_sessions")
+}
+
+// 新增：对话消息表
+model ConversationMessage {
+  id          String   @id @default(uuid())
+  sessionId   String
+  messageId   String
+  type        String // user, ai
+  content     String
+  metadata    Json     @default("{}")
+  suggestions Json     @default("[]")
+  createdAt   DateTime @default(now())
+
+  // 关联关系
+  session ConversationSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("conversation_messages")
+}
+
+// 新增：生成的问卷表
+model GeneratedSurvey {
+  id                 String   @id @default(uuid())
+  sessionId          String
+  userId             String?
+  title              String
+  description        String?
+  questions          Json
+  prompt             String
+  aiProvider         String
+  modelName          String
+  generationMetadata Json     @default("{}")
+  createdAt          DateTime @default(now())
+
+  // 关联关系
+  session ConversationSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  user    User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("generated_surveys")
 }

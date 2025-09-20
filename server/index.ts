@@ -6,11 +6,33 @@ import { userService, templateService, aiConfigService } from './services'
 import { surveyRouter } from './router/survey'
 import { aiConfigRouter } from './router/ai-config'
 import { AIRouter } from './router/ai'
+import { conversationRouter } from './router/conversation'
+import { aiConversationRouter } from './router/ai-conversation'
+import { conversationHistoryRouter } from './router/conversation-history'
+import { initializeConversationServices } from './services/conversation'
+import { activeModelService } from './services/ai/active-model'
+import { PrismaClient } from '@prisma/client'
+import { Redis } from 'ioredis'
+
+// 初始化对话服务
+const prisma = new PrismaClient()
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+
+// 初始化对话相关服务
+try {
+	initializeConversationServices(prisma, redis, 'ollama', {})
+	console.log('对话服务初始化成功')
+} catch (error) {
+	console.error('对话服务初始化失败:', error)
+}
 
 export const appRouter = router({
 	surver: surveyRouter,
 	aiConfig: aiConfigRouter,
 	ai: AIRouter,
+	conversation: conversationRouter,
+	aiConversation: aiConversationRouter,
+	conversationHistory: conversationHistoryRouter,
 	// 用户相关路由
 	Register: procedure
 		.input(
@@ -232,8 +254,8 @@ export const appRouter = router({
 		.input(z.object({ prompt: z.string() }))
 		.mutation(async (opt) => {
 			try {
-				// 获取用户的活跃配置
-				const activeConfig = await aiConfigService.getActiveConfig(
+				// 获取用户的活跃配置（包含真实API密钥）
+				const activeConfig = await activeModelService.getActiveAIConfig(
 					opt.ctx.userId,
 				)
 				if (!activeConfig) {

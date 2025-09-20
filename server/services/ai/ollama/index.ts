@@ -162,7 +162,6 @@ class OllamaService {
 		try {
 			const list = await ollama.list()
 			const models = (list.models || []) as OllamaModel[]
-			console.log('models:', models)
 			this.setCache(cacheKey, models, 60000)
 			return models
 		} catch (error) {
