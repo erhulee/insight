@@ -10,9 +10,10 @@ export function MessageList({
 	messages,
 	isLoading,
 	onSuggestionClick,
-}: MessageListProps) {
+	className = '',
+}: MessageListProps & { className?: string }) {
 	return (
-		<div className="space-y-4">
+		<div className={className}>
 			{messages.map((message) => (
 				<div
 					key={message.id}

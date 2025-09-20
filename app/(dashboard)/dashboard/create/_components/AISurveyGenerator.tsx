@@ -10,6 +10,8 @@ import {
 	Sparkles,
 	ArrowRight,
 	History,
+	PanelRightOpen,
+	PanelRightClose,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { trpc } from '@/app/_trpc/client'
@@ -22,8 +24,14 @@ import { TraditionalMode, SurveyPreview } from './traditional'
 import { GeneratedSurvey } from './types/conversation'
 import { useOptimizedConversation } from './hooks/useOptimizedConversation'
 import { ConversationHistory } from './history/ConversationHistory'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export function AISurveyGenerator() {
+	const [isSideBarOpen, setIsSideBarOpen] = useState(false)
 	// 模式状态
 	const [mode, setMode] = useState<'traditional' | 'conversation' | 'history'>(
 		'conversation',
@@ -130,7 +138,6 @@ export function AISurveyGenerator() {
 			setIsGenerating(false)
 		}
 	}
-
 	// 编辑历史会话
 	const handleEditSession = (targetSessionId: string) => {
 		// 切换到对话模式
@@ -144,94 +151,77 @@ export function AISurveyGenerator() {
 		<div className="w-full space-y-6">
 			<Card>
 				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<Sparkles className="h-6 w-6 text-primary" />
-						AI 问卷生成器
+					<CardTitle className="flex items-center justify-between ">
+						<div className=" flex flex-row items-center gap-2">
+							<Sparkles className="h-6 w-6 text-primary" />
+							AI 问卷生成器
+						</div>
+						<Tooltip>
+							<TooltipTrigger>
+								{isSideBarOpen ? (
+									<PanelRightClose
+										onClick={() => setIsSideBarOpen(!isSideBarOpen)}
+									></PanelRightClose>
+								) : (
+									<PanelRightOpen
+										onClick={() => setIsSideBarOpen(!isSideBarOpen)}
+									></PanelRightOpen>
+								)}
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>{isSideBarOpen ? '关闭状态面板' : '打开状态面板'}</p>
+							</TooltipContent>
+						</Tooltip>
 					</CardTitle>
 				</CardHeader>
-				<CardContent>
-					<Tabs
-						value={mode}
-						onValueChange={(value) =>
-							setMode(value as 'traditional' | 'conversation' | 'history')
-						}
-					>
-						<TabsList className="grid w-full grid-cols-2">
-							<TabsTrigger
-								value="traditional"
-								className="flex items-center gap-2"
-							>
-								<FileText className="h-4 w-4" />
-								传统模式
-							</TabsTrigger>
-							<TabsTrigger
-								value="conversation"
-								className="flex items-center gap-2"
-							>
-								<MessageCircle className="h-4 w-4" />
-								对话模式
-							</TabsTrigger>
-						</TabsList>
+				<CardContent className="flex flex-row gap-4">
+					{/* 对话区域 */}
+					<div className="w-full">
+						<ConversationPanel
+							sessionId={sessionId}
+							messages={messages}
+							isLoading={isLoading}
+							onSendMessage={sendMessage}
+							onSuggestionClick={handleSuggestionClick}
+							onReset={resetConversation}
+							inputValue={inputValue}
+							onInputChange={onInputChange}
+						/>
+					</div>
 
-						<TabsContent value="traditional" className="space-y-4">
-							<TraditionalMode
-								prompt={prompt}
-								onPromptChange={setPrompt}
-								onGenerate={handleGenerateSurvey}
-								isGenerating={isGenerating}
+					{/* 状态面板 */}
+					{isSideBarOpen && (
+						<div className="space-y-4 w-1/3">
+							<ConversationHistory
+								onSelectSession={handleEditSession}
+							></ConversationHistory>
+							<ConversationState
+								state={conversationState}
+								collectedInfo={conversationState.collectedInfo}
 							/>
-						</TabsContent>
-
-						<TabsContent value="conversation" className="space-y-4">
-							<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-								{/* 对话区域 */}
-								<div className="lg:col-span-2 space-y-4">
-									<ConversationPanel
-										sessionId={sessionId}
-										messages={messages}
-										isLoading={isLoading}
-										onSendMessage={sendMessage}
-										onSuggestionClick={handleSuggestionClick}
-										onReset={resetConversation}
-										inputValue={inputValue}
-										onInputChange={onInputChange}
-									/>
-								</div>
-
-								{/* 状态面板 */}
-								<div className="space-y-4">
-									<ConversationHistory
-										onSelectSession={handleEditSession}
-									></ConversationHistory>
-									<ConversationState
-										state={conversationState}
-										collectedInfo={conversationState.collectedInfo}
-									/>
-									{conversationState.phase === 'complete' && (
-										<Card>
-											<CardContent className="pt-6">
-												<Button
-													className="w-full"
-													size="lg"
-													onClick={handleGenerateConversationSurvey}
-													disabled={
-														isGenerating ||
-														generateConversationSurveyMutation.isPending
-													}
-												>
-													<ArrowRight className="h-4 w-4 mr-2" />
-													{isGenerating ||
-													generateConversationSurveyMutation.isPending
-														? '生成中...'
-														: '生成问卷'}
-												</Button>
-											</CardContent>
-										</Card>
-									)}
-								</div>
-							</div>
-						</TabsContent>
-					</Tabs>
+							{conversationState.phase === 'complete' && (
+								<Card>
+									<CardContent className="pt-6">
+										<Button
+											className="w-full"
+											size="lg"
+											onClick={handleGenerateConversationSurvey}
+											disabled={
+												isGenerating ||
+												generateConversationSurveyMutation.isPending
+											}
+										>
+											<ArrowRight className="h-4 w-4 mr-2" />
+											{isGenerating ||
+											generateConversationSurveyMutation.isPending
+												? '生成中...'
+												: '生成问卷'}
+										</Button>
+									</CardContent>
+								</Card>
+							)}
+						</div>
+					)}
 				</CardContent>
 			</Card>
 

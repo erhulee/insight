@@ -197,14 +197,16 @@ export const conversationRouter = router({
 			}
 		}),
 
-	// 获取会话状态
+	// 获取会话状态（包含消息）
 	getSession: protectedProcedure
 		.input(z.object({ sessionId: z.string() }))
 		.query(async ({ input, ctx }) => {
 			debugger
 			try {
 				const conversationService = getConversationService()
-				const session = await conversationService.getSession(input.sessionId)
+				const session = await conversationService.getSessionDetail(
+					input.sessionId,
+				)
 
 				if (!session) {
 					throw new Error('会话不存在')
@@ -240,9 +242,7 @@ export const conversationRouter = router({
 
 				const stats = {
 					messageCount: messages.length,
-					duration: session.completedAt
-						? session.completedAt.getTime() - session.createdAt.getTime()
-						: Date.now() - session.createdAt.getTime(),
+					duration: Date.now() - session.createdAt.getTime(),
 					phase: session.state.phase,
 					progress: session.state.progress,
 					completionRate: session.state.progress,

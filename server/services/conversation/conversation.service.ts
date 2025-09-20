@@ -107,6 +107,7 @@ export class ConversationService {
 				messageId: this.generateMessageId(),
 				type: 'user',
 				content,
+				suggestions: [],
 				metadata: {},
 			},
 		})
@@ -127,13 +128,10 @@ export class ConversationService {
 				messageId: this.generateMessageId(),
 				type: 'ai',
 				content: aiResponse.content,
-				suggestions: aiResponse.suggestions,
+				suggestions: aiResponse.suggestions || [],
 				metadata: aiResponse.metadata || {},
 			},
 		})
-
-		// 不再需要更新会话状态，因为字段已删除
-
 		return {
 			userMessage,
 			aiMessage,
@@ -305,6 +303,63 @@ export class ConversationService {
 		}
 
 		return null
+	}
+
+	/**
+	 * 获取会话详情，包含所有消息
+	 */
+	async getSessionDetail(
+		sessionId: string,
+	): Promise<ConversationSession | null> {
+		// 先检查缓存
+		const cached = await this.cache.getSession(sessionId)
+		if (cached) {
+			// 如果缓存中有消息，直接返回
+			if (cached.messages && cached.messages.length > 0) {
+				return cached
+			}
+		}
+
+		// 从数据库获取会话和消息
+		const dbSession = await this.prisma.conversationSession.findUnique({
+			where: { sessionId },
+			include: {
+				messages: {
+					orderBy: { createdAt: 'asc' },
+				},
+			},
+		})
+
+		if (!dbSession) {
+			return null
+		}
+
+		// 转换为Message格式
+		const messages: Message[] = dbSession.messages.map((msg) => ({
+			id: msg.messageId,
+			type: msg.type as 'user' | 'ai',
+			content: msg.content,
+			timestamp: msg.createdAt,
+			suggestions: Array.isArray(msg.suggestions)
+				? (msg.suggestions as string[])
+				: undefined,
+		}))
+
+		// 转换为ConversationSession格式
+		const session: ConversationSession = {
+			id: dbSession.id,
+			sessionId: dbSession.sessionId,
+			userId: dbSession.userId!,
+			state: createInitialConversationState(),
+			messages,
+			createdAt: dbSession.createdAt,
+			updatedAt: dbSession.updatedAt,
+		}
+
+		// 缓存会话（包含消息）
+		await this.cache.cacheSession(sessionId, session)
+
+		return session
 	}
 
 	private async getRecentMessages(

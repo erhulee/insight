@@ -13,6 +13,7 @@ export function useOptimizedConversation() {
 	const [sessionId, setSessionId] = useState<string | null>(null)
 	const [inputValue, setInputValue] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
+	const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([])
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
 	// Conversation Router - 会话状态管理
@@ -23,12 +24,15 @@ export function useOptimizedConversation() {
 	)
 	const resetSessionMutation = trpc.conversation.resetConversation.useMutation()
 
-	// 派生状态 - 从 useQuery 数据中获取
-	const messages: Message[] =
+	// 派生状态 - 从 useQuery 数据中获取，合并乐观更新
+	const serverMessages: Message[] =
 		getSessionQuery.data?.messages?.map((msg: any) => ({
 			...msg,
 			timestamp: new Date(msg.timestamp),
 		})) || []
+
+	// 合并服务器消息和乐观更新消息
+	const messages: Message[] = [...serverMessages, ...optimisticMessages]
 
 	const conversationState: ConversationState =
 		getSessionQuery.data?.state || createInitialConversationState()
@@ -80,19 +84,37 @@ export function useOptimizedConversation() {
 				session_id = session.id
 			}
 			console.log('sessionId:', session_id)
+
 			// 清空输入框
 			setInputValue('')
 
-			// 调用AI对话API - 服务端会自动处理状态更新和历史消息
+			// 乐观更新：立即添加用户消息到本地状态
+			const userMessage: Message = {
+				id: `temp_${Date.now()}`,
+				type: 'user',
+				content,
+				timestamp: new Date(),
+				suggestions: [],
+			}
+
+			// 立即显示用户消息
+			setOptimisticMessages([userMessage])
+
+			// 调用AI对话API
 			await aiChatMutation.mutateAsync({
 				sessionId: session_id!,
 				message: content,
 			})
 
-			// 数据会自动通过 useQuery 更新，无需手动设置本地状态
+			// 成功后清除乐观更新消息，让服务器数据覆盖
+			setOptimisticMessages([])
+			// 刷新服务器数据
+			await getSessionQuery.refetch()
 		} catch (error) {
 			console.error('发送消息失败:', error)
 			toast.error('发送消息失败')
+			// 失败时清除乐观更新消息
+			setOptimisticMessages([])
 		} finally {
 			setIsLoading(false)
 		}

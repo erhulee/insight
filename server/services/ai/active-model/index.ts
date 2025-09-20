@@ -62,7 +62,13 @@ export class ActiveModelService {
 			},
 		})
 
-		return activeConfig
+		// 转换 BigInt 为字符串，避免 JSON 序列化错误
+		return {
+			...activeConfig,
+			modelSize: activeConfig.modelSize
+				? activeConfig.modelSize.toString()
+				: null,
+		} as any
 	}
 
 	/**
@@ -78,10 +84,18 @@ export class ActiveModelService {
 					},
 				},
 			})
+			console.log('[debug] activeConfig', activeConfig)
 			if (!activeConfig) {
 				return null
 			}
-			return activeConfig
+
+			// 转换 BigInt 为字符串，避免 JSON 序列化错误
+			return {
+				...activeConfig,
+				modelSize: activeConfig.modelSize
+					? activeConfig.modelSize.toString()
+					: null,
+			} as any
 		} catch (error) {
 			console.error('getActiveModel error', error)
 			return null
@@ -121,11 +135,13 @@ export class ActiveModelService {
 				baseUrl: activeModel.baseUrl || 'http://localhost:11434',
 				apiKey: '', // ollama 不需要 API 密钥
 				model: activeModel.modelName,
-				modelSize: activeModel.modelSize,
+				modelSize: activeModel.modelSize
+					? activeModel.modelSize.toString()
+					: null,
 				isActive: true,
 				createdAt: activeModel.createdAt,
 				updatedAt: activeModel.updatedAt,
-			} as AIConfig
+			} as any
 		}
 
 		// 其他类型的模型（如 OpenAI、Anthropic 等）需要查询 aIConfig 表
